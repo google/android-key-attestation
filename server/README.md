@@ -11,6 +11,7 @@ Introduction
 ------------
 
 This example demonstrates the following tasks:
+
 1. Loading the certificates from [PEM][2]-encoded strings.
 1. Verifying the [X.509][3] certificate chain, up to the root. Note that this example
    does NOT require the root certificate to appear within Google's list of
@@ -49,7 +50,7 @@ Getting Started
 This sample uses the Gradle build system. To build this project, use the
 `gradlew build` command or use "Import Project" in IntelliJ or Android Studio.
  
-Run the main method in `KeyAttestationSample` directly or use the `gradlew run` task to execute
+Run the main method in `KeyAttestationExample` directly or use the `gradlew run` task to execute
 this sample.
 
 Support
@@ -59,7 +60,7 @@ Support
 - Stack Overflow: http://stackoverflow.com/questions/tagged/android
 
 If you've found an error in this sample, please file an issue:
-https://github.com/googlesamples/android-security-keyattestation
+https://github.com/googlesamples/android-key-attestation
 
 Patches are encouraged, and may be submitted by forking this project and
 submitting a pull request through GitHub. Please see CONTRIBUTING.md for more details.

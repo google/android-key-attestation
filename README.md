@@ -12,6 +12,8 @@ certificate's authenticity on a separate server that you trust.
 For more details, see the documentation and the guide at 
 https://developer.android.com/training/articles/security-key-attestation.html .
 
+[1]: https://www.bouncycastle.org/
+
 
 Getting Started
 ---------------
@@ -25,7 +27,7 @@ Support
 - Stack Overflow: http://stackoverflow.com/questions/tagged/android
 
 If you've found an error in this sample, please file an issue:
-https://github.com/googlesamples/android-security-keyattestation
+https://github.com/googlesamples/android-key-attestation
 
 Patches are encouraged, and may be submitted by forking this project and
 submitting a pull request through GitHub. Please see CONTRIBUTING.md for more details.
