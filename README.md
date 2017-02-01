@@ -7,7 +7,7 @@ generated in an Android device.
 
 This repository contains a [server](server/) sample that shows how to attest an Android certificate
 outside the Android framework. This is the recommended best practice, since if the Android device
-is rooted or otherwise compromised, on-device validation of the attestation may be inaccurate.
+is rooted or otherwise compromised on-device validation of the attestation may be inaccurate.
 
 For more details, see the documentation and the guide at 
 https://developer.android.com/training/articles/security-key-attestation.html .
