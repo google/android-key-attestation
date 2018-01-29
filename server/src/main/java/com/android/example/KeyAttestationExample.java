@@ -414,7 +414,7 @@ public class KeyAttestationExample {
             CertificateException, NoSuchAlgorithmException,
             InvalidKeyException, NoSuchProviderException,
             SignatureException {
-        for (int i = 1; i < certs.length; ++i) {
+        for (int i = 0; i < certs.length; ++i) {
             // Verify that the certificate has not expired.
             certs[i].checkValidity();
             if (i > 0) {
