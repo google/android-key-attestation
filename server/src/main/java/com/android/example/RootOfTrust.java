@@ -1,0 +1,88 @@
+/* Copyright 2019, The Android Open Source Project, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.android.example;
+
+import static com.android.example.ASN1Parsing.getBooleanFromAsn1;
+import static com.android.example.ASN1Parsing.getIntegerFromAsn1;
+import static com.android.example.Constants.KM_VERIFIED_BOOT_STATE_FAILED;
+import static com.android.example.Constants.KM_VERIFIED_BOOT_STATE_SELF_SIGNED;
+import static com.android.example.Constants.KM_VERIFIED_BOOT_STATE_UNVERIFIED;
+import static com.android.example.Constants.KM_VERIFIED_BOOT_STATE_VERIFIED;
+import static com.android.example.Constants.ROOT_OF_TRUST_DEVICE_LOCKED_INDEX;
+import static com.android.example.Constants.ROOT_OF_TRUST_VERIFIED_BOOT_HASH_INDEX;
+import static com.android.example.Constants.ROOT_OF_TRUST_VERIFIED_BOOT_KEY_INDEX;
+import static com.android.example.Constants.ROOT_OF_TRUST_VERIFIED_BOOT_STATE_INDEX;
+
+import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.ASN1Sequence;
+
+/**
+ * This collection of values defines key information about the device's status.
+ */
+class RootOfTrust {
+
+  final byte[] verifiedBootKey;
+  final boolean deviceLocked;
+  final VerifiedBootState verifiedBootState;
+  final byte[] verifiedBootHash;
+
+  private RootOfTrust(ASN1Sequence rootOfTrust) {
+    this.verifiedBootKey =
+        ((ASN1OctetString) rootOfTrust.getObjectAt(ROOT_OF_TRUST_VERIFIED_BOOT_KEY_INDEX))
+            .getOctets();
+    this.deviceLocked =
+        getBooleanFromAsn1(rootOfTrust.getObjectAt(ROOT_OF_TRUST_DEVICE_LOCKED_INDEX));
+    this.verifiedBootState =
+        rootOfTrustToEnum(
+            getIntegerFromAsn1(rootOfTrust.getObjectAt(ROOT_OF_TRUST_VERIFIED_BOOT_STATE_INDEX)));
+    this.verifiedBootHash =
+        ((ASN1OctetString) rootOfTrust.getObjectAt(ROOT_OF_TRUST_VERIFIED_BOOT_HASH_INDEX))
+            .getOctets();
+  }
+
+  static RootOfTrust createRootOfTrust(ASN1Sequence rootOfTrust) {
+    if (rootOfTrust == null) {
+      return null;
+    }
+    return new RootOfTrust(rootOfTrust);
+  }
+
+  private static VerifiedBootState rootOfTrustToEnum(int securityLevel) {
+    switch (securityLevel) {
+      case KM_VERIFIED_BOOT_STATE_VERIFIED:
+        return VerifiedBootState.VERIFIED;
+      case KM_VERIFIED_BOOT_STATE_SELF_SIGNED:
+        return VerifiedBootState.SELFSIGNED;
+      case KM_VERIFIED_BOOT_STATE_UNVERIFIED:
+        return VerifiedBootState.UNVERIFIED;
+      case KM_VERIFIED_BOOT_STATE_FAILED:
+        return VerifiedBootState.FAILED;
+      default:
+        throw new IllegalArgumentException("Invalid verified boot state.");
+    }
+  }
+
+  /**
+   * This provides the device's current boot state, which represents the level of protection
+   * provided to the user and to apps after the device finishes booting.
+   */
+  enum VerifiedBootState {
+    VERIFIED,
+    SELFSIGNED,
+    UNVERIFIED,
+    FAILED
+  }
+}
