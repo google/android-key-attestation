@@ -71,7 +71,7 @@ import org.bouncycastle.util.encoders.Base64;
 public class KeyAttestationExample {
 
 
-  private static final String CERT_FILES_DIR = "examples/key_EC_StrongBox_off";
+  private static final String CERT_FILES_DIR = "examples/pem/key_EC_StrongBox_off";
 
   public static void main(String[] args)
       throws CertificateException, IOException, NoSuchProviderException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
@@ -243,7 +243,7 @@ public class KeyAttestationExample {
 
   private static X509Certificate[] loadCertificates(String certFilesDir)
       throws CertificateException, IOException {
-    // Load the attestation certificates from files.
+    // Load the attestation certificates from the directory.
     List<Path> records =
         Files.walk(Paths.get(certFilesDir))
             .filter(Files::isRegularFile)
