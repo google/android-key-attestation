@@ -48,8 +48,7 @@ class ParsedAttestationRecord {
   final AuthorizationList softwareEnforced;
   final AuthorizationList teeEnforced;
 
-  ParsedAttestationRecord(X509Certificate cert) throws IOException {
-    ASN1Sequence extensionData = extractAttestationSequence(cert);
+  private ParsedAttestationRecord(ASN1Sequence extensionData) {
     this.attestationVersion =
         ASN1Parsing.getIntegerFromAsn1(extensionData.getObjectAt(ATTESTATION_VERSION_INDEX));
     this.attestationSecurityLevel =
@@ -71,6 +70,12 @@ class ParsedAttestationRecord {
     this.teeEnforced =
         AuthorizationList.createAuthorizationList(
             ((ASN1Sequence) extensionData.getObjectAt(TEE_ENFORCED_INDEX)).toArray());
+  }
+
+  static ParsedAttestationRecord createParsedAttestationRecord(X509Certificate cert)
+      throws IOException {
+    ASN1Sequence extensionData = extractAttestationSequence(cert);
+    return new ParsedAttestationRecord(extensionData);
   }
 
   private static SecurityLevel securityLevelToEnum(int securityLevel) {

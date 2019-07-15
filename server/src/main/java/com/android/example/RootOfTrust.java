@@ -15,8 +15,6 @@
 
 package com.android.example;
 
-import static com.android.example.ASN1Parsing.getBooleanFromAsn1;
-import static com.android.example.ASN1Parsing.getIntegerFromAsn1;
 import static com.android.example.Constants.KM_VERIFIED_BOOT_STATE_FAILED;
 import static com.android.example.Constants.KM_VERIFIED_BOOT_STATE_SELF_SIGNED;
 import static com.android.example.Constants.KM_VERIFIED_BOOT_STATE_UNVERIFIED;
@@ -44,10 +42,10 @@ class RootOfTrust {
         ((ASN1OctetString) rootOfTrust.getObjectAt(ROOT_OF_TRUST_VERIFIED_BOOT_KEY_INDEX))
             .getOctets();
     this.deviceLocked =
-        getBooleanFromAsn1(rootOfTrust.getObjectAt(ROOT_OF_TRUST_DEVICE_LOCKED_INDEX));
+        ASN1Parsing.getBooleanFromAsn1(rootOfTrust.getObjectAt(ROOT_OF_TRUST_DEVICE_LOCKED_INDEX));
     this.verifiedBootState =
         rootOfTrustToEnum(
-            getIntegerFromAsn1(rootOfTrust.getObjectAt(ROOT_OF_TRUST_VERIFIED_BOOT_STATE_INDEX)));
+            ASN1Parsing.getIntegerFromAsn1(rootOfTrust.getObjectAt(ROOT_OF_TRUST_VERIFIED_BOOT_STATE_INDEX)));
     this.verifiedBootHash =
         ((ASN1OctetString) rootOfTrust.getObjectAt(ROOT_OF_TRUST_VERIFIED_BOOT_HASH_INDEX))
             .getOctets();

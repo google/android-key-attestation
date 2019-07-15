@@ -159,8 +159,8 @@ class AuthorizationList {
     this.rootOfTrust =
         Optional.ofNullable(
             RootOfTrust.createRootOfTrust(
-                ((ASN1Sequence)
-                    findAuthorizationListEntry(authorizationMap, KM_TAG_ROOT_OF_TRUST))));
+                (ASN1Sequence)
+                    findAuthorizationListEntry(authorizationMap, KM_TAG_ROOT_OF_TRUST)));
     this.osVersion =
         findOptionalIntegerAuthorizationListEntry(authorizationMap, (KM_TAG_OS_VERSION));
     this.osPatchLevel =
