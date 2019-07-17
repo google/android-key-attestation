@@ -13,11 +13,11 @@
  * limitations under the License.
  */
 
-package com.android.example;
+package com.google.android.attestation;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import com.android.example.ParsedAttestationRecord.SecurityLevel;
+import com.google.android.attestation.ParsedAttestationRecord.SecurityLevel;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.cert.CertificateException;

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package com.android.example;
+package com.google.android.attestation;
 
 
 import static com.google.common.truth.Truth.assertThat;

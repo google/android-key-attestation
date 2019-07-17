@@ -13,16 +13,16 @@
  * limitations under the License.
  */
 
-package com.android.example;
+package com.google.android.attestation;
 
-import static com.android.example.Constants.KM_VERIFIED_BOOT_STATE_FAILED;
-import static com.android.example.Constants.KM_VERIFIED_BOOT_STATE_SELF_SIGNED;
-import static com.android.example.Constants.KM_VERIFIED_BOOT_STATE_UNVERIFIED;
-import static com.android.example.Constants.KM_VERIFIED_BOOT_STATE_VERIFIED;
-import static com.android.example.Constants.ROOT_OF_TRUST_DEVICE_LOCKED_INDEX;
-import static com.android.example.Constants.ROOT_OF_TRUST_VERIFIED_BOOT_HASH_INDEX;
-import static com.android.example.Constants.ROOT_OF_TRUST_VERIFIED_BOOT_KEY_INDEX;
-import static com.android.example.Constants.ROOT_OF_TRUST_VERIFIED_BOOT_STATE_INDEX;
+import static com.google.android.attestation.Constants.KM_VERIFIED_BOOT_STATE_FAILED;
+import static com.google.android.attestation.Constants.KM_VERIFIED_BOOT_STATE_SELF_SIGNED;
+import static com.google.android.attestation.Constants.KM_VERIFIED_BOOT_STATE_UNVERIFIED;
+import static com.google.android.attestation.Constants.KM_VERIFIED_BOOT_STATE_VERIFIED;
+import static com.google.android.attestation.Constants.ROOT_OF_TRUST_DEVICE_LOCKED_INDEX;
+import static com.google.android.attestation.Constants.ROOT_OF_TRUST_VERIFIED_BOOT_HASH_INDEX;
+import static com.google.android.attestation.Constants.ROOT_OF_TRUST_VERIFIED_BOOT_KEY_INDEX;
+import static com.google.android.attestation.Constants.ROOT_OF_TRUST_VERIFIED_BOOT_STATE_INDEX;
 
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
@@ -30,12 +30,12 @@ import org.bouncycastle.asn1.ASN1Sequence;
 /**
  * This collection of values defines key information about the device's status.
  */
-class RootOfTrust {
+public class RootOfTrust {
 
-  final byte[] verifiedBootKey;
-  final boolean deviceLocked;
-  final VerifiedBootState verifiedBootState;
-  final byte[] verifiedBootHash;
+  public final byte[] verifiedBootKey;
+  public final boolean deviceLocked;
+  public final VerifiedBootState verifiedBootState;
+  public final byte[] verifiedBootHash;
 
   private RootOfTrust(ASN1Sequence rootOfTrust) {
     this.verifiedBootKey =
@@ -77,7 +77,7 @@ class RootOfTrust {
    * This provides the device's current boot state, which represents the level of protection
    * provided to the user and to apps after the device finishes booting.
    */
-  enum VerifiedBootState {
+  public enum VerifiedBootState {
     VERIFIED,
     SELFSIGNED,
     UNVERIFIED,

@@ -18,7 +18,7 @@ apply plugin: 'application'
 
 // Set the main class for for Gradle 'run' task.
 //noinspection GroovyUnusedAssignment
-mainClassName = 'KeyAttestationExample'
+mainClassName = 'com.android.example.KeyAttestationExample'
 
 repositories {
     mavenCentral()

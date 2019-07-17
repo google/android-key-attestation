@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 
-package com.android.example;
+package com.google.android.attestation;
 
 
 import static com.google.common.truth.Truth.assertThat;
 
-import com.android.example.RootOfTrust.VerifiedBootState;
+import com.google.android.attestation.RootOfTrust.VerifiedBootState;
 import com.google.common.truth.Truth;
 import java.io.IOException;
 import org.bouncycastle.asn1.ASN1Sequence;

@@ -15,10 +15,12 @@
 
 package com.android.example;
 
-import static com.android.example.Constants.GOOGLE_ROOT_CERTIFICATE;
-import static com.android.example.ParsedAttestationRecord.createParsedAttestationRecord;
-import static com.android.example.ParsedAttestationRecord.extractAttestationSequence;
+import static com.google.android.attestation.Constants.GOOGLE_ROOT_CERTIFICATE;
+import static com.google.android.attestation.ParsedAttestationRecord.createParsedAttestationRecord;
 
+import com.google.android.attestation.AuthorizationList;
+import com.google.android.attestation.ParsedAttestationRecord;
+import com.google.android.attestation.RootOfTrust;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -38,7 +40,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.util.encoders.Base64;
 
 /**
@@ -75,7 +76,8 @@ public class KeyAttestationExample {
   private static final String CERT_FILES_DIR = "examples/pem/algorithm_EC_SecurityLevel_StrongBox";
 
   public static void main(String[] args)
-      throws CertificateException, IOException, NoSuchProviderException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+      throws CertificateException, IOException, NoSuchProviderException, NoSuchAlgorithmException,
+      InvalidKeyException, SignatureException {
     X509Certificate[] certs;
     if (args.length == 1) {
       String certFilesDir = args[0];
@@ -85,14 +87,6 @@ public class KeyAttestationExample {
     }
 
     verifyCertificateChain(certs);
-
-    // Get the attestation extension data as an ASN.1 SEQUENCE.
-    ASN1Sequence extensionData = extractAttestationSequence(certs[0]);
-
-    // In the Bouncy Castle library, ASN.1 objects have reasonable
-    // toString() methods, so if you want to display a quick view of the
-    // key's characteristics, it's as easy as printing to a log.
-    System.out.println("Attestation contents: " + extensionData);
 
     ParsedAttestationRecord parsedAttestationRecord = createParsedAttestationRecord(certs[0]);
 

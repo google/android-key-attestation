@@ -13,20 +13,20 @@
  * limitations under the License.
  */
 
-package com.android.example;
+package com.google.android.attestation;
 
-import static com.android.example.Constants.ATTESTATION_CHALLENGE_INDEX;
-import static com.android.example.Constants.ATTESTATION_SECURITY_LEVEL_INDEX;
-import static com.android.example.Constants.ATTESTATION_VERSION_INDEX;
-import static com.android.example.Constants.KEYMASTER_SECURITY_LEVEL_INDEX;
-import static com.android.example.Constants.KEYMASTER_VERSION_INDEX;
-import static com.android.example.Constants.KEY_DESCRIPTION_OID;
-import static com.android.example.Constants.KM_SECURITY_LEVEL_SOFTWARE;
-import static com.android.example.Constants.KM_SECURITY_LEVEL_STRONG_BOX;
-import static com.android.example.Constants.KM_SECURITY_LEVEL_TRUSTED_ENVIRONMENT;
-import static com.android.example.Constants.SW_ENFORCED_INDEX;
-import static com.android.example.Constants.TEE_ENFORCED_INDEX;
-import static com.android.example.Constants.UNIQUE_ID_INDEX;
+import static com.google.android.attestation.Constants.ATTESTATION_CHALLENGE_INDEX;
+import static com.google.android.attestation.Constants.ATTESTATION_SECURITY_LEVEL_INDEX;
+import static com.google.android.attestation.Constants.ATTESTATION_VERSION_INDEX;
+import static com.google.android.attestation.Constants.KEYMASTER_SECURITY_LEVEL_INDEX;
+import static com.google.android.attestation.Constants.KEYMASTER_VERSION_INDEX;
+import static com.google.android.attestation.Constants.KEY_DESCRIPTION_OID;
+import static com.google.android.attestation.Constants.KM_SECURITY_LEVEL_SOFTWARE;
+import static com.google.android.attestation.Constants.KM_SECURITY_LEVEL_STRONG_BOX;
+import static com.google.android.attestation.Constants.KM_SECURITY_LEVEL_TRUSTED_ENVIRONMENT;
+import static com.google.android.attestation.Constants.SW_ENFORCED_INDEX;
+import static com.google.android.attestation.Constants.TEE_ENFORCED_INDEX;
+import static com.google.android.attestation.Constants.UNIQUE_ID_INDEX;
 
 import java.io.IOException;
 import java.security.cert.X509Certificate;
@@ -37,16 +37,16 @@ import org.bouncycastle.asn1.ASN1Sequence;
 /**
  * Java representation of Key Attestation extension data.
  */
-class ParsedAttestationRecord {
+public class ParsedAttestationRecord {
 
-  final int attestationVersion;
-  final SecurityLevel attestationSecurityLevel;
-  final int keymasterVersion;
-  final SecurityLevel keymasterSecurityLevel;
-  final byte[] attestationChallenge;
-  final byte[] uniqueId;
-  final AuthorizationList softwareEnforced;
-  final AuthorizationList teeEnforced;
+  public final int attestationVersion;
+  public final SecurityLevel attestationSecurityLevel;
+  public final int keymasterVersion;
+  public final SecurityLevel keymasterSecurityLevel;
+  public final byte[] attestationChallenge;
+  public final byte[] uniqueId;
+  public final AuthorizationList softwareEnforced;
+  public final AuthorizationList teeEnforced;
 
   private ParsedAttestationRecord(ASN1Sequence extensionData) {
     this.attestationVersion =
@@ -72,7 +72,7 @@ class ParsedAttestationRecord {
             ((ASN1Sequence) extensionData.getObjectAt(TEE_ENFORCED_INDEX)).toArray());
   }
 
-  static ParsedAttestationRecord createParsedAttestationRecord(X509Certificate cert)
+  public static ParsedAttestationRecord createParsedAttestationRecord(X509Certificate cert)
       throws IOException {
     ASN1Sequence extensionData = extractAttestationSequence(cert);
     return new ParsedAttestationRecord(extensionData);
@@ -91,7 +91,7 @@ class ParsedAttestationRecord {
     }
   }
 
-  static ASN1Sequence extractAttestationSequence(X509Certificate attestationCert)
+  private static ASN1Sequence extractAttestationSequence(X509Certificate attestationCert)
       throws IOException {
     byte[] attestationExtensionBytes = attestationCert.getExtensionValue(KEY_DESCRIPTION_OID);
     if (attestationExtensionBytes == null || attestationExtensionBytes.length == 0) {

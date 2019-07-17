@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 
-package com.android.example;
+package com.google.android.attestation;
 
 /**
  * Key Attestation constants
  */
-class Constants {
+public class Constants {
 
   static final String KEY_DESCRIPTION_OID = "1.3.6.1.4.1.11129.2.1.17";
 
@@ -91,7 +91,7 @@ class Constants {
   // certificate in a real attestation certificate chain from a compliant
   // device.
   // (Note, the sample chain used here is not signed with this certificate.)
-  static final String GOOGLE_ROOT_CERTIFICATE =
+  public static final String GOOGLE_ROOT_CERTIFICATE =
       "-----BEGIN CERTIFICATE-----\n"
           + "MIIFYDCCA0igAwIBAgIJAOj6GWMU0voYMA0GCSqGSIb3DQEBCwUAMBsxGTAXBgNV"
           + "BAUTEGY5MjAwOWU4NTNiNmIwNDUwHhcNMTYwNTI2MTYyODUyWhcNMjYwNTI0MTYy"
