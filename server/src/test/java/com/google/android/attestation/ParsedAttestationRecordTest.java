@@ -16,6 +16,7 @@
 package com.google.android.attestation;
 
 import static com.google.common.truth.Truth.assertThat;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.android.attestation.ParsedAttestationRecord.SecurityLevel;
 import java.io.ByteArrayInputStream;
@@ -27,9 +28,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-/**
- * Test for {@link ParsedAttestationRecord}.
- */
+/** Test for {@link ParsedAttestationRecord}. */
 @RunWith(JUnit4.class)
 public class ParsedAttestationRecordTest {
 
@@ -67,18 +66,28 @@ public class ParsedAttestationRecordTest {
           + "-----END CERTIFICATE-----";
 
   private static final int EXPECTED_ATTESTATION_VERSION = 3;
-  private static final SecurityLevel
-      EXPECTED_ATTESTATION_SECURITY_LEVEL = SecurityLevel.TRUSTED_ENVIRONMENT;
+  private static final SecurityLevel EXPECTED_ATTESTATION_SECURITY_LEVEL =
+      SecurityLevel.TRUSTED_ENVIRONMENT;
   private static final int EXPECTED_KEYMASTER_VERSION = 4;
-  private static final SecurityLevel EXPECTED_KEYMASTER_SECURITY_LEVEL = SecurityLevel.TRUSTED_ENVIRONMENT;
-  private static final byte[] EXPECTED_ATTESTATION_CHALLENGE = "abc".getBytes();
-  private static final byte[] EXPECTED_UNIQUE_ID = "".getBytes();
+  private static final SecurityLevel EXPECTED_KEYMASTER_SECURITY_LEVEL =
+      SecurityLevel.TRUSTED_ENVIRONMENT;
+  private static final byte[] EXPECTED_ATTESTATION_CHALLENGE = "abc".getBytes(UTF_8);
+  private static final byte[] EXPECTED_UNIQUE_ID = "".getBytes(UTF_8);
+
+  private static X509Certificate getAttestationRecord(String certStr) throws CertificateException {
+    CertificateFactory factory = CertificateFactory.getInstance("X509");
+    X509Certificate cert =
+        (X509Certificate)
+            factory.generateCertificate(new ByteArrayInputStream(certStr.getBytes(UTF_8)));
+    cert.checkValidity();
+    return cert;
+  }
 
   @Test
   public void testParseAttestationRecord() throws CertificateException, IOException {
     X509Certificate x509Certificate = getAttestationRecord(CERT);
-    ParsedAttestationRecord attestationRecord = ParsedAttestationRecord
-        .createParsedAttestationRecord(x509Certificate);
+    ParsedAttestationRecord attestationRecord =
+        ParsedAttestationRecord.createParsedAttestationRecord(x509Certificate);
 
     assertThat(attestationRecord.attestationVersion).isEqualTo(EXPECTED_ATTESTATION_VERSION);
     assertThat(attestationRecord.attestationSecurityLevel)
@@ -90,13 +99,5 @@ public class ParsedAttestationRecordTest {
     assertThat(attestationRecord.uniqueId).isEqualTo(EXPECTED_UNIQUE_ID);
     assertThat(attestationRecord.softwareEnforced).isNotNull();
     assertThat(attestationRecord.teeEnforced).isNotNull();
-  }
-
-  private X509Certificate getAttestationRecord(String certStr) throws CertificateException {
-    CertificateFactory factory = CertificateFactory.getInstance("X509");
-    X509Certificate cert = (X509Certificate) factory
-        .generateCertificate(new ByteArrayInputStream(certStr.getBytes()));
-    cert.checkValidity();
-    return cert;
   }
 }

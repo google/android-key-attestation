@@ -34,9 +34,7 @@ import java.security.SignatureException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.time.Instant;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -72,12 +70,11 @@ import org.bouncycastle.util.encoders.Base64;
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class KeyAttestationExample {
 
-
   private static final String CERT_FILES_DIR = "examples/pem/algorithm_EC_SecurityLevel_StrongBox";
 
   public static void main(String[] args)
       throws CertificateException, IOException, NoSuchProviderException, NoSuchAlgorithmException,
-      InvalidKeyException, SignatureException {
+          InvalidKeyException, SignatureException {
     X509Certificate[] certs;
     if (args.length == 1) {
       String certFilesDir = args[0];
@@ -121,41 +118,41 @@ public class KeyAttestationExample {
     printOptional(authorizationList.ecCurve, indent + "EC Curve");
     printOptional(authorizationList.rsaPublicExponent, indent + "RSA Public Exponent");
     System.out.println(indent + "Rollback Resistance: " + authorizationList.rollbackResistance);
-    printOptionalDateTime(authorizationList.activeDateTime, indent + "Active DateTime");
-    printOptionalDateTime(authorizationList.originationExpireDateTime,
-        indent + "Origination Expire DateTime");
-    printOptionalDateTime(authorizationList.usageExpireDateTime, indent + "Usage Expire DateTime");
+    printOptional(authorizationList.activeDateTime, indent + "Active DateTime");
+    printOptional(
+        authorizationList.originationExpireDateTime, indent + "Origination Expire DateTime");
+    printOptional(authorizationList.usageExpireDateTime, indent + "Usage Expire DateTime");
     System.out.println(indent + "No Auth Required: " + authorizationList.noAuthRequired);
     printOptional(authorizationList.userAuthType, indent + "User Auth Type");
     printOptional(authorizationList.authTimeout, indent + "Auth Timeout");
     System.out.println(indent + "Allow While On Body: " + authorizationList.allowWhileOnBody);
-    System.out
-        .println(indent + "Trusted User Presence Required: "
+    System.out.println(
+        indent
+            + "Trusted User Presence Required: "
             + authorizationList.trustedUserPresenceRequired);
-    System.out
-        .println(indent + "Trusted Confirmation Required: "
-            + authorizationList.trustedConfirmationRequired);
-    System.out
-        .println(indent + "Unlocked Device Required: " + authorizationList.unlockedDeviceRequired);
+    System.out.println(
+        indent + "Trusted Confirmation Required: " + authorizationList.trustedConfirmationRequired);
+    System.out.println(
+        indent + "Unlocked Device Required: " + authorizationList.unlockedDeviceRequired);
     System.out.println(indent + "All Applications: " + authorizationList.allApplications);
     printOptional(authorizationList.applicationId, indent + "Application ID");
-    printOptionalDateTime(authorizationList.creationDateTime, indent + "Creation DateTime");
+    printOptional(authorizationList.creationDateTime, indent + "Creation DateTime");
     printOptional(authorizationList.origin, indent + "Origin");
     System.out.println(indent + "Rollback Resistant: " + authorizationList.rollbackResistant);
     System.out.println(indent + "Root Of Trust:");
     printRootOfTrust(authorizationList.rootOfTrust, indent + "\t");
     printOptional(authorizationList.osVersion, indent + "OS Version");
     printOptional(authorizationList.osPatchLevel, indent + "OS Patch Level");
-    printOptional(authorizationList.attestationApplicationId,
-        indent + "Attestation Application ID");
+    printOptional(
+        authorizationList.attestationApplicationId, indent + "Attestation Application ID");
     printOptional(authorizationList.attestationIdBrand, indent + "Attestation ID Brand");
     printOptional(authorizationList.attestationIdDevice, indent + "Attestation ID Device");
     printOptional(authorizationList.attestationIdProduct, indent + "Attestation ID Product");
     printOptional(authorizationList.attestationIdSerial, indent + "Attestation ID Serial");
     printOptional(authorizationList.attestationIdImei, indent + "Attestation ID IMEI");
     printOptional(authorizationList.attestationIdMeid, indent + "Attestation ID MEID");
-    printOptional(authorizationList.attestationIdManufacturer,
-        indent + "Attestation ID Manufacturer");
+    printOptional(
+        authorizationList.attestationIdManufacturer, indent + "Attestation ID Manufacturer");
     printOptional(authorizationList.attestationIdModel, indent + "Attestation ID Model");
     printOptional(authorizationList.vendorPatchLevel, indent + "Vendor Patch Level");
     printOptional(authorizationList.bootPatchLevel, indent + "Boot Patch Level");
@@ -164,14 +161,16 @@ public class KeyAttestationExample {
   private static void printRootOfTrust(Optional<RootOfTrust> rootOfTrust, String indent) {
     if (rootOfTrust.isPresent()) {
       System.out.println(
-          indent + "Verified Boot Key: " + Base64
-              .toBase64String(rootOfTrust.get().verifiedBootKey));
+          indent
+              + "Verified Boot Key: "
+              + Base64.toBase64String(rootOfTrust.get().verifiedBootKey));
       System.out.println(indent + "Device Locked: " + rootOfTrust.get().deviceLocked);
-      System.out
-          .println(indent + "Verified Boot State: " + rootOfTrust.get().verifiedBootState.name());
       System.out.println(
-          indent + "Verified Boot Hash: " + Base64
-              .toBase64String(rootOfTrust.get().verifiedBootHash));
+          indent + "Verified Boot State: " + rootOfTrust.get().verifiedBootState.name());
+      System.out.println(
+          indent
+              + "Verified Boot Hash: "
+              + Base64.toBase64String(rootOfTrust.get().verifiedBootHash));
     }
   }
 
@@ -185,15 +184,9 @@ public class KeyAttestationExample {
     }
   }
 
-  private static void printOptionalDateTime(Optional<Long> dateTime, String caption) {
-    dateTime.ifPresent(integer -> System.out.println(
-        caption + ": " + Date
-            .from(Instant.ofEpochMilli(integer))));
-  }
-
   private static void verifyCertificateChain(X509Certificate[] certs)
       throws CertificateException, NoSuchAlgorithmException, InvalidKeyException,
-      NoSuchProviderException, SignatureException {
+          NoSuchProviderException, SignatureException {
     for (int i = 1; i < certs.length; ++i) {
       // Verify that the certificate has not expired.
       certs[i].checkValidity();

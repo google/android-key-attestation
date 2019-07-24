@@ -20,9 +20,7 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Enumerated;
 import org.bouncycastle.asn1.ASN1Integer;
 
-/**
- * Utils to get java representation of ASN1 types.
- */
+/** Utils to get java representation of ASN1 types. */
 class ASN1Parsing {
 
   static boolean getBooleanFromAsn1(ASN1Encodable asn1Value) {

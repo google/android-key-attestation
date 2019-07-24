@@ -15,7 +15,6 @@
 
 package com.google.android.attestation;
 
-
 import static com.google.common.truth.Truth.assertThat;
 
 import com.google.android.attestation.RootOfTrust.VerifiedBootState;
@@ -27,9 +26,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-/**
- * Test for {@link RootOfTrust}.
- */
+/** Test for {@link RootOfTrust}. */
 @RunWith(JUnit4.class)
 public class RootOfTrustTest {
 
@@ -38,14 +35,18 @@ public class RootOfTrustTest {
       "MEoEIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQEACgECBCByjbEnTx8c8Vcd5DgLBIpVSsSjgOdvU1UI"
           + "NSkISpN4AQ==\n";
 
-  private static final byte[] EXPECTED_VERIFIED_BOOT_KEY = Base64
-      .decode("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=");
+  private static final byte[] EXPECTED_VERIFIED_BOOT_KEY =
+      Base64.decode("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=");
   private static final boolean EXPECTED_DEVICE_LOCKED = false;
   private static final VerifiedBootState EXPECTED_VERIFIED_BOOT_STATE =
       VerifiedBootState.UNVERIFIED;
-  private static final byte[] EXPECTED_VERIFIED_BOOT_HASH = Base64
-      .decode("co2xJ08fHPFXHeQ4CwSKVUrEo4Dnb1NVCDUpCEqTeAE=");
+  private static final byte[] EXPECTED_VERIFIED_BOOT_HASH =
+      Base64.decode("co2xJ08fHPFXHeQ4CwSKVUrEo4Dnb1NVCDUpCEqTeAE=");
 
+  private static ASN1Sequence getRootOfTrustSequence(String rootOfTrustB64) throws IOException {
+    byte[] rootOfTrustBytes = Base64.decode(rootOfTrustB64);
+    return (ASN1Sequence) ASN1Sequence.fromByteArray(rootOfTrustBytes);
+  }
 
   @Test
   public void testCreateRootOfTrust() throws IOException {
@@ -62,10 +63,5 @@ public class RootOfTrustTest {
   @Test
   public void testCreateEmptyRootOfTrust() {
     Truth.assertThat(RootOfTrust.createRootOfTrust(null)).isNull();
-  }
-
-  private ASN1Sequence getRootOfTrustSequence(String rootOfTrustB64) throws IOException {
-    byte[] rootOfTrustBytes = Base64.decode(rootOfTrustB64);
-    return (ASN1Sequence) ASN1Sequence.fromByteArray(rootOfTrustBytes);
   }
 }

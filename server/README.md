@@ -40,7 +40,7 @@ Pre-requisites
 --------------
 
 - Up-to-date Java JDK
-- [Bouncy Castle Cryptography Java APIs][5] (included as depedency in gradle build configuration).
+- [Bouncy Castle Cryptography Java APIs][5] (included as dependency in gradle build configuration).
 
 [5]: https://www.bouncycastle.org/java.html
 

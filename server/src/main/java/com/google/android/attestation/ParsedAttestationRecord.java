@@ -34,9 +34,7 @@ import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
 
-/**
- * Java representation of Key Attestation extension data.
- */
+/** Java representation of Key Attestation extension data. */
 public class ParsedAttestationRecord {
 
   public final int attestationVersion;
