@@ -31,4 +31,6 @@ dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'com.google.truth:truth:1.0'
     testCompile 'com.google.truth.extensions:truth-java8-extension:1.0'
+    // ErrorProne for Immutable annotation
+    compile 'com.google.errorprone:error_prone_annotations:2.3.3'
 }

@@ -28,6 +28,7 @@ import static com.google.android.attestation.Constants.SW_ENFORCED_INDEX;
 import static com.google.android.attestation.Constants.TEE_ENFORCED_INDEX;
 import static com.google.android.attestation.Constants.UNIQUE_ID_INDEX;
 
+import com.google.errorprone.annotations.Immutable;
 import java.io.IOException;
 import java.security.cert.X509Certificate;
 import org.bouncycastle.asn1.ASN1InputStream;
@@ -35,6 +36,7 @@ import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
 
 /** Java representation of Key Attestation extension data. */
+@Immutable
 public class ParsedAttestationRecord {
 
   public final int attestationVersion;
