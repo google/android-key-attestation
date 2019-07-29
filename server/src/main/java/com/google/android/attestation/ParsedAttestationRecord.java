@@ -64,10 +64,12 @@ public class ParsedAttestationRecord {
     this.uniqueId = ((ASN1OctetString) extensionData.getObjectAt(UNIQUE_ID_INDEX)).getOctets();
     this.softwareEnforced =
         AuthorizationList.createAuthorizationList(
-            ((ASN1Sequence) extensionData.getObjectAt(SW_ENFORCED_INDEX)).toArray());
+            ((ASN1Sequence) extensionData.getObjectAt(SW_ENFORCED_INDEX)).toArray(),
+            attestationVersion);
     this.teeEnforced =
         AuthorizationList.createAuthorizationList(
-            ((ASN1Sequence) extensionData.getObjectAt(TEE_ENFORCED_INDEX)).toArray());
+            ((ASN1Sequence) extensionData.getObjectAt(TEE_ENFORCED_INDEX)).toArray(),
+            attestationVersion);
   }
 
   public static ParsedAttestationRecord createParsedAttestationRecord(X509Certificate cert)

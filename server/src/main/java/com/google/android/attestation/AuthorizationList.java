@@ -114,7 +114,7 @@ public class AuthorizationList {
   public final Optional<Integer> vendorPatchLevel;
   public final Optional<Integer> bootPatchLevel;
 
-  private AuthorizationList(ASN1Encodable[] authorizationList) {
+  private AuthorizationList(ASN1Encodable[] authorizationList, int attestationVersion) {
     Map<Integer, ASN1Primitive> authorizationMap = getAuthorizationMap(authorizationList);
     this.purpose = findOptionalIntegerSetAuthorizationListEntry(authorizationMap, KM_TAG_PURPOSE);
     this.algorithm = findOptionalIntegerAuthorizationListEntry(authorizationMap, KM_TAG_ALGORITHM);
@@ -161,7 +161,8 @@ public class AuthorizationList {
     this.rootOfTrust =
         Optional.ofNullable(
             RootOfTrust.createRootOfTrust(
-                (ASN1Sequence) findAuthorizationListEntry(authorizationMap, KM_TAG_ROOT_OF_TRUST)));
+                (ASN1Sequence) findAuthorizationListEntry(authorizationMap, KM_TAG_ROOT_OF_TRUST),
+                attestationVersion));
     this.osVersion = findOptionalIntegerAuthorizationListEntry(authorizationMap, KM_TAG_OS_VERSION);
     this.osPatchLevel =
         findOptionalIntegerAuthorizationListEntry(authorizationMap, KM_TAG_OS_PATCH_LEVEL);
@@ -192,8 +193,9 @@ public class AuthorizationList {
         findOptionalIntegerAuthorizationListEntry(authorizationMap, KM_TAG_BOOT_PATCH_LEVEL);
   }
 
-  static AuthorizationList createAuthorizationList(ASN1Encodable[] authorizationList) {
-    return new AuthorizationList(authorizationList);
+  static AuthorizationList createAuthorizationList(
+      ASN1Encodable[] authorizationList, int attestationVersion) {
+    return new AuthorizationList(authorizationList, attestationVersion);
   }
 
   private static Map<Integer, ASN1Primitive> getAuthorizationMap(

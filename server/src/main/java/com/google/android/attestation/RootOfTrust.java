@@ -35,7 +35,7 @@ public class RootOfTrust {
   public final VerifiedBootState verifiedBootState;
   public final byte[] verifiedBootHash;
 
-  private RootOfTrust(ASN1Sequence rootOfTrust) {
+  private RootOfTrust(ASN1Sequence rootOfTrust, int attestationVersion) {
     this.verifiedBootKey =
         ((ASN1OctetString) rootOfTrust.getObjectAt(ROOT_OF_TRUST_VERIFIED_BOOT_KEY_INDEX))
             .getOctets();
@@ -45,16 +45,20 @@ public class RootOfTrust {
         rootOfTrustToEnum(
             ASN1Parsing.getIntegerFromAsn1(
                 rootOfTrust.getObjectAt(ROOT_OF_TRUST_VERIFIED_BOOT_STATE_INDEX)));
-    this.verifiedBootHash =
-        ((ASN1OctetString) rootOfTrust.getObjectAt(ROOT_OF_TRUST_VERIFIED_BOOT_HASH_INDEX))
-            .getOctets();
+    if (attestationVersion >= 3) {
+      this.verifiedBootHash =
+          ((ASN1OctetString) rootOfTrust.getObjectAt(ROOT_OF_TRUST_VERIFIED_BOOT_HASH_INDEX))
+              .getOctets();
+    } else {
+      this.verifiedBootHash = null;
+    }
   }
 
-  static RootOfTrust createRootOfTrust(ASN1Sequence rootOfTrust) {
+  static RootOfTrust createRootOfTrust(ASN1Sequence rootOfTrust, int attestationVersion) {
     if (rootOfTrust == null) {
       return null;
     }
-    return new RootOfTrust(rootOfTrust);
+    return new RootOfTrust(rootOfTrust, attestationVersion);
   }
 
   private static VerifiedBootState rootOfTrustToEnum(int securityLevel) {

@@ -46,6 +46,7 @@ public class AuthorizationListTest {
       "MIGwoQgxBgIBAgIBA6IDAgEBowQCAggApQUxAwIBBKYIMQYCAQMCAQW/gUgFAgMBAAG/g3cCBQC/hT4DAgEAv4VATDBK"
           + "BCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEBAAoBAgQgco2xJ08fHPFXHeQ4CwSKVUrEo4Dnb1"
           + "NVCDUpCEqTeAG/hUEDAgEAv4VCBQIDAxSzv4VOBgIEATQV8b+FTwYCBAE0Few=";
+  private static final int ATTESTATION_VERISON = 3;
 
   // Some enum values, complete list can be found at:
   // https://source.android.com/security/keystore/tags
@@ -95,7 +96,7 @@ public class AuthorizationListTest {
   public void testCanParseAuthorizationListFromSwEnforced() throws IOException {
     AuthorizationList authorizationList =
         AuthorizationList.createAuthorizationList(
-            getEncodableAuthorizationList(SW_ENFORCED_EXTENSION_DATA));
+            getEncodableAuthorizationList(SW_ENFORCED_EXTENSION_DATA), ATTESTATION_VERISON);
 
     assertThat(authorizationList.creationDateTime).hasValue(EXPECTED_SW_CREATION_DATETIME);
     assertThat(authorizationList.rootOfTrust).isEmpty();
@@ -107,7 +108,7 @@ public class AuthorizationListTest {
   public void testCanParseAuthorizationListFromTeeEnforced() throws IOException {
     AuthorizationList authorizationList =
         AuthorizationList.createAuthorizationList(
-            getEncodableAuthorizationList(TEE_ENFORCED_EXTENSION_DATA));
+            getEncodableAuthorizationList(TEE_ENFORCED_EXTENSION_DATA), ATTESTATION_VERISON);
 
     assertThat(authorizationList.purpose).hasValue(EXPECTED_TEE_PURPOSE);
     assertThat(authorizationList.algorithm).hasValue(EXPECTED_TEE_ALGORITHM);

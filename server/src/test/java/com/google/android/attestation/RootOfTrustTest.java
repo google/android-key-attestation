@@ -34,6 +34,7 @@ public class RootOfTrustTest {
   private static final String ROOT_OF_TRUST =
       "MEoEIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQEACgECBCByjbEnTx8c8Vcd5DgLBIpVSsSjgOdvU1UI"
           + "NSkISpN4AQ==\n";
+  private static final int ATTESTATION_VERSION = 3;
 
   private static final byte[] EXPECTED_VERIFIED_BOOT_KEY =
       Base64.decode("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=");
@@ -51,7 +52,8 @@ public class RootOfTrustTest {
   @Test
   public void testCreateRootOfTrust() throws IOException {
     ASN1Sequence rootOfTrustSequence = getRootOfTrustSequence(ROOT_OF_TRUST);
-    RootOfTrust rootOfTrust = RootOfTrust.createRootOfTrust(rootOfTrustSequence);
+    RootOfTrust rootOfTrust =
+        RootOfTrust.createRootOfTrust(rootOfTrustSequence, ATTESTATION_VERSION);
 
     assertThat(rootOfTrust).isNotNull();
     assertThat(rootOfTrust.verifiedBootKey).isEqualTo(EXPECTED_VERIFIED_BOOT_KEY);
@@ -62,6 +64,6 @@ public class RootOfTrustTest {
 
   @Test
   public void testCreateEmptyRootOfTrust() {
-    Truth.assertThat(RootOfTrust.createRootOfTrust(null)).isNull();
+    Truth.assertThat(RootOfTrust.createRootOfTrust(null, ATTESTATION_VERSION)).isNull();
   }
 }
