@@ -24,12 +24,10 @@ import static com.google.android.attestation.Constants.ROOT_OF_TRUST_VERIFIED_BO
 import static com.google.android.attestation.Constants.ROOT_OF_TRUST_VERIFIED_BOOT_KEY_INDEX;
 import static com.google.android.attestation.Constants.ROOT_OF_TRUST_VERIFIED_BOOT_STATE_INDEX;
 
-import com.google.errorprone.annotations.Immutable;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
 
 /** This collection of values defines key information about the device's status. */
-@Immutable
 public class RootOfTrust {
 
   public final byte[] verifiedBootKey;

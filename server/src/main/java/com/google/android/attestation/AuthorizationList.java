@@ -53,7 +53,6 @@ import static com.google.android.attestation.Constants.KM_TAG_USAGE_EXPIRE_DATE_
 import static com.google.android.attestation.Constants.KM_TAG_USER_AUTH_TYPE;
 import static com.google.android.attestation.Constants.KM_TAG_VENDOR_PATCH_LEVEL;
 
-import com.google.errorprone.annotations.Immutable;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
@@ -74,7 +73,6 @@ import org.bouncycastle.asn1.ASN1TaggedObject;
  * hardware abstraction layer (HAL). You compare these values to the device's current state or to a
  * set of expected values to verify that a key pair is still valid for use in your app.
  */
-@Immutable
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class AuthorizationList {
 
