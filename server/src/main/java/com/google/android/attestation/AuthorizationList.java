@@ -67,6 +67,7 @@ import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1TaggedObject;
+import org.bouncycastle.asn1.DEROctetString;
 
 /**
  * This data structure contains the key pair's properties themselves, as defined in the Keymaster
@@ -102,7 +103,8 @@ public class AuthorizationList {
   public final Optional<RootOfTrust> rootOfTrust;
   public final Optional<Integer> osVersion;
   public final Optional<Integer> osPatchLevel;
-  public final Optional<byte[]> attestationApplicationId;
+  public final Optional<AttestationApplicationId> attestationApplicationId;
+  public final Optional<byte[]> attestationApplicationIdBytes;
   public final Optional<byte[]> attestationIdBrand;
   public final Optional<byte[]> attestationIdDevice;
   public final Optional<byte[]> attestationIdProduct;
@@ -167,6 +169,12 @@ public class AuthorizationList {
     this.osPatchLevel =
         findOptionalIntegerAuthorizationListEntry(authorizationMap, KM_TAG_OS_PATCH_LEVEL);
     this.attestationApplicationId =
+        Optional.ofNullable(
+            AttestationApplicationId.createAttestationApplicationId(
+                (DEROctetString)
+                    findAuthorizationListEntry(
+                        authorizationMap, KM_TAG_ATTESTATION_APPLICATION_ID)));
+    this.attestationApplicationIdBytes =
         findOptionalByteArrayAuthorizationListEntry(
             authorizationMap, KM_TAG_ATTESTATION_APPLICATION_ID);
     this.attestationIdBrand =

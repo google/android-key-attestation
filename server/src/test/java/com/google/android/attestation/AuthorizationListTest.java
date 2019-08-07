@@ -60,7 +60,7 @@ public class AuthorizationListTest {
 
   // 2019-07-15T14:56:32.972Z
   private static final Instant EXPECTED_SW_CREATION_DATETIME = Instant.ofEpochMilli(1563202592972L);
-  private static final byte[] EXPECTED_SW_ATTESTATION_APPLICATION_ID =
+  private static final byte[] EXPECTED_SW_ATTESTATION_APPLICATION_ID_BYTES =
       Base64.decode(
           "MIIBszGCAYswDAQHYW5kcm9pZAIBHTAZBBRjb20uYW5kcm9pZC5rZXljaGFpbgIBHTAZBBRjb20uYW5kcm9pZC5z"
               + "ZXR0aW5ncwIBHTAZBBRjb20ucXRpLmRpYWdzZXJ2aWNlcwIBHTAaBBVjb20uYW5kcm9pZC5keW5zeXN0ZW"
@@ -70,7 +70,6 @@ public class AuthorizationListTest {
               + "UmVzdGFydERldGVjdG9yAgEdMCIEHWNvbS5nb29nbGUuYW5kcm9pZC5oaWRkZW5tZW51AgEBMCMEHmNvbS"
               + "5hbmRyb2lkLnByb3ZpZGVycy5zZXR0aW5ncwIBHTEiBCAwGqPLCBE0UBxF8UIqvGbCQiT9Xe1f3I8X5pcX"
               + "b9hmqg==");
-
   private static final ImmutableSet<Integer> EXPECTED_TEE_PURPOSE =
       ImmutableSet.of(PURPOSE_SIGN, PURPOSE_VERIFY);
   private static final Integer EXPECTED_TEE_ALGORITHM = ALGORITHM_RSA;
@@ -100,8 +99,9 @@ public class AuthorizationListTest {
 
     assertThat(authorizationList.creationDateTime).hasValue(EXPECTED_SW_CREATION_DATETIME);
     assertThat(authorizationList.rootOfTrust).isEmpty();
-    assertThat(authorizationList.attestationApplicationId)
-        .hasValue(EXPECTED_SW_ATTESTATION_APPLICATION_ID);
+    assertThat(authorizationList.attestationApplicationId).isPresent();
+    assertThat(authorizationList.attestationApplicationIdBytes)
+        .hasValue(EXPECTED_SW_ATTESTATION_APPLICATION_ID_BYTES);
   }
 
   @Test

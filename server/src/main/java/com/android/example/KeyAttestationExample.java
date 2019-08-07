@@ -18,6 +18,8 @@ package com.android.example;
 import static com.google.android.attestation.Constants.GOOGLE_ROOT_CERTIFICATE;
 import static com.google.android.attestation.ParsedAttestationRecord.createParsedAttestationRecord;
 
+import com.google.android.attestation.AttestationApplicationId;
+import com.google.android.attestation.AttestationApplicationId.AttestationPackageInfo;
 import com.google.android.attestation.AuthorizationList;
 import com.google.android.attestation.ParsedAttestationRecord;
 import com.google.android.attestation.RootOfTrust;
@@ -70,7 +72,8 @@ import org.bouncycastle.util.encoders.Base64;
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class KeyAttestationExample {
 
-  private static final String CERT_FILES_DIR = "examples/pem/algorithm_EC_SecurityLevel_StrongBox";
+  private static final String DEFAULT_CERT_FILES_DIR =
+      "examples/pem/algorithm_EC_SecurityLevel_StrongBox";
 
   public static void main(String[] args)
       throws CertificateException, IOException, NoSuchProviderException, NoSuchAlgorithmException,
@@ -80,7 +83,7 @@ public class KeyAttestationExample {
       String certFilesDir = args[0];
       certs = loadCertificates(certFilesDir);
     } else {
-      certs = loadCertificates(CERT_FILES_DIR);
+      certs = loadCertificates(DEFAULT_CERT_FILES_DIR);
     }
 
     verifyCertificateChain(certs);
@@ -96,7 +99,7 @@ public class KeyAttestationExample {
 
     System.out.println(
         "Attestation Challenge: " + new String(parsedAttestationRecord.attestationChallenge));
-    System.out.println("Unique ID: " + new String(parsedAttestationRecord.uniqueId));
+    System.out.println("Unique ID: " + Arrays.toString(parsedAttestationRecord.uniqueId));
 
     System.out.println("Software Enforced Authorization List:");
     AuthorizationList softwareEnforced = parsedAttestationRecord.softwareEnforced;
@@ -139,12 +142,19 @@ public class KeyAttestationExample {
     printOptional(authorizationList.creationDateTime, indent + "Creation DateTime");
     printOptional(authorizationList.origin, indent + "Origin");
     System.out.println(indent + "Rollback Resistant: " + authorizationList.rollbackResistant);
-    System.out.println(indent + "Root Of Trust:");
-    printRootOfTrust(authorizationList.rootOfTrust, indent + "\t");
+    if (authorizationList.rootOfTrust.isPresent()) {
+      System.out.println(indent + "Root Of Trust:");
+      printRootOfTrust(authorizationList.rootOfTrust, indent + "\t");
+    }
     printOptional(authorizationList.osVersion, indent + "OS Version");
     printOptional(authorizationList.osPatchLevel, indent + "OS Patch Level");
+    if (authorizationList.attestationApplicationId.isPresent()) {
+      System.out.println(indent + "Attestation Application ID:");
+      printAttestationApplicationId(authorizationList.attestationApplicationId, indent + "\t");
+    }
     printOptional(
-        authorizationList.attestationApplicationId, indent + "Attestation Application ID");
+        authorizationList.attestationApplicationIdBytes,
+        indent + "Attestation Application ID Bytes");
     printOptional(authorizationList.attestationIdBrand, indent + "Attestation ID Brand");
     printOptional(authorizationList.attestationIdDevice, indent + "Attestation ID Device");
     printOptional(authorizationList.attestationIdProduct, indent + "Attestation ID Product");
@@ -171,6 +181,20 @@ public class KeyAttestationExample {
           indent
               + "Verified Boot Hash: "
               + Base64.toBase64String(rootOfTrust.get().verifiedBootHash));
+    }
+  }
+
+  private static void printAttestationApplicationId(
+      Optional<AttestationApplicationId> attestationApplicationId, String indent) {
+    if (attestationApplicationId.isPresent()) {
+      System.out.println(indent + "Package Infos (<package name>, <version>): ");
+      for (AttestationPackageInfo info : attestationApplicationId.get().packageInfos) {
+        System.out.println(indent + "\t" + info.packageName + ", " + info.version);
+      }
+      System.out.println(indent + "Signature Digests:");
+      for (byte[] digest : attestationApplicationId.get().signatureDigests) {
+        System.out.println(indent + "\t" + Base64.toBase64String(digest));
+      }
     }
   }
 

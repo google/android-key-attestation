@@ -18,7 +18,6 @@ package com.google.android.attestation;
 import static com.google.common.truth.Truth.assertThat;
 
 import com.google.android.attestation.RootOfTrust.VerifiedBootState;
-import com.google.common.truth.Truth;
 import java.io.IOException;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.util.encoders.Base64;
@@ -64,6 +63,6 @@ public class RootOfTrustTest {
 
   @Test
   public void testCreateEmptyRootOfTrust() {
-    Truth.assertThat(RootOfTrust.createRootOfTrust(null, ATTESTATION_VERSION)).isNull();
+    assertThat(RootOfTrust.createRootOfTrust(null, ATTESTATION_VERSION)).isNull();
   }
 }

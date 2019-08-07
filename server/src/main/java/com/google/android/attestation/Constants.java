@@ -106,6 +106,10 @@ public class Constants {
   static final int ROOT_OF_TRUST_DEVICE_LOCKED_INDEX = 1;
   static final int ROOT_OF_TRUST_VERIFIED_BOOT_STATE_INDEX = 2;
   static final int ROOT_OF_TRUST_VERIFIED_BOOT_HASH_INDEX = 3;
+  static final int ATTESTATION_APPLICATION_ID_PACKAGE_INFOS_INDEX = 0;
+  static final int ATTESTATION_APPLICATION_ID_SIGNATURE_DIGESTS_INDEX = 1;
+  static final int ATTESTATION_PACKAGE_INFO_PACKAGE_NAME_INDEX = 0;
+  static final int ATTESTATION_PACKAGE_INFO_VERSION_INDEX = 1;
   // Some security values. The complete list is in this AOSP file:
   // hardware/libhardware/include/hardware/keymaster_defs.h
   static final int KM_SECURITY_LEVEL_SOFTWARE = 0;
