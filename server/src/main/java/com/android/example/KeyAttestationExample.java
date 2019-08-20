@@ -21,6 +21,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.android.attestation.AttestationApplicationId;
 import com.google.android.attestation.AttestationApplicationId.AttestationPackageInfo;
+import com.google.android.attestation.CertificateRevocationStatus;
 import com.google.android.attestation.AuthorizationList;
 import com.google.android.attestation.ParsedAttestationRecord;
 import com.google.android.attestation.RootOfTrust;
@@ -32,7 +33,6 @@ import java.nio.file.Paths;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -63,13 +63,12 @@ import org.bouncycastle.util.encoders.Base64;
  * attestation, Android 7.0 (API level 24) or higher, and Google Play services, your production code
  * should enforce this requirement.
  *
- * <p>3. Extracting the attestation extension data from the attestation certificate.
+ * <p>3. Checking if any certificate in the chain has been revoked or suspended.
  *
- * <p>4. Verifying (and printing) several important data elements from the attestation extension.
+ * <p>4. Extracting the attestation extension data from the attestation certificate.
  *
- * <p>Although this sample code doesn't check the revocation status of intermediate and root
- * certificates, you should do so in production-level code. Note that attestation certificates don't
- * have certificate revocation lists.
+ * <p>5. Verifying (and printing) several important data elements from the attestation extension.
+ *
  */
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class KeyAttestationExample {
@@ -212,20 +211,23 @@ public class KeyAttestationExample {
 
   private static void verifyCertificateChain(X509Certificate[] certs)
       throws CertificateException, NoSuchAlgorithmException, InvalidKeyException,
-          NoSuchProviderException, SignatureException {
-    for (int i = 1; i < certs.length; ++i) {
+      NoSuchProviderException, SignatureException, IOException {
+    X509Certificate parent = certs[certs.length - 1];
+    for (int i = certs.length - 1; i >= 0; i--) {
+      X509Certificate cert = certs[i];
       // Verify that the certificate has not expired.
-      certs[i].checkValidity();
-      if (i > 0) {
-        // Verify previous certificate with the public key from this
-        // certificate. If verification fails, the verify() method
-        // throws an exception.
-        PublicKey pubKey = certs[i].getPublicKey();
-        certs[i - 1].verify(pubKey);
-        if (i == certs.length - 1) {
-          // The last certificate (the root) is self-signed.
-          certs[i].verify(pubKey);
+      cert.checkValidity();
+      cert.verify(parent.getPublicKey());
+      parent = cert;
+      try {
+        CertificateRevocationStatus certStatus = CertificateRevocationStatus
+            .fetchStatus(cert.getSerialNumber());
+        if (certStatus != null) {
+          throw new CertificateException(
+              "Certificate revocation status is " + certStatus.status.name());
         }
+      } catch (IOException e) {
+        throw new IOException("Unable to fetch certificate status. Check connectivity.");
       }
     }
 
