@@ -17,6 +17,7 @@ package com.android.example;
 
 import static com.google.android.attestation.Constants.GOOGLE_ROOT_CERTIFICATE;
 import static com.google.android.attestation.ParsedAttestationRecord.createParsedAttestationRecord;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.android.attestation.AttestationApplicationId;
 import com.google.android.attestation.AttestationApplicationId.AttestationPackageInfo;
@@ -40,6 +41,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.bouncycastle.util.encoders.Base64;
 
 /**
@@ -72,8 +74,7 @@ import org.bouncycastle.util.encoders.Base64;
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class KeyAttestationExample {
 
-  private static final String DEFAULT_CERT_FILES_DIR =
-      "examples/pem/algorithm_EC_SecurityLevel_StrongBox";
+  private KeyAttestationExample() {}
 
   public static void main(String[] args)
       throws CertificateException, IOException, NoSuchProviderException, NoSuchAlgorithmException,
@@ -83,7 +84,7 @@ public class KeyAttestationExample {
       String certFilesDir = args[0];
       certs = loadCertificates(certFilesDir);
     } else {
-      certs = loadCertificates(DEFAULT_CERT_FILES_DIR);
+      throw new IOException("Expected path to a directory containing certificates as an argument.");
     }
 
     verifyCertificateChain(certs);
@@ -98,7 +99,8 @@ public class KeyAttestationExample {
         "Keymaster Security Level: " + parsedAttestationRecord.keymasterSecurityLevel.name());
 
     System.out.println(
-        "Attestation Challenge: " + new String(parsedAttestationRecord.attestationChallenge));
+        "Attestation Challenge: "
+            + new String(parsedAttestationRecord.attestationChallenge, UTF_8));
     System.out.println("Unique ID: " + Arrays.toString(parsedAttestationRecord.uniqueId));
 
     System.out.println("Software Enforced Authorization List:");
@@ -198,7 +200,7 @@ public class KeyAttestationExample {
     }
   }
 
-  private static void printOptional(Optional optional, String caption) {
+  private static <T> void printOptional(Optional<T> optional, String caption) {
     if (optional.isPresent()) {
       if (optional.get() instanceof byte[]) {
         System.out.println(caption + ": " + Base64.toBase64String((byte[]) optional.get()));
@@ -234,7 +236,8 @@ public class KeyAttestationExample {
     X509Certificate secureRoot =
         (X509Certificate)
             CertificateFactory.getInstance("X.509")
-                .generateCertificate(new ByteArrayInputStream(GOOGLE_ROOT_CERTIFICATE.getBytes()));
+                .generateCertificate(
+                    new ByteArrayInputStream(GOOGLE_ROOT_CERTIFICATE.getBytes(UTF_8)));
     if (Arrays.equals(
         secureRoot.getTBSCertificate(), certs[certs.length - 1].getTBSCertificate())) {
       System.out.println(
@@ -256,11 +259,10 @@ public class KeyAttestationExample {
   private static X509Certificate[] loadCertificates(String certFilesDir)
       throws CertificateException, IOException {
     // Load the attestation certificates from the directory in alphabetic order.
-    List<Path> records =
-        Files.walk(Paths.get(certFilesDir))
-            .filter(Files::isRegularFile)
-            .sorted()
-            .collect(Collectors.toList());
+    List<Path> records;
+    try (Stream<Path> pathStream = Files.walk(Paths.get(certFilesDir))) {
+      records = pathStream.filter(Files::isRegularFile).sorted().collect(Collectors.toList());
+    }
     X509Certificate[] certs = new X509Certificate[records.size()];
     CertificateFactory factory = CertificateFactory.getInstance("X.509");
     for (int i = 0; i < records.size(); ++i) {
