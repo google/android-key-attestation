@@ -42,7 +42,7 @@ public class RootOfTrust {
     this.deviceLocked =
         ASN1Parsing.getBooleanFromAsn1(rootOfTrust.getObjectAt(ROOT_OF_TRUST_DEVICE_LOCKED_INDEX));
     this.verifiedBootState =
-        rootOfTrustToEnum(
+        verifiedBootStateToEnum(
             ASN1Parsing.getIntegerFromAsn1(
                 rootOfTrust.getObjectAt(ROOT_OF_TRUST_VERIFIED_BOOT_STATE_INDEX)));
     if (attestationVersion >= 3) {
@@ -61,12 +61,12 @@ public class RootOfTrust {
     return new RootOfTrust(rootOfTrust, attestationVersion);
   }
 
-  private static VerifiedBootState rootOfTrustToEnum(int securityLevel) {
+  private static VerifiedBootState verifiedBootStateToEnum(int securityLevel) {
     switch (securityLevel) {
       case KM_VERIFIED_BOOT_STATE_VERIFIED:
         return VerifiedBootState.VERIFIED;
       case KM_VERIFIED_BOOT_STATE_SELF_SIGNED:
-        return VerifiedBootState.SELFSIGNED;
+        return VerifiedBootState.SELF_SIGNED;
       case KM_VERIFIED_BOOT_STATE_UNVERIFIED:
         return VerifiedBootState.UNVERIFIED;
       case KM_VERIFIED_BOOT_STATE_FAILED:
@@ -82,7 +82,7 @@ public class RootOfTrust {
    */
   public enum VerifiedBootState {
     VERIFIED,
-    SELFSIGNED,
+    SELF_SIGNED,
     UNVERIFIED,
     FAILED
   }
