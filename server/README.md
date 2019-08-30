@@ -12,7 +12,7 @@ Introduction
 
 This example demonstrates the following tasks:
 
-1. Loading the certificates from [PEM][2]-encoded strings.
+1. Loading the certificates from [PEM/DER][2]-encoded strings.
 1. Verifying the [X.509][3] certificate chain, up to the root. Note that this example
    does NOT require the root certificate to appear within Google's list of
    root certificates. However, if you're verifying the properties of
@@ -21,8 +21,7 @@ This example demonstrates the following tasks:
    services, your production code should enforce this requirement.
 1. Extracting the attestation extension data from the attestation
    certificate.
-1. Verifying (and printing) several important data elements from the
-   attestation extension.
+1. Verifying (and printing) data elements from the attestation extension.
 
 For more information about the process of extracting attestation certificate
 extension data, as well as the extension data schema, see the
@@ -50,13 +49,15 @@ Getting Started
 This sample uses the Gradle build system. To build this project, use the
 `gradlew build` command or use "Import Project" in IntelliJ or Android Studio.
  
-Run the main method in `KeyAttestationExample` directly or use the `gradlew run` task to execute
-this sample.
+Run the main method in `KeyAttestationExample` directly or use the
+`gradlew run --args="<cert-directory>"` task to execute this sample. The `cert-directory` must
+contain the certificate chain, one certificate per file in either DER or PEM encoding and the files
+are read in alphabetical order. For example the provided
+`/examples/pem/algorithm_EC_SecurityLevel_StrongBox/` can be used.
 
 Support
 -------
 
-- Google+ Community: https://plus.google.com/communities/105153134372062985968
 - Stack Overflow: http://stackoverflow.com/questions/tagged/android
 
 If you've found an error in this sample, please file an issue:
