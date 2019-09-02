@@ -26,7 +26,7 @@ repositories {
 
 dependencies {
     // Bouncy Castle Cryptography APIs used for certificate verification
-    compile 'org.bouncycastle:bcpkix-jdk15on:1.55'
+    compile 'org.bouncycastle:bcpkix-jdk15on:1.61'
     // JUnit, Truth and Truth8 used for testing
     testCompile 'junit:junit:4.12'
     testCompile 'com.google.truth:truth:1.0'

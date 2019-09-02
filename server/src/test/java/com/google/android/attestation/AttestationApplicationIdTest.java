@@ -76,7 +76,7 @@ public class AttestationApplicationIdTest {
     assertThat(AttestationApplicationId.createAttestationApplicationId(null)).isNull();
     assertThat(
             AttestationApplicationId.createAttestationApplicationId(
-                new DEROctetString(Base64.decode("Invalid DEROctet String"))))
+                new DEROctetString("Invalid DEROctet String".getBytes())))
         .isNull();
   }
 
