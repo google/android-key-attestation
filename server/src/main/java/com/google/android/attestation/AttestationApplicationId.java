@@ -19,10 +19,13 @@ import static com.google.android.attestation.Constants.ATTESTATION_APPLICATION_I
 import static com.google.android.attestation.Constants.ATTESTATION_APPLICATION_ID_SIGNATURE_DIGESTS_INDEX;
 import static com.google.android.attestation.Constants.ATTESTATION_PACKAGE_INFO_PACKAGE_NAME_INDEX;
 import static com.google.android.attestation.Constants.ATTESTATION_PACKAGE_INFO_VERSION_INDEX;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1OctetString;
@@ -111,6 +114,11 @@ public class AttestationApplicationId implements Comparable<AttestationApplicati
         && (compareTo((AttestationApplicationId) o) == 0);
   }
 
+  @Override
+  public int hashCode() {
+    return Objects.hash(packageInfos, Arrays.deepHashCode(signatureDigests.toArray()));
+  }
+
   /** Provides package's name and version number. */
   public static class AttestationPackageInfo implements Comparable<AttestationPackageInfo> {
     public final String packageName;
@@ -121,7 +129,8 @@ public class AttestationApplicationId implements Comparable<AttestationApplicati
           new String(
               ((ASN1OctetString)
                       packageInfo.getObjectAt(ATTESTATION_PACKAGE_INFO_PACKAGE_NAME_INDEX))
-                  .getOctets());
+                  .getOctets(),
+              UTF_8);
       this.version =
           ((ASN1Integer) packageInfo.getObjectAt(ATTESTATION_PACKAGE_INFO_VERSION_INDEX))
               .getValue()
@@ -148,11 +157,16 @@ public class AttestationApplicationId implements Comparable<AttestationApplicati
 
     @Override
     public boolean equals(Object o) {
-      return (o instanceof AttestationPackageInfo) && (0 == compareTo((AttestationPackageInfo) o));
+      return (o instanceof AttestationPackageInfo) && (compareTo((AttestationPackageInfo) o) == 0);
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(packageName, version);
     }
   }
 
-  private class ByteArrayComparator implements java.util.Comparator<byte[]> {
+  private static class ByteArrayComparator implements java.util.Comparator<byte[]> {
     @Override
     public int compare(byte[] a, byte[] b) {
       int res = Integer.compare(a.length, b.length);

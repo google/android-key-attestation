@@ -31,16 +31,17 @@ import org.junit.runners.JUnit4;
 public class AttestationApplicationIdTest {
 
   // Generated from certificate with RSA Algorithm and StrongBox Security Level
-  private static final String ATTESTATION_APPLICATION_ID =
-      "MIIBszGCAYswDAQHYW5kcm9pZAIBHTAZBBRjb20uYW5kcm9pZC5rZXljaGFpbgIBHTAZBBRjb20uYW5kcm9pZC5zZXR0"
-          + "aW5ncwIBHTAZBBRjb20ucXRpLmRpYWdzZXJ2aWNlcwIBHTAaBBVjb20uYW5kcm9pZC5keW5zeXN0ZW0CAR0wHQ"
-          + "QYY29tLmFuZHJvaWQuaW5wdXRkZXZpY2VzAgEdMB8EGmNvbS5hbmRyb2lkLmxvY2FsdHJhbnNwb3J0AgEdMB8E"
-          + "GmNvbS5hbmRyb2lkLmxvY2F0aW9uLmZ1c2VkAgEdMB8EGmNvbS5hbmRyb2lkLnNlcnZlci50ZWxlY29tAgEdMC"
-          + "AEG2NvbS5hbmRyb2lkLndhbGxwYXBlcmJhY2t1cAIBHTAhBBxjb20uZ29vZ2xlLlNTUmVzdGFydERldGVjdG9y"
-          + "AgEdMCIEHWNvbS5nb29nbGUuYW5kcm9pZC5oaWRkZW5tZW51AgEBMCMEHmNvbS5hbmRyb2lkLnByb3ZpZGVycy"
-          + "5zZXR0aW5ncwIBHTEiBCAwGqPLCBE0UBxF8UIqvGbCQiT9Xe1f3I8X5pcXb9hmqg==";
-  private static final DEROctetString ATTESTATION_APPLICATION_ID_OCTETS =
-      new DEROctetString(Base64.decode(ATTESTATION_APPLICATION_ID));
+  private static final DEROctetString ATTESTATION_APPLICATION_ID =
+      new DEROctetString(
+          Base64.decode(
+              "MIIBszGCAYswDAQHYW5kcm9pZAIBHTAZBBRjb20uYW5kcm9pZC5rZXljaGFpbgIBHTAZBBRjb20uYW5kcm9p"
+                  + "ZC5zZXR0aW5ncwIBHTAZBBRjb20ucXRpLmRpYWdzZXJ2aWNlcwIBHTAaBBVjb20uYW5kcm9pZC5keW"
+                  + "5zeXN0ZW0CAR0wHQQYY29tLmFuZHJvaWQuaW5wdXRkZXZpY2VzAgEdMB8EGmNvbS5hbmRyb2lkLmxv"
+                  + "Y2FsdHJhbnNwb3J0AgEdMB8EGmNvbS5hbmRyb2lkLmxvY2F0aW9uLmZ1c2VkAgEdMB8EGmNvbS5hbm"
+                  + "Ryb2lkLnNlcnZlci50ZWxlY29tAgEdMCAEG2NvbS5hbmRyb2lkLndhbGxwYXBlcmJhY2t1cAIBHTAh"
+                  + "BBxjb20uZ29vZ2xlLlNTUmVzdGFydERldGVjdG9yAgEdMCIEHWNvbS5nb29nbGUuYW5kcm9pZC5oaW"
+                  + "RkZW5tZW51AgEBMCMEHmNvbS5hbmRyb2lkLnByb3ZpZGVycy5zZXR0aW5ncwIBHTEiBCAwGqPLCBE0"
+                  + "UBxF8UIqvGbCQiT9Xe1f3I8X5pcXb9hmqg=="));
 
   private static final List<AttestationPackageInfo> EXPECTED_PACKAGE_INFOS =
       ImmutableList.of(
@@ -66,7 +67,7 @@ public class AttestationApplicationIdTest {
   @Test
   public void testCreateAttestationApplicationId() {
     AttestationApplicationId attestationApplicationId =
-        AttestationApplicationId.createAttestationApplicationId(ATTESTATION_APPLICATION_ID_OCTETS);
+        AttestationApplicationId.createAttestationApplicationId(ATTESTATION_APPLICATION_ID);
     assertThat(attestationApplicationId).isEqualTo(EXPECTED_ATTESTATION_APPLICATION_ID);
   }
 
@@ -75,7 +76,31 @@ public class AttestationApplicationIdTest {
     assertThat(AttestationApplicationId.createAttestationApplicationId(null)).isNull();
     assertThat(
             AttestationApplicationId.createAttestationApplicationId(
-                new DEROctetString(Base64.decode("Invalid DEROcetet String"))))
+                new DEROctetString(Base64.decode("Invalid DEROctet String"))))
         .isNull();
+  }
+
+  @Test
+  public void testEquals() {
+    AttestationApplicationId attestationApplicationId =
+        AttestationApplicationId.createAttestationApplicationId(ATTESTATION_APPLICATION_ID);
+    AttestationApplicationId emptyAttestationApplicationId =
+        new AttestationApplicationId(ImmutableList.of(), ImmutableList.of());
+
+    assertThat(attestationApplicationId.equals(EXPECTED_ATTESTATION_APPLICATION_ID)).isTrue();
+    assertThat(EXPECTED_ATTESTATION_APPLICATION_ID.equals(attestationApplicationId)).isTrue();
+
+    assertThat(attestationApplicationId.equals(emptyAttestationApplicationId)).isFalse();
+    assertThat(emptyAttestationApplicationId.equals(attestationApplicationId)).isFalse();
+  }
+
+  @Test
+  public void testEqualObjectsHaveEqualHashCodes() {
+    AttestationApplicationId attestationApplicationId =
+        AttestationApplicationId.createAttestationApplicationId(ATTESTATION_APPLICATION_ID);
+
+    assertThat(attestationApplicationId.equals(EXPECTED_ATTESTATION_APPLICATION_ID)).isTrue();
+    assertThat(attestationApplicationId.hashCode())
+        .isEqualTo(EXPECTED_ATTESTATION_APPLICATION_ID.hashCode());
   }
 }
