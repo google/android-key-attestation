@@ -16,17 +16,17 @@
 package com.google.android.attestation;
 
 import static com.google.common.truth.Truth.assertThat;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.android.attestation.AttestationApplicationId.AttestationPackageInfo;
 import com.google.common.collect.ImmutableList;
-import java.util.List;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.util.encoders.Base64;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-/** Test for {@link AttestationApplicationId} */
+/** Test for {@link AttestationApplicationId}. */
 @RunWith(JUnit4.class)
 public class AttestationApplicationIdTest {
 
@@ -43,7 +43,7 @@ public class AttestationApplicationIdTest {
                   + "RkZW5tZW51AgEBMCMEHmNvbS5hbmRyb2lkLnByb3ZpZGVycy5zZXR0aW5ncwIBHTEiBCAwGqPLCBE0"
                   + "UBxF8UIqvGbCQiT9Xe1f3I8X5pcXb9hmqg=="));
 
-  private static final List<AttestationPackageInfo> EXPECTED_PACKAGE_INFOS =
+  private static final ImmutableList<AttestationPackageInfo> EXPECTED_PACKAGE_INFOS =
       ImmutableList.of(
           new AttestationPackageInfo("android", 29L),
           new AttestationPackageInfo("com.android.keychain", 29L),
@@ -58,7 +58,7 @@ public class AttestationApplicationIdTest {
           new AttestationPackageInfo("com.google.SSRestartDetector", 29L),
           new AttestationPackageInfo("com.google.android.hiddenmenu", 1L),
           new AttestationPackageInfo("com.android.providers.settings", 29L));
-  private static final List<byte[]> EXPECTED_SIGNATURE_DIGESTS =
+  private static final ImmutableList<byte[]> EXPECTED_SIGNATURE_DIGESTS =
       ImmutableList.of(Base64.decode("MBqjywgRNFAcRfFCKrxmwkIk/V3tX9yPF+aXF2/YZqo=\n"));
 
   private static final AttestationApplicationId EXPECTED_ATTESTATION_APPLICATION_ID =
@@ -76,7 +76,7 @@ public class AttestationApplicationIdTest {
     assertThat(AttestationApplicationId.createAttestationApplicationId(null)).isNull();
     assertThat(
             AttestationApplicationId.createAttestationApplicationId(
-                new DEROctetString("Invalid DEROctet String".getBytes())))
+                new DEROctetString("Invalid DEROctet String".getBytes(UTF_8))))
         .isNull();
   }
 
