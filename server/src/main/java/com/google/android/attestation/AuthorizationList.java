@@ -15,6 +15,10 @@
 
 package com.google.android.attestation;
 
+import static com.google.android.attestation.AuthorizationList.UserAuthType.FINGERPRINT;
+import static com.google.android.attestation.AuthorizationList.UserAuthType.PASSWORD;
+import static com.google.android.attestation.AuthorizationList.UserAuthType.USER_AUTH_TYPE_ANY;
+import static com.google.android.attestation.AuthorizationList.UserAuthType.USER_AUTH_TYPE_NONE;
 import static com.google.android.attestation.Constants.KM_TAG_ACTIVE_DATE_TIME;
 import static com.google.android.attestation.Constants.KM_TAG_ALGORITHM;
 import static com.google.android.attestation.Constants.KM_TAG_ALLOW_WHILE_ON_BODY;
@@ -52,6 +56,7 @@ import static com.google.android.attestation.Constants.KM_TAG_UNLOCKED_DEVICE_RE
 import static com.google.android.attestation.Constants.KM_TAG_USAGE_EXPIRE_DATE_TIME;
 import static com.google.android.attestation.Constants.KM_TAG_USER_AUTH_TYPE;
 import static com.google.android.attestation.Constants.KM_TAG_VENDOR_PATCH_LEVEL;
+import static com.google.android.attestation.Constants.UINT32_MAX;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -76,6 +81,13 @@ import org.bouncycastle.asn1.DEROctetString;
  */
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class AuthorizationList {
+  /** Specifies the types of user authenticators that may be used to authorize this key. */
+  public enum UserAuthType {
+    USER_AUTH_TYPE_NONE,
+    PASSWORD,
+    FINGERPRINT,
+    USER_AUTH_TYPE_ANY
+  }
 
   public final Optional<Set<Integer>> purpose;
   public final Optional<Integer> algorithm;
@@ -89,7 +101,7 @@ public class AuthorizationList {
   public final Optional<Instant> originationExpireDateTime;
   public final Optional<Instant> usageExpireDateTime;
   public final boolean noAuthRequired;
-  public final Optional<Integer> userAuthType;
+  public final Optional<UserAuthType> userAuthType;
   public final Optional<Duration> authTimeout;
   public final boolean allowWhileOnBody;
   public final boolean trustedUserPresenceRequired;
@@ -138,8 +150,7 @@ public class AuthorizationList {
             authorizationMap, KM_TAG_USAGE_EXPIRE_DATE_TIME);
     this.noAuthRequired =
         findBooleanAuthorizationListEntry(authorizationMap, KM_TAG_NO_AUTH_REQUIRED);
-    this.userAuthType =
-        findOptionalIntegerAuthorizationListEntry(authorizationMap, KM_TAG_USER_AUTH_TYPE);
+    this.userAuthType = findOptionalUserAuthType(authorizationMap, KM_TAG_USER_AUTH_TYPE);
     this.authTimeout =
         findOptionalDurationSecondsAuthorizationListEntry(authorizationMap, KM_TAG_AUTH_TIMEOUT);
     this.allowWhileOnBody =
@@ -267,5 +278,25 @@ public class AuthorizationList {
       Map<Integer, ASN1Primitive> authorizationMap, int tag) {
     ASN1OctetString entry = (ASN1OctetString) findAuthorizationListEntry(authorizationMap, tag);
     return Optional.ofNullable(entry).map(ASN1OctetString::getOctets);
+  }
+
+  private static Optional<UserAuthType> findOptionalUserAuthType(
+      Map<Integer, ASN1Primitive> authorizationMap, int tag) {
+    Optional<Long> userAuthType = findOptionalLongAuthorizationListEntry(authorizationMap, tag);
+    return userAuthType.map(AuthorizationList::userAuthTypeToEnum);
+  }
+
+  // Visible for testing.
+  static UserAuthType userAuthTypeToEnum(long userAuthType) {
+    if (userAuthType == 0L) {
+      return USER_AUTH_TYPE_NONE;
+    } else if (userAuthType == 1L) {
+      return PASSWORD;
+    } else if (userAuthType == 2L) {
+      return FINGERPRINT;
+    } else if (userAuthType == UINT32_MAX) {
+      return USER_AUTH_TYPE_ANY;
+    }
+    throw new IllegalArgumentException("Invalid User Auth Type.");
   }
 }

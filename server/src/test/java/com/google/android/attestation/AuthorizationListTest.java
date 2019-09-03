@@ -15,8 +15,15 @@
 
 package com.google.android.attestation;
 
+import static com.google.android.attestation.AuthorizationList.UserAuthType.FINGERPRINT;
+import static com.google.android.attestation.AuthorizationList.UserAuthType.PASSWORD;
+import static com.google.android.attestation.AuthorizationList.UserAuthType.USER_AUTH_TYPE_ANY;
+import static com.google.android.attestation.AuthorizationList.UserAuthType.USER_AUTH_TYPE_NONE;
+import static com.google.android.attestation.AuthorizationList.userAuthTypeToEnum;
+import static com.google.android.attestation.Constants.UINT32_MAX;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth8.assertThat;
+import static org.junit.Assert.fail;
 
 import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
@@ -123,5 +130,20 @@ public class AuthorizationListTest {
     assertThat(authorizationList.osPatchLevel).hasValue(EXPECTED_TEE_OS_PATCH_LEVEL);
     assertThat(authorizationList.vendorPatchLevel).hasValue(EXPECTED_TEE_VENDOR_PATCH_LEVEL);
     assertThat(authorizationList.bootPatchLevel).hasValue(EXPECTED_TEE_BOOT_PATCH_LEVEL);
+  }
+
+  @Test
+  public void testUserAuthTypeToEnum() {
+    assertThat(userAuthTypeToEnum(0L)).isEqualTo(USER_AUTH_TYPE_NONE);
+    assertThat(userAuthTypeToEnum(1L)).isEqualTo(PASSWORD);
+    assertThat(userAuthTypeToEnum(2L)).isEqualTo(FINGERPRINT);
+    assertThat(userAuthTypeToEnum(UINT32_MAX)).isEqualTo(USER_AUTH_TYPE_ANY);
+
+    try {
+      userAuthTypeToEnum(3L);
+      fail();
+    } catch (IllegalArgumentException expected) {
+      assertThat(expected).hasMessageThat().contains("Invalid User Auth Type.");
+    }
   }
 }

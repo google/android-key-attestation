@@ -119,4 +119,6 @@ public class Constants {
   static final int KM_VERIFIED_BOOT_STATE_SELF_SIGNED = 1;
   static final int KM_VERIFIED_BOOT_STATE_UNVERIFIED = 2;
   static final int KM_VERIFIED_BOOT_STATE_FAILED = 3;
+  // Unsigned max value of 32-bit integer, 2^32 - 1
+  static final long UINT32_MAX = (((long) Integer.MAX_VALUE) << 1) + 1;
 }
