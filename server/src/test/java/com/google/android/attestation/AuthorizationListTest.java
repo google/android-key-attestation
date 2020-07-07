@@ -109,6 +109,7 @@ public class AuthorizationListTest {
     assertThat(authorizationList.attestationApplicationId).isPresent();
     assertThat(authorizationList.attestationApplicationIdBytes)
         .hasValue(EXPECTED_SW_ATTESTATION_APPLICATION_ID_BYTES);
+    assertThat(authorizationList.individualAttestation).isFalse();
   }
 
   @Test
@@ -130,6 +131,7 @@ public class AuthorizationListTest {
     assertThat(authorizationList.osPatchLevel).hasValue(EXPECTED_TEE_OS_PATCH_LEVEL);
     assertThat(authorizationList.vendorPatchLevel).hasValue(EXPECTED_TEE_VENDOR_PATCH_LEVEL);
     assertThat(authorizationList.bootPatchLevel).hasValue(EXPECTED_TEE_BOOT_PATCH_LEVEL);
+    assertThat(authorizationList.individualAttestation).isFalse();
   }
 
   @Test
@@ -145,5 +147,20 @@ public class AuthorizationListTest {
     } catch (IllegalArgumentException expected) {
       assertThat(expected).hasMessageThat().contains("Invalid User Auth Type.");
     }
+  }
+
+  private static final String EXTENTION_DATA_WITH_INDIVIDUAL_ATTESTATION =
+      "MIH0oQgxBgIBAgIBA6IDAgEBowQCAggApQUxAwIBBKYIMQYCAQMCAQW/gUgFAgMBAAG/g3cCBQC/hT4DAgEAv4VATDBK"
+          + "BCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEBAAoBAgQgEvR7Lf1t9nD6P2qyUmgiQ0mG+RixYn"
+          + "glj2TaAMZmHn2/hUEFAgMBrbC/hUIFAgMDFRi/hUYIBAZnb29nbGW/hUcHBAVzYXJnb7+FSAcEBXNhcmdvv4VM"
+          + "CAQGR29vZ2xlv4VNCgQIUGl4ZWwgM2G/hU4GAgQBND1lv4VPBgIEATQ9Zb+FUAIFAA==";
+  @Test
+  public void testCanParseIndividualAttestation() throws IOException{
+    AuthorizationList authorizationList =
+        AuthorizationList.createAuthorizationList(
+            getEncodableAuthorizationList(EXTENTION_DATA_WITH_INDIVIDUAL_ATTESTATION),
+            ATTESTATION_VERSION);
+
+    assertThat(authorizationList.individualAttestation).isTrue();
   }
 }
