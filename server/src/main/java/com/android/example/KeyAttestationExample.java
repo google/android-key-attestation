@@ -241,7 +241,8 @@ public class KeyAttestationExample {
                 .generateCertificate(
                     new ByteArrayInputStream(GOOGLE_ROOT_CERTIFICATE.getBytes(UTF_8)));
     if (Arrays.equals(
-        secureRoot.getTBSCertificate(), certs[certs.length - 1].getTBSCertificate())) {
+        secureRoot.getPublicKey().getEncoded(),
+        certs[certs.length - 1].getPublicKey().getEncoded())) {
       System.out.println(
           "The root certificate is correct, so this attestation is trustworthy, as long as none of"
               + " the certificates in the chain have been revoked. A production-level system"
