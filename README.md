@@ -6,8 +6,8 @@ from an Android attestation data structure to verify that a key pair has been
 generated in an Android device. 
 
 This repository contains a [server](server/) sample that shows how to attest an Android certificate
-outside the Android framework. This is the recommended best practise, as it is safer to check the
-certificate's authenticity on a separate server that you trust.
+outside the Android framework. This is the recommended best practice, since if the Android device
+is rooted or otherwise compromised on-device validation of the attestation may be inaccurate.
 
 For more details, see the documentation and the guide at 
 https://developer.android.com/training/articles/security-key-attestation.html .
