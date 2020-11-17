@@ -15,144 +15,142 @@
 
 package com.google.android.attestation;
 
-/**
- * Key Attestation constants
- */
+/** Key Attestation constants */
 public class Constants {
 
-    // The Google root certificate that must have been used to sign the root
-    // certificate in a real attestation certificate chain from a compliant
-    // device.
-    // (Note, the sample chain used here is not signed with this certificate.)
-    public static final String GOOGLE_ROOT_CERTIFICATE =
-            "-----BEGIN CERTIFICATE-----\n"
-                    + "MIIFYDCCA0igAwIBAgIJAOj6GWMU0voYMA0GCSqGSIb3DQEBCwUAMBsxGTAXBgNV"
-                    + "BAUTEGY5MjAwOWU4NTNiNmIwNDUwHhcNMTYwNTI2MTYyODUyWhcNMjYwNTI0MTYy"
-                    + "ODUyWjAbMRkwFwYDVQQFExBmOTIwMDllODUzYjZiMDQ1MIICIjANBgkqhkiG9w0B"
-                    + "AQEFAAOCAg8AMIICCgKCAgEAr7bHgiuxpwHsK7Qui8xUFmOr75gvMsd/dTEDDJdS"
-                    + "Sxtf6An7xyqpRR90PL2abxM1dEqlXnf2tqw1Ne4Xwl5jlRfdnJLmN0pTy/4lj4/7"
-                    + "tv0Sk3iiKkypnEUtR6WfMgH0QZfKHM1+di+y9TFRtv6y//0rb+T+W8a9nsNL/ggj"
-                    + "nar86461qO0rOs2cXjp3kOG1FEJ5MVmFmBGtnrKpa73XpXyTqRxB/M0n1n/W9nGq"
-                    + "C4FSYa04T6N5RIZGBN2z2MT5IKGbFlbC8UrW0DxW7AYImQQcHtGl/m00QLVWutHQ"
-                    + "oVJYnFPlXTcHYvASLu+RhhsbDmxMgJJ0mcDpvsC4PjvB+TxywElgS70vE0XmLD+O"
-                    + "JtvsBslHZvPBKCOdT0MS+tgSOIfga+z1Z1g7+DVagf7quvmag8jfPioyKvxnK/Eg"
-                    + "sTUVi2ghzq8wm27ud/mIM7AY2qEORR8Go3TVB4HzWQgpZrt3i5MIlCaY504LzSRi"
-                    + "igHCzAPlHws+W0rB5N+er5/2pJKnfBSDiCiFAVtCLOZ7gLiMm0jhO2B6tUXHI/+M"
-                    + "RPjy02i59lINMRRev56GKtcd9qO/0kUJWdZTdA2XoS82ixPvZtXQpUpuL12ab+9E"
-                    + "aDK8Z4RHJYYfCT3Q5vNAXaiWQ+8PTWm2QgBR/bkwSWc+NpUFgNPN9PvQi8WEg5Um"
-                    + "AGMCAwEAAaOBpjCBozAdBgNVHQ4EFgQUNmHhAHyIBQlRi0RsR/8aTMnqTxIwHwYD"
-                    + "VR0jBBgwFoAUNmHhAHyIBQlRi0RsR/8aTMnqTxIwDwYDVR0TAQH/BAUwAwEB/zAO"
-                    + "BgNVHQ8BAf8EBAMCAYYwQAYDVR0fBDkwNzA1oDOgMYYvaHR0cHM6Ly9hbmRyb2lk"
-                    + "Lmdvb2dsZWFwaXMuY29tL2F0dGVzdGF0aW9uL2NybC8wDQYJKoZIhvcNAQELBQAD"
-                    + "ggIBACDIw41L3KlXG0aMiS//cqrG+EShHUGo8HNsw30W1kJtjn6UBwRM6jnmiwfB"
-                    + "Pb8VA91chb2vssAtX2zbTvqBJ9+LBPGCdw/E53Rbf86qhxKaiAHOjpvAy5Y3m00m"
-                    + "qC0w/Zwvju1twb4vhLaJ5NkUJYsUS7rmJKHHBnETLi8GFqiEsqTWpG/6ibYCv7rY"
-                    + "DBJDcR9W62BW9jfIoBQcxUCUJouMPH25lLNcDc1ssqvC2v7iUgI9LeoM1sNovqPm"
-                    + "QUiG9rHli1vXxzCyaMTjwftkJLkf6724DFhuKug2jITV0QkXvaJWF4nUaHOTNA4u"
-                    + "JU9WDvZLI1j83A+/xnAJUucIv/zGJ1AMH2boHqF8CY16LpsYgBt6tKxxWH00XcyD"
-                    + "CdW2KlBCeqbQPcsFmWyWugxdcekhYsAWyoSf818NUsZdBWBaR/OukXrNLfkQ79Iy"
-                    + "ZohZbvabO/X+MVT3rriAoKc8oE2Uws6DF+60PV7/WIPjNvXySdqspImSN78mflxD"
-                    + "qwLqRBYkA3I75qppLGG9rp7UCdRjxMl8ZDBld+7yvHVgt1cVzJx9xnyGCC23Uaic"
-                    + "MDSXYrB4I4WHXPGjxhZuCuPBLTdOLU8YRvMYdEvYebWHMpvwGCF6bAx3JBpIeOQ1"
-                    + "wDB5y0USicV3YgYGmi+NZfhA4URSh77Yd6uuJOJENRaNVTzk\n"
-                    + "-----END CERTIFICATE-----";
+  // The Google root certificate that must have been used to sign the root
+  // certificate in a real attestation certificate chain from a compliant
+  // device.
+  // (Note, the sample chain used here is not signed with this certificate.)
+  public static final String GOOGLE_ROOT_CERTIFICATE =
+      "-----BEGIN CERTIFICATE-----\n"
+          + "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\n"
+          + "-----END CERTIFICATE-----";
     static final String GOOGLE_ROOT_CERTIFICATE_2 =
             "-----BEGIN CERTIFICATE-----\n" +
-                    "MIIFHDCCAwSgAwIBAgIJANUP8luj8tazMA0GCSqGSIb3DQEBCwUAMBsxGTAXBgNV\n" +
-                    "BAUTEGY5MjAwOWU4NTNiNmIwNDUwHhcNMTkxMTIyMjAzNzU4WhcNMzQxMTE4MjAz\n" +
-                    "NzU4WjAbMRkwFwYDVQQFExBmOTIwMDllODUzYjZiMDQ1MIICIjANBgkqhkiG9w0B\n" +
-                    "AQEFAAOCAg8AMIICCgKCAgEAr7bHgiuxpwHsK7Qui8xUFmOr75gvMsd/dTEDDJdS\n" +
-                    "Sxtf6An7xyqpRR90PL2abxM1dEqlXnf2tqw1Ne4Xwl5jlRfdnJLmN0pTy/4lj4/7\n" +
-                    "tv0Sk3iiKkypnEUtR6WfMgH0QZfKHM1+di+y9TFRtv6y//0rb+T+W8a9nsNL/ggj\n" +
-                    "nar86461qO0rOs2cXjp3kOG1FEJ5MVmFmBGtnrKpa73XpXyTqRxB/M0n1n/W9nGq\n" +
-                    "C4FSYa04T6N5RIZGBN2z2MT5IKGbFlbC8UrW0DxW7AYImQQcHtGl/m00QLVWutHQ\n" +
-                    "oVJYnFPlXTcHYvASLu+RhhsbDmxMgJJ0mcDpvsC4PjvB+TxywElgS70vE0XmLD+O\n" +
-                    "JtvsBslHZvPBKCOdT0MS+tgSOIfga+z1Z1g7+DVagf7quvmag8jfPioyKvxnK/Eg\n" +
-                    "sTUVi2ghzq8wm27ud/mIM7AY2qEORR8Go3TVB4HzWQgpZrt3i5MIlCaY504LzSRi\n" +
-                    "igHCzAPlHws+W0rB5N+er5/2pJKnfBSDiCiFAVtCLOZ7gLiMm0jhO2B6tUXHI/+M\n" +
-                    "RPjy02i59lINMRRev56GKtcd9qO/0kUJWdZTdA2XoS82ixPvZtXQpUpuL12ab+9E\n" +
-                    "aDK8Z4RHJYYfCT3Q5vNAXaiWQ+8PTWm2QgBR/bkwSWc+NpUFgNPN9PvQi8WEg5Um\n" +
-                    "AGMCAwEAAaNjMGEwHQYDVR0OBBYEFDZh4QB8iAUJUYtEbEf/GkzJ6k8SMB8GA1Ud\n" +
-                    "IwQYMBaAFDZh4QB8iAUJUYtEbEf/GkzJ6k8SMA8GA1UdEwEB/wQFMAMBAf8wDgYD\n" +
-                    "VR0PAQH/BAQDAgIEMA0GCSqGSIb3DQEBCwUAA4ICAQBOMaBc8oumXb2voc7XCWnu\n" +
-                    "XKhBBK3e2KMGz39t7lA3XXRe2ZLLAkLM5y3J7tURkf5a1SutfdOyXAmeE6SRo83U\n" +
-                    "h6WszodmMkxK5GM4JGrnt4pBisu5igXEydaW7qq2CdC6DOGjG+mEkN8/TA6p3cno\n" +
-                    "L/sPyz6evdjLlSeJ8rFBH6xWyIZCbrcpYEJzXaUOEaxxXxgYz5/cTiVKN2M1G2ok\n" +
-                    "QBUIYSY6bjEL4aUN5cfo7ogP3UvliEo3Eo0YgwuzR2v0KR6C1cZqZJSTnghIC/vA\n" +
-                    "D32KdNQ+c3N+vl2OTsUVMC1GiWkngNx1OO1+kXW+YTnnTUOtOIswUP/Vqd5SYgAI\n" +
-                    "mMAfY8U9/iIgkQj6T2W6FsScy94IN9fFhE1UtzmLoBIuUFsVXJMTz+Jucth+IqoW\n" +
-                    "Fua9v1R93/k98p41pjtFX+H8DslVgfP097vju4KDlqN64xV1grw3ZLl4CiOe/A91\n" +
-                    "oeLm2UHOq6wn3esB4r2EIQKb6jTVGu5sYCcdWpXr0AUVqcABPdgL+H7qJguBw09o\n" +
-                    "jm6xNIrw2OocrDKsudk/okr/AwqEyPKw9WnMlQgLIKw1rODG2NvU9oR3GVGdMkUB\n" +
-                    "ZutL8VuFkERQGt6vQ2OCw0sV47VMkuYbacK/xyZFiRcrPJPb41zgbQj9XAEyLKCH\n" +
-                    "ex0SdDrx+tWUDqG8At2JHA==\n" +
-                    "-----END CERTIFICATE-----";
-    static final String KEY_DESCRIPTION_OID = "1.3.6.1.4.1.11129.2.1.17";
-    static final int ATTESTATION_VERSION_INDEX = 0;
-    static final int ATTESTATION_SECURITY_LEVEL_INDEX = 1;
-    static final int KEYMASTER_VERSION_INDEX = 2;
-    static final int KEYMASTER_SECURITY_LEVEL_INDEX = 3;
-    static final int ATTESTATION_CHALLENGE_INDEX = 4;
-    static final int UNIQUE_ID_INDEX = 5;
-    static final int SW_ENFORCED_INDEX = 6;
-    static final int TEE_ENFORCED_INDEX = 7;
-    // Authorization list tags. The list is in this AOSP file:
-    // hardware/libhardware/include/hardware/keymaster_defs.h
-    static final int KM_TAG_PURPOSE = 1;
-    static final int KM_TAG_ALGORITHM = 2;
-    static final int KM_TAG_KEY_SIZE = 3;
-    static final int KM_TAG_DIGEST = 5;
-    static final int KM_TAG_PADDING = 6;
-    static final int KM_TAG_EC_CURVE = 10;
-    static final int KM_TAG_RSA_PUBLIC_EXPONENT = 200;
-    static final int KM_TAG_ROLLBACK_RESISTANCE = 303;
-    static final int KM_TAG_ACTIVE_DATE_TIME = 400;
-    static final int KM_TAG_ORIGINATION_EXPIRE_DATE_TIME = 401;
-    static final int KM_TAG_USAGE_EXPIRE_DATE_TIME = 402;
-    static final int KM_TAG_NO_AUTH_REQUIRED = 503;
-    static final int KM_TAG_USER_AUTH_TYPE = 504;
-    static final int KM_TAG_AUTH_TIMEOUT = 505;
-    static final int KM_TAG_ALLOW_WHILE_ON_BODY = 506;
-    static final int KM_TAG_TRUSTED_USER_PRESENCE_REQUIRED = 507;
-    static final int KM_TAG_TRUSTED_CONFIRMATION_REQUIRED = 508;
-    static final int KM_TAG_UNLOCKED_DEVICE_REQUIRED = 509;
-    static final int KM_TAG_ALL_APPLICATIONS = 600;
-    static final int KM_TAG_APPLICATION_ID = 601;
-    static final int KM_TAG_CREATION_DATE_TIME = 701;
-    static final int KM_TAG_ORIGIN = 702;
-    static final int KM_TAG_ROLLBACK_RESISTANT = 703;
-    static final int KM_TAG_ROOT_OF_TRUST = 704;
-    static final int KM_TAG_OS_VERSION = 705;
-    static final int KM_TAG_OS_PATCH_LEVEL = 706;
-    static final int KM_TAG_ATTESTATION_APPLICATION_ID = 709;
-    static final int KM_TAG_ATTESTATION_ID_BRAND = 710;
-    static final int KM_TAG_ATTESTATION_ID_DEVICE = 711;
-    static final int KM_TAG_ATTESTATION_ID_PRODUCT = 712;
-    static final int KM_TAG_ATTESTATION_ID_SERIAL = 713;
-    static final int KM_TAG_ATTESTATION_ID_IMEI = 714;
-    static final int KM_TAG_ATTESTATION_ID_MEID = 715;
-    static final int KM_TAG_ATTESTATION_ID_MANUFACTURER = 716;
-    static final int KM_TAG_ATTESTATION_ID_MODEL = 717;
-    static final int KM_TAG_VENDOR_PATCH_LEVEL = 718;
-    static final int KM_TAG_BOOT_PATCH_LEVEL = 719;
-    static final int KM_TAG_DEVICE_UNIQUE_ATTESTATION = 720;
-    static final int ROOT_OF_TRUST_VERIFIED_BOOT_KEY_INDEX = 0;
-    static final int ROOT_OF_TRUST_DEVICE_LOCKED_INDEX = 1;
-    static final int ROOT_OF_TRUST_VERIFIED_BOOT_STATE_INDEX = 2;
-    static final int ROOT_OF_TRUST_VERIFIED_BOOT_HASH_INDEX = 3;
-    static final int ATTESTATION_APPLICATION_ID_PACKAGE_INFOS_INDEX = 0;
-    static final int ATTESTATION_APPLICATION_ID_SIGNATURE_DIGESTS_INDEX = 1;
-    static final int ATTESTATION_PACKAGE_INFO_PACKAGE_NAME_INDEX = 0;
-    static final int ATTESTATION_PACKAGE_INFO_VERSION_INDEX = 1;
-    // Some security values. The complete list is in this AOSP file:
-    // hardware/libhardware/include/hardware/keymaster_defs.h
-    static final int KM_SECURITY_LEVEL_SOFTWARE = 0;
-    static final int KM_SECURITY_LEVEL_TRUSTED_ENVIRONMENT = 1;
-    static final int KM_SECURITY_LEVEL_STRONG_BOX = 2;
-    static final int KM_VERIFIED_BOOT_STATE_VERIFIED = 0;
-    static final int KM_VERIFIED_BOOT_STATE_SELF_SIGNED = 1;
-    static final int KM_VERIFIED_BOOT_STATE_UNVERIFIED = 2;
-    static final int KM_VERIFIED_BOOT_STATE_FAILED = 3;
-    // Unsigned max value of 32-bit integer, 2^32 - 1
-    static final long UINT32_MAX = (((long) Integer.MAX_VALUE) << 1) + 1;
+            "MIIFHDCCAwSgAwIBAgIJANUP8luj8tazMA0GCSqGSIb3DQEBCwUAMBsxGTAXBgNV" +
+            "BAUTEGY5MjAwOWU4NTNiNmIwNDUwHhcNMTkxMTIyMjAzNzU4WhcNMzQxMTE4MjAz" +
+            "NzU4WjAbMRkwFwYDVQQFExBmOTIwMDllODUzYjZiMDQ1MIICIjANBgkqhkiG9w0B" +
+            "AQEFAAOCAg8AMIICCgKCAgEAr7bHgiuxpwHsK7Qui8xUFmOr75gvMsd/dTEDDJdS" +
+            "Sxtf6An7xyqpRR90PL2abxM1dEqlXnf2tqw1Ne4Xwl5jlRfdnJLmN0pTy/4lj4/7" +
+            "tv0Sk3iiKkypnEUtR6WfMgH0QZfKHM1+di+y9TFRtv6y//0rb+T+W8a9nsNL/ggj" +
+            "nar86461qO0rOs2cXjp3kOG1FEJ5MVmFmBGtnrKpa73XpXyTqRxB/M0n1n/W9nGq" +
+            "C4FSYa04T6N5RIZGBN2z2MT5IKGbFlbC8UrW0DxW7AYImQQcHtGl/m00QLVWutHQ" +
+            "oVJYnFPlXTcHYvASLu+RhhsbDmxMgJJ0mcDpvsC4PjvB+TxywElgS70vE0XmLD+O" +
+            "JtvsBslHZvPBKCOdT0MS+tgSOIfga+z1Z1g7+DVagf7quvmag8jfPioyKvxnK/Eg" +
+            "sTUVi2ghzq8wm27ud/mIM7AY2qEORR8Go3TVB4HzWQgpZrt3i5MIlCaY504LzSRi" +
+            "igHCzAPlHws+W0rB5N+er5/2pJKnfBSDiCiFAVtCLOZ7gLiMm0jhO2B6tUXHI/+M" +
+            "RPjy02i59lINMRRev56GKtcd9qO/0kUJWdZTdA2XoS82ixPvZtXQpUpuL12ab+9E" +
+            "aDK8Z4RHJYYfCT3Q5vNAXaiWQ+8PTWm2QgBR/bkwSWc+NpUFgNPN9PvQi8WEg5Um" +
+            "AGMCAwEAAaNjMGEwHQYDVR0OBBYEFDZh4QB8iAUJUYtEbEf/GkzJ6k8SMB8GA1Ud" +
+            "IwQYMBaAFDZh4QB8iAUJUYtEbEf/GkzJ6k8SMA8GA1UdEwEB/wQFMAMBAf8wDgYD" +
+            "VR0PAQH/BAQDAgIEMA0GCSqGSIb3DQEBCwUAA4ICAQBOMaBc8oumXb2voc7XCWnu" +
+            "XKhBBK3e2KMGz39t7lA3XXRe2ZLLAkLM5y3J7tURkf5a1SutfdOyXAmeE6SRo83U" +
+            "h6WszodmMkxK5GM4JGrnt4pBisu5igXEydaW7qq2CdC6DOGjG+mEkN8/TA6p3cno" +
+            "L/sPyz6evdjLlSeJ8rFBH6xWyIZCbrcpYEJzXaUOEaxxXxgYz5/cTiVKN2M1G2ok" +
+            "QBUIYSY6bjEL4aUN5cfo7ogP3UvliEo3Eo0YgwuzR2v0KR6C1cZqZJSTnghIC/vA" +
+            "D32KdNQ+c3N+vl2OTsUVMC1GiWkngNx1OO1+kXW+YTnnTUOtOIswUP/Vqd5SYgAI" +
+            "mMAfY8U9/iIgkQj6T2W6FsScy94IN9fFhE1UtzmLoBIuUFsVXJMTz+Jucth+IqoW" +
+            "Fua9v1R93/k98p41pjtFX+H8DslVgfP097vju4KDlqN64xV1grw3ZLl4CiOe/A91" +
+            "oeLm2UHOq6wn3esB4r2EIQKb6jTVGu5sYCcdWpXr0AUVqcABPdgL+H7qJguBw09o" +
+            "jm6xNIrw2OocrDKsudk/okr/AwqEyPKw9WnMlQgLIKw1rODG2NvU9oR3GVGdMkUB" +
+            "ZutL8VuFkERQGt6vQ2OCw0sV47VMkuYbacK/xyZFiRcrPJPb41zgbQj9XAEyLKCH" +
+            "ex0SdDrx+tWUDqG8At2JHA==\n"
+             +"-----END CERTIFICATE-----";
+  static final String KEY_DESCRIPTION_OID = "1.3.6.1.4.1.11129.2.1.17";
+  static final int ATTESTATION_VERSION_INDEX = 0;
+  static final int ATTESTATION_SECURITY_LEVEL_INDEX = 1;
+  static final int KEYMASTER_VERSION_INDEX = 2;
+  static final int KEYMASTER_SECURITY_LEVEL_INDEX = 3;
+  static final int ATTESTATION_CHALLENGE_INDEX = 4;
+  static final int UNIQUE_ID_INDEX = 5;
+  static final int SW_ENFORCED_INDEX = 6;
+  static final int TEE_ENFORCED_INDEX = 7;
+  // Authorization list tags. The list is in this AOSP file:
+  // hardware/libhardware/include/hardware/keymaster_defs.h
+  static final int KM_TAG_PURPOSE = 1;
+  static final int KM_TAG_ALGORITHM = 2;
+  static final int KM_TAG_KEY_SIZE = 3;
+  static final int KM_TAG_DIGEST = 5;
+  static final int KM_TAG_PADDING = 6;
+  static final int KM_TAG_EC_CURVE = 10;
+  static final int KM_TAG_RSA_PUBLIC_EXPONENT = 200;
+  static final int KM_TAG_ROLLBACK_RESISTANCE = 303;
+  static final int KM_TAG_ACTIVE_DATE_TIME = 400;
+  static final int KM_TAG_ORIGINATION_EXPIRE_DATE_TIME = 401;
+  static final int KM_TAG_USAGE_EXPIRE_DATE_TIME = 402;
+  static final int KM_TAG_NO_AUTH_REQUIRED = 503;
+  static final int KM_TAG_USER_AUTH_TYPE = 504;
+  static final int KM_TAG_AUTH_TIMEOUT = 505;
+  static final int KM_TAG_ALLOW_WHILE_ON_BODY = 506;
+  static final int KM_TAG_TRUSTED_USER_PRESENCE_REQUIRED = 507;
+  static final int KM_TAG_TRUSTED_CONFIRMATION_REQUIRED = 508;
+  static final int KM_TAG_UNLOCKED_DEVICE_REQUIRED = 509;
+  static final int KM_TAG_ALL_APPLICATIONS = 600;
+  static final int KM_TAG_APPLICATION_ID = 601;
+  static final int KM_TAG_CREATION_DATE_TIME = 701;
+  static final int KM_TAG_ORIGIN = 702;
+  static final int KM_TAG_ROLLBACK_RESISTANT = 703;
+  static final int KM_TAG_ROOT_OF_TRUST = 704;
+  static final int KM_TAG_OS_VERSION = 705;
+  static final int KM_TAG_OS_PATCH_LEVEL = 706;
+  static final int KM_TAG_ATTESTATION_APPLICATION_ID = 709;
+  static final int KM_TAG_ATTESTATION_ID_BRAND = 710;
+  static final int KM_TAG_ATTESTATION_ID_DEVICE = 711;
+  static final int KM_TAG_ATTESTATION_ID_PRODUCT = 712;
+  static final int KM_TAG_ATTESTATION_ID_SERIAL = 713;
+  static final int KM_TAG_ATTESTATION_ID_IMEI = 714;
+  static final int KM_TAG_ATTESTATION_ID_MEID = 715;
+  static final int KM_TAG_ATTESTATION_ID_MANUFACTURER = 716;
+  static final int KM_TAG_ATTESTATION_ID_MODEL = 717;
+  static final int KM_TAG_VENDOR_PATCH_LEVEL = 718;
+  static final int KM_TAG_BOOT_PATCH_LEVEL = 719;
+  static final int KM_TAG_DEVICE_UNIQUE_ATTESTATION = 720;
+  static final int ROOT_OF_TRUST_VERIFIED_BOOT_KEY_INDEX = 0;
+  static final int ROOT_OF_TRUST_DEVICE_LOCKED_INDEX = 1;
+  static final int ROOT_OF_TRUST_VERIFIED_BOOT_STATE_INDEX = 2;
+  static final int ROOT_OF_TRUST_VERIFIED_BOOT_HASH_INDEX = 3;
+  static final int ATTESTATION_APPLICATION_ID_PACKAGE_INFOS_INDEX = 0;
+  static final int ATTESTATION_APPLICATION_ID_SIGNATURE_DIGESTS_INDEX = 1;
+  static final int ATTESTATION_PACKAGE_INFO_PACKAGE_NAME_INDEX = 0;
+  static final int ATTESTATION_PACKAGE_INFO_VERSION_INDEX = 1;
+  // Some security values. The complete list is in this AOSP file:
+  // hardware/libhardware/include/hardware/keymaster_defs.h
+  static final int KM_SECURITY_LEVEL_SOFTWARE = 0;
+  static final int KM_SECURITY_LEVEL_TRUSTED_ENVIRONMENT = 1;
+  static final int KM_SECURITY_LEVEL_STRONG_BOX = 2;
+  static final int KM_VERIFIED_BOOT_STATE_VERIFIED = 0;
+  static final int KM_VERIFIED_BOOT_STATE_SELF_SIGNED = 1;
+  static final int KM_VERIFIED_BOOT_STATE_UNVERIFIED = 2;
+  static final int KM_VERIFIED_BOOT_STATE_FAILED = 3;
+  // Unsigned max value of 32-bit integer, 2^32 - 1
+  static final long UINT32_MAX = (((long) Integer.MAX_VALUE) << 1) + 1;
 }
