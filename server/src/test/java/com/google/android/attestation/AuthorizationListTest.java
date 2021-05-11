@@ -28,6 +28,10 @@ import static org.junit.Assert.fail;
 import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.util.encoders.Base64;
@@ -136,13 +140,17 @@ public class AuthorizationListTest {
 
   @Test
   public void testUserAuthTypeToEnum() {
-    assertThat(userAuthTypeToEnum(0L)).isEqualTo(USER_AUTH_TYPE_NONE);
-    assertThat(userAuthTypeToEnum(1L)).isEqualTo(PASSWORD);
-    assertThat(userAuthTypeToEnum(2L)).isEqualTo(FINGERPRINT);
-    assertThat(userAuthTypeToEnum(UINT32_MAX)).isEqualTo(USER_AUTH_TYPE_ANY);
+    assertThat(userAuthTypeToEnum(0L)).isEqualTo(Collections.singleton(USER_AUTH_TYPE_NONE));
+    assertThat(userAuthTypeToEnum(1L)).isEqualTo(Collections.singleton(PASSWORD));
+    assertThat(userAuthTypeToEnum(2L)).isEqualTo(Collections.singleton(FINGERPRINT));
+    assertThat(userAuthTypeToEnum(3L)).isEqualTo(new HashSet<>(Arrays.asList(PASSWORD, FINGERPRINT)));
+    assertThat(userAuthTypeToEnum(UINT32_MAX)).isEqualTo(
+        new HashSet<>(Arrays.asList(PASSWORD, FINGERPRINT, USER_AUTH_TYPE_ANY))
+    );
+
 
     try {
-      userAuthTypeToEnum(3L);
+      userAuthTypeToEnum(4L);
       fail();
     } catch (IllegalArgumentException expected) {
       assertThat(expected).hasMessageThat().contains("Invalid User Auth Type.");

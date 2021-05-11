@@ -102,7 +102,7 @@ public class AuthorizationList {
   public final Optional<Instant> originationExpireDateTime;
   public final Optional<Instant> usageExpireDateTime;
   public final boolean noAuthRequired;
-  public final Optional<UserAuthType> userAuthType;
+  public final Optional<Set<UserAuthType>> userAuthType;
   public final Optional<Duration> authTimeout;
   public final boolean allowWhileOnBody;
   public final boolean trustedUserPresenceRequired;
@@ -284,23 +284,33 @@ public class AuthorizationList {
     return Optional.ofNullable(entry).map(ASN1OctetString::getOctets);
   }
 
-  private static Optional<UserAuthType> findOptionalUserAuthType(
+  private static Optional<Set<UserAuthType>> findOptionalUserAuthType(
       Map<Integer, ASN1Primitive> authorizationMap, int tag) {
     Optional<Long> userAuthType = findOptionalLongAuthorizationListEntry(authorizationMap, tag);
     return userAuthType.map(AuthorizationList::userAuthTypeToEnum);
   }
 
   // Visible for testing.
-  static UserAuthType userAuthTypeToEnum(long userAuthType) {
-    if (userAuthType == 0L) {
-      return USER_AUTH_TYPE_NONE;
-    } else if (userAuthType == 1L) {
-      return PASSWORD;
-    } else if (userAuthType == 2L) {
-      return FINGERPRINT;
-    } else if (userAuthType == UINT32_MAX) {
-      return USER_AUTH_TYPE_ANY;
+  static Set<UserAuthType> userAuthTypeToEnum(long userAuthType) {
+    Set<UserAuthType> result = new HashSet<>();
+    if (userAuthType == 0) {
+      result.add(USER_AUTH_TYPE_NONE);
+    } else {
+      if ((userAuthType & 1L) == 1L) {
+        result.add(PASSWORD);
+      }
+      if ((userAuthType & 2L) == 2L) {
+        result.add(FINGERPRINT);
+      }
+      if (userAuthType == UINT32_MAX) {
+        result.add(USER_AUTH_TYPE_ANY);
+      }
     }
-    throw new IllegalArgumentException("Invalid User Auth Type.");
+
+    if (result.isEmpty()) {
+      throw new IllegalArgumentException("Invalid User Auth Type.");
+    }
+
+    return result;
   }
 }
