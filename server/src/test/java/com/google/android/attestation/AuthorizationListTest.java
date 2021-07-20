@@ -28,9 +28,7 @@ import static org.junit.Assert.fail;
 import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Sequence;
@@ -140,13 +138,11 @@ public class AuthorizationListTest {
 
   @Test
   public void testUserAuthTypeToEnum() {
-    assertThat(userAuthTypeToEnum(0L)).isEqualTo(Collections.singleton(USER_AUTH_TYPE_NONE));
-    assertThat(userAuthTypeToEnum(1L)).isEqualTo(Collections.singleton(PASSWORD));
-    assertThat(userAuthTypeToEnum(2L)).isEqualTo(Collections.singleton(FINGERPRINT));
-    assertThat(userAuthTypeToEnum(3L)).isEqualTo(new HashSet<>(Arrays.asList(PASSWORD, FINGERPRINT)));
-    assertThat(userAuthTypeToEnum(UINT32_MAX)).isEqualTo(
-        new HashSet<>(Arrays.asList(PASSWORD, FINGERPRINT, USER_AUTH_TYPE_ANY))
-    );
+    assertThat(userAuthTypeToEnum(0L)).isEqualTo(Set.of(USER_AUTH_TYPE_NONE));
+    assertThat(userAuthTypeToEnum(1L)).isEqualTo(Set.of(PASSWORD));
+    assertThat(userAuthTypeToEnum(2L)).isEqualTo(Set.of(FINGERPRINT));
+    assertThat(userAuthTypeToEnum(3L)).isEqualTo(Set.of(PASSWORD, FINGERPRINT));
+    assertThat(userAuthTypeToEnum(UINT32_MAX)).isEqualTo(Set.of(PASSWORD, FINGERPRINT, USER_AUTH_TYPE_ANY));
 
 
     try {

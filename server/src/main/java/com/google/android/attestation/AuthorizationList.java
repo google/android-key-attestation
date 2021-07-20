@@ -292,19 +292,20 @@ public class AuthorizationList {
 
   // Visible for testing.
   static Set<UserAuthType> userAuthTypeToEnum(long userAuthType) {
-    Set<UserAuthType> result = new HashSet<>();
     if (userAuthType == 0) {
-      result.add(USER_AUTH_TYPE_NONE);
-    } else {
-      if ((userAuthType & 1L) == 1L) {
-        result.add(PASSWORD);
-      }
-      if ((userAuthType & 2L) == 2L) {
-        result.add(FINGERPRINT);
-      }
-      if (userAuthType == UINT32_MAX) {
-        result.add(USER_AUTH_TYPE_ANY);
-      }
+      return Set.of(USER_AUTH_TYPE_NONE);
+    }
+
+    Set<UserAuthType> result = new HashSet<>();
+
+    if ((userAuthType & 1L) == 1L) {
+      result.add(PASSWORD);
+    }
+    if ((userAuthType & 2L) == 2L) {
+      result.add(FINGERPRINT);
+    }
+    if (userAuthType == UINT32_MAX) {
+      result.add(USER_AUTH_TYPE_ANY);
     }
 
     if (result.isEmpty()) {
