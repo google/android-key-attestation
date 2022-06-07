@@ -37,6 +37,7 @@ import static com.google.android.attestation.Constants.KM_TAG_AUTH_TIMEOUT;
 import static com.google.android.attestation.Constants.KM_TAG_BOOT_PATCH_LEVEL;
 import static com.google.android.attestation.Constants.KM_TAG_CREATION_DATE_TIME;
 import static com.google.android.attestation.Constants.KM_TAG_DEVICE_UNIQUE_ATTESTATION;
+import static com.google.android.attestation.Constants.KM_TAG_IDENTITY_CREDENTIAL_KEY;
 import static com.google.android.attestation.Constants.KM_TAG_DIGEST;
 import static com.google.android.attestation.Constants.KM_TAG_EC_CURVE;
 import static com.google.android.attestation.Constants.KM_TAG_KEY_SIZE;
@@ -136,6 +137,7 @@ public class AuthorizationList {
   public final Optional<Integer> vendorPatchLevel;
   public final Optional<Integer> bootPatchLevel;
   public final boolean individualAttestation;
+  public final boolean identityCredentialKey;
 
   private AuthorizationList(ASN1Encodable[] authorizationList, int attestationVersion) {
     Map<Integer, ASN1Primitive> authorizationMap = getAuthorizationMap(authorizationList);
@@ -221,6 +223,9 @@ public class AuthorizationList {
         findOptionalIntegerAuthorizationListEntry(authorizationMap, KM_TAG_BOOT_PATCH_LEVEL);
     this.individualAttestation =
         findBooleanAuthorizationListEntry(authorizationMap, KM_TAG_DEVICE_UNIQUE_ATTESTATION);
+    this.identityCredentialKey =
+        findBooleanAuthorizationListEntry(authorizationMap, KM_TAG_IDENTITY_CREDENTIAL_KEY);
+
   }
 
   private AuthorizationList(Builder builder) {

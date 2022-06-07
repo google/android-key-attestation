@@ -84,6 +84,7 @@ public class Constants {
   static final int KM_TAG_VENDOR_PATCH_LEVEL = 718;
   static final int KM_TAG_BOOT_PATCH_LEVEL = 719;
   static final int KM_TAG_DEVICE_UNIQUE_ATTESTATION = 720;
+  static final int KM_TAG_IDENTITY_CREDENTIAL_KEY = 721;
   static final int ROOT_OF_TRUST_VERIFIED_BOOT_KEY_INDEX = 0;
   static final int ROOT_OF_TRUST_DEVICE_LOCKED_INDEX = 1;
   static final int ROOT_OF_TRUST_VERIFIED_BOOT_STATE_INDEX = 2;

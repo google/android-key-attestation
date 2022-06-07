@@ -167,6 +167,8 @@ public class KeyAttestationExample {
     printOptional(authorizationList.attestationIdModel, indent + "Attestation ID Model");
     printOptional(authorizationList.vendorPatchLevel, indent + "Vendor Patch Level");
     printOptional(authorizationList.bootPatchLevel, indent + "Boot Patch Level");
+    System.out.println(
+        indent + "Identity Credential Key: " + authorizationList.identityCredentialKey);
   }
 
   private static void printRootOfTrust(Optional<RootOfTrust> rootOfTrust, String indent) {
