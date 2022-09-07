@@ -1,15 +1,23 @@
-Android Key Attestation Sample
+Android Key Attestation Library
 ===================================
 
-This sample illustrates how to use the [Bouncy Castle ASN.1][1] parser to extract information
+This library uses the [Bouncy Castle ASN.1][1] parser to extract information
 from an Android attestation data structure to verify that a key pair has been
-generated in an Android device. 
+generated in a hardware-protected environment of an Android device. It is
+maintained in tandem with Android's key attestation capabilities and is meant
+for production use.
 
-This repository contains a [server](server/) sample that shows how to attest an Android certificate
-outside the Android framework. This is the recommended best practice, since if the Android device
-is rooted or otherwise compromised on-device validation of the attestation may be inaccurate.
+This repository contains a [server](server/src/main/java/com/android/example/)
+sample code that shows how to validate an Android attestation certificate chain
+outside the Android framework. This is the recommended best practice, since if
+the Android device is rooted or otherwise compromised, on-device validation of
+the attestation may be inaccurate.
 
-For more details, see the documentation and the guide at 
+The entry point into the
+[library itself](server/src/main/java/com/google/android/attestation/)
+is `com.google.android.attestation.ParsedAttestationRecord.createParsedAttestationRecord`.
+
+For more details, see the documentation and the guide at
 https://developer.android.com/training/articles/security-key-attestation.html .
 
 [1]: https://www.bouncycastle.org/
@@ -26,7 +34,7 @@ Support
 - Stack Overflow: http://stackoverflow.com/questions/tagged/android
 
 If you've found an error in this sample, please file an issue:
-https://github.com/googlesamples/android-key-attestation
+https://github.com/google/android-key-attestation
 
 Patches are encouraged, and may be submitted by forking this project and
 submitting a pull request through GitHub. Please see CONTRIBUTING.md for more details.
