@@ -1,0 +1,418 @@
+/* Copyright 2022, The Android Open Source Project, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+syntax = "proto3";
+
+package com.google.android.attestation;
+
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+import "google/type/date.proto";
+
+option java_package = "com.google.android.attestation";
+
+message KeyDescription {
+  // The version of the key attestation feature.
+  enum AttestationVersion {
+    ATTESTATION_VERSION_UNSPECIFIED = 0;
+    ATTESTATION_V_ONE = 1;
+    ATTESTATION_V_TWO = 2;
+    ATTESTATION_V_THREE = 3;
+    ATTESTATION_V_FOUR = 4;
+    ATTESTATION_V_ONE_ZERO_ZERO = 100;
+    ATTESTATION_V_TWO_ZERO_ZERO = 200;
+  }
+
+  AttestationVersion attestation_version = 1;
+
+  // This data structure indicates the extent to which a software feature, such
+  // as a key pair, is protected based on its location within the device.
+  enum SecurityLevel {
+    SECURITY_LEVEL_UNSPECIFIED = 0;
+    // The logic for creating and managing the feature is implemented in the
+    // Android system. For the purposes of creating and storing key pairs, this
+    // location is less secure than the TEE but is more secure than your app's
+    // process space.
+    SOFTWARE = 1;
+    // The logic for creating and managing the feature is implemented in secure
+    // hardware, such as a TEE. For the purposes of creating and storing key
+    // pairs, this location is more secure because secure hardware is highly
+    // resistant to remote compromise.
+    TRUSTED_ENVIRONMENT = 2;
+    // The logic for creating and managing the feature is implemented in a
+    // dedicated hardware security module. For the purposes of creating and
+    // storing key pairs, this location is more secure because it is highly
+    // resistant to remote compromise and hardware attacks against the module.
+    // Present only in key attestation version 3.
+    STRONG_BOX = 3;
+  }
+
+  // The security level of the attestation.
+  SecurityLevel attestation_security_level = 2;
+
+  // The version of the Keymaster hardware abstraction layer (HAL). Use 0 to
+  // represent version 0.2 or 0.3, 1 to represent version 1.0, and 2 to
+  // represent version 2.0.
+  enum KeymasterVersion {
+    KEYMASTER_VERSION_UNSPECIFIED = 0;
+    KM_V_ZERO = 1;
+    KM_V_ONE = 2;
+    KM_V_TWO = 3;
+    KM_V_THREE = 4;
+    KM_V_FOUR = 5;
+    KM_V_FOUR_ONE = 6;
+    KM_V_ONE_ZERO_ZERO = 7;
+    KM_V_TWO_ZERO_ZERO = 8;
+  }
+
+  KeymasterVersion keymaster_version = 3;
+
+  // The security level of the Keymaster implementation.
+  SecurityLevel keymaster_security_level = 4;
+
+  bytes attestation_challenge = 5;
+  // This value identifies the device—but only for a limited period of time. It
+  // is computed and is only used by system apps. In all other apps, uniqueId is
+  // empty.
+  bytes unique_id = 6;
+
+  // This data structure contains the key pair's properties themselves, as
+  // defined in the Keymaster hardware abstraction layer (HAL). You compare
+  // these values to the device's current state or to a set of expected values
+  // to verify that a key pair is still valid for use in your app.
+  message AuthorizationList {
+    enum KeyPurpose {
+      PURPOSE_UNSPECIFIED = 0;
+      ENCRYPT = 1;
+      DECRYPT = 2;
+      SIGN = 3;
+      VERIFY = 4;
+      DERIVE_KEY = 5;
+      WRAP_KEY = 6;
+      AGREE_KEY = 7;
+      ATTEST_KEY = 8;
+    }
+
+    // Specifies the set of purposes for which the key may be used.
+    repeated KeyPurpose purposes = 1;
+
+    enum Algorithm {
+      ALGORITHM_UNSPECIFIED = 0;
+      RSA = 1;
+      EC = 2;
+      AES = 3;
+      HMAC = 4;
+      TRIPLE_DES = 5;
+    }
+
+    // Specifies the cryptographic algorithm with which the key is used.
+    Algorithm algorithm = 2;
+
+    // Specifies the size, in bits, of the key, measuring in the normal way for
+    // the key's algorithm. For example, for RSA keys, key_size specifies
+    // the size of the public modulus. For AES keys it specifies the length of
+    // the secret key material.
+    .google.protobuf.Int32Value key_size = 3;
+
+    enum Digest {
+      DIGEST_UNSPECIFIED = 0;
+      DIGEST_NONE = 1;
+      MD5 = 2;
+      SHA1 = 3;
+      SHA_2_224 = 4;
+      SHA_2_256 = 5;
+      SHA_2_384 = 6;
+      SHA_2_512 = 7;
+    }
+
+    // Specifies the digest algorithms that may be used with the key to perform
+    // signing and verification operations. This field is relevant to RSA, ECDSA
+    // and HMAC keys.
+    repeated Digest digests = 4;
+
+    enum Padding {
+      PADDING_UNSPECIFIED = 0;
+      // NONE may be used with either RSA or AES keys.
+      PADDING_NONE = 1;
+      // RSA_OAEP is used only for RSA encryption/decryption keys and specifies
+      // RSA PKCS#1v2 OAEP padding.
+      RSA_OAEP = 2;
+      // RSA_PSS is used only for RSA signing/verification keys and specifies
+      // RSA PKCS#1v2 PSS padding.
+      RSA_PSS = 3;
+      // RSA_PKCS1_1_5_ENCRYPT is used only for RSA encryption/decryption keys
+      // and specifies RSA PKCS#1 v1.5 randomized padding.
+      RSA_PKCS1_1_5_ENCRYPT = 4;
+      // RSA_PKCS1_1_5_SIGN is used only for RSA signing/verification keys and
+      // specifies RSA PKCS#1 v1.5 deterministic padding.
+      RSA_PKCS1_1_5_SIGN = 5;
+      // PKCS7 may only be used with AES keys, and only with ECB and CBC modes.
+      PKCS7 = 64;
+    }
+
+    // Specifies the padding modes that may be used with the key. This field is
+    // relevant to RSA and AES keys.
+    repeated Padding paddings = 5;
+
+    // In Keymaster 1, the curve used for EC keys was guessed from the specified
+    // key size. To improve flexibility moving forward, Keymaster 2 introduced
+    // an explicit way to specify curves. EC key generation requests may have
+    // ec_curve, key_size, or both.
+    enum EcCurve {
+      EC_CURVE_UNSPECIFIED = 0;
+      P_224 = 1;
+      P_256 = 2;
+      P_384 = 3;
+      P_521 = 4;
+    }
+
+    // The set of parameters used to generate an elliptic curve (EC) key pair,
+    // which uses ECDSA for signing and verification, within the Android system
+    // keystore.
+    EcCurve ec_curve = 6;
+
+    // Specifies the value of the public exponent for an RSA key pair. This
+    // field is relevant only to RSA keys, and necessary for all RSA keys. The
+    // value is a 64-bit unsigned integer that satisfies the requirements of an
+    // RSA public exponent. This value has to be a prime number. Trustlets
+    // support the value 2^16+1 and may support other reasonable values, in
+    // particular the value 3.  If no exponent is specified or if the specified
+    // exponent is not supported, key generation fails.
+    .google.protobuf.Int64Value rsa_public_exponent = 7;
+
+    // Corresponds to rollback_resistant.
+    // Present only in key attestation version 3.
+    bool rollback_resistance = 8;
+
+    // Specifies the date and time at which the key becomes active. Prior to
+    // this time, any attempt to use the key fails.
+    .google.protobuf.Timestamp active_datetime = 9;
+
+    // Specifies the date and time at which the key expires for signing and
+    // encryption purposes. After this time, any attempt to use a key with
+    // KeyPurpose.SIGN or KeyPurpose.ENCRYPT provided to begin fails.
+    .google.protobuf.Timestamp origination_expire_datetime = 10;
+
+    // Specifies the date and time at which the key expires for verification and
+    // decryption purposes. After this time, any attempt to use a key with
+    // KeyPurpose.VERIFY or KeyPurpose.DECRYPT provided to begin fails.
+    .google.protobuf.Timestamp usage_expire_datetime = 11;
+
+    // Specifies that no authentication is required to use this key.
+    bool no_auth_required = 12;
+
+    enum UserAuthType {
+      USER_AUTH_TYPE_UNSPECIFIED = 0;
+      USER_AUTH_TYPE_NONE = 1;
+      PASSWORD = 2;
+      FINGERPRINT = 3;
+      USER_AUTH_TYPE_ANY = 4;
+    }
+
+    // Specifies the types of user authenticators that may be used to authorize
+    // this key.
+    UserAuthType user_auth_type = 13;
+
+    // Specifies the time in seconds for which the key is authorized for use,
+    // after authentication.
+    .google.protobuf.Duration auth_timeout = 14;
+
+    // This field is applicable only for Android Wear devices with on-body
+    // sensors. At this point, it's not expected that any TEE will be able to
+    // provide secure access to an on-body sensor, or that on-body sensors are
+    // very secure, so this is expected to be a purely software-enforced
+    // feature.
+    bool allow_while_on_body = 15;
+
+    // Specifies that this key is usable only if the user has provided proof of
+    // physical presence.
+    // Present only in key attestation version 3.
+    bool trusted_user_presence_required = 16;
+
+    // Specifies that the key is usable only if the user provides confirmation
+    // of the data to be signed using an approval token.
+    // Present only in key attestation version 3.
+    bool trusted_confirmation_required = 17;
+
+    // Present only in key attestation version 3.
+    bool unlocked_device_required = 18;
+
+    // Indicates whether all apps on a device can access the key pair.
+    bool all_applications = 19;
+
+    // When provided to generateKey or importKey, this field specifies data that
+    // is necessary during all uses of the key.
+    .google.protobuf.BytesValue application_id = 20;
+
+    // Specifies the date and time the key was created.
+    .google.protobuf.Timestamp creation_datetime = 21;
+
+    enum Origin {
+      ORIGIN_UNSPECIFIED = 0;
+      // GENERATED indicates that Keymaster generated the key. If in the
+      // hardware-enforced list, the key was generated in secure hardware and is
+      // permanently hardware bound. If in the software-enforced list, the key
+      // was generated in SoftKeymaster and is not hardware bound.
+      GENERATED = 1;
+      // DERIVED indicates that the key was derived inside Keymaster. Likely
+      // exists off-device.
+      DERIVED = 2;
+      IMPORTED = 3;
+      UNKNOWN = 4;
+    }
+
+    // Specifies where the key was created, if known. This field may not be
+    // specified during key generation or import, and must be added to the key
+    // characteristics by the trustlet.
+    Origin origin = 22;
+
+    // Indicates that the key is rollback-resistant, meaning that when deleted
+    // by deleteKey or deleteAllKeys, the key is guaranteed to be permanently
+    // deleted and unusable. It's possible that keys without this field could be
+    // deleted and then restored from backup.
+    // Present only in key attestation version 1 and 2. Corresponds to
+    // rollback_resistance in version 3.
+    bool rollback_resistant = 23;
+
+    // This collection of values defines key information about the device's
+    // status.
+    message RootOfTrust {
+      // A secure hash of the key that verifies the system image. It is
+      // recommended that you use the SHA-256 algorithm for this hash.
+      bytes verified_boot_key = 1;
+
+      // True if the device's bootloader is locked, which enables Verified Boot
+      // checking and prevents an unsigned device image from being flashed onto
+      // the device.
+      bool device_locked = 2;
+
+      enum VerifiedBootState {
+        VERIFIED_BOOT_STATE_UNSPECIFIED = 0;
+        VERIFIED = 1;
+        SELF_SIGNED = 2;
+        UNVERIFIED = 3;
+        FAILED = 4;
+      }
+
+      // The boot state of the device, according to the Verified Boot feature.
+      VerifiedBootState verified_boot_state = 3;
+
+      // A digest of all data protected by Verified Boot. For devices that use
+      // the Android Verified Boot implementation of Verified Boot, this value
+      // contains the digest of the VBMeta struct, or the Verified Boot metadata
+      // structure.
+      // Present only in key attestation version 3.
+      bytes verified_boot_hash = 4;
+    }
+
+    // Specifies the root of trust, the key used by verified boot to validate
+    // the operating system booted (if any).
+    RootOfTrust root_of_trust = 24;
+
+    // The version of the Android operating system associated with the
+    // Keymaster.
+    .google.protobuf.Int32Value os_version = 25;
+
+    // The month and year associated with the security patch that is being used
+    // within the Keymaster.
+    google.type.Date os_patch_level = 26;
+
+    // This data structure reflects the Android platform's belief as to which
+    // apps are allowed to use the secret key material under attestation. The ID
+    // can comprise multiple packages if and only if multiple packages share the
+    // same UID.
+    message AttestationApplicationId {
+      message AttestationPackageInfo {
+        .google.protobuf.StringValue package_name = 1;
+        .google.protobuf.Int64Value version = 2;
+      }
+      // A set of AttestationPackageInfo objects, each providing a package's
+      // name and version number.
+      repeated AttestationPackageInfo package_infos = 1;
+      // A set of SHA-256 digests of the app's signature blobs.
+      repeated bytes signature_digests = 2;
+    }
+
+    // Used to identify the set of possible applications of which one has
+    // initiated a key attestation.
+    // Present only in key attestation version 2 and 3.
+    AttestationApplicationId attestation_application_id = 27;
+
+    // Provides the device's brand name, as returned by Build.BRAND in Android.
+    // This field is set only when requesting attestation of the device's
+    // identifiers.
+    // Present only in key attestation version 2 and 3.
+    .google.protobuf.BytesValue attestation_id_brand = 28;
+
+    // Provides the device's device name, as returned by Build.DEVICE in
+    // Android. This field is set only when requesting attestation of the
+    // device's identifiers.
+    // Present only in key attestation version 2 and 3.
+    .google.protobuf.BytesValue attestation_id_device = 29;
+
+    // Provides the device's product name, as returned by Build.PRODUCT in
+    // Android. This field is set only when requesting attestation of the
+    // device's identifiers.
+    // Present only in key attestation version 2 and 3.
+    .google.protobuf.BytesValue attestation_id_product = 30;
+
+    // Provides the device's serial number. This field is set only when
+    // requesting attestation of the device's identifiers.
+    // Present only in key attestation version 2 and 3.
+    .google.protobuf.BytesValue attestation_id_serial = 31;
+
+    // Provides the IMEIs for all radios on the device. This field is set only
+    // when requesting attestation of the device's identifiers.
+    // Present only in key attestation version 2 and 3.
+    .google.protobuf.BytesValue attestation_id_imei = 32;
+
+    // Provides the MEIDs for all radios on the device. This field will only be
+    // set when requesting attestation of the device's identifiers.
+    // Present only in key attestation version 2 and 3.
+    .google.protobuf.BytesValue attestation_id_meid = 33;
+
+    // Provides the device's manufacturer name, as returned by
+    // Build.MANUFACTURER in Android. This field is set only when requesting
+    // attestation of the device's identifiers.
+    // Present only in key attestation version 2 and 3.
+    .google.protobuf.BytesValue attestation_id_manufacturer = 34;
+
+    // Provides the device's model name, as returned by Build.MODEL in Android.
+    // This field is set only when requesting attestation of the device's
+    // identifiers.
+    // Present only in key attestation version 2 and 3.
+    .google.protobuf.BytesValue attestation_id_model = 35;
+
+    // This field specifies the vendor image security patch level with which the
+    // key may be used. This field is never sent to the keymaster TA, but is
+    // added to the hardware-enforced authorization list by the TA.
+    // Present only in key attestation version 3.
+    google.type.Date vendor_patch_level = 36;
+
+    // specifies the boot image (kernel) security patch level with which the key
+    // may be used. This tag is never sent to the keymaster TA, but is added to
+    // the hardware-enforced authorization list by the TA.
+    // Present only in key attestation version 3.
+    google.type.Date boot_patch_level = 37;
+  }
+
+  // Optional. The Keymaster authorization list that is enforced by the Android
+  // system, not by the device's TEE.
+  AuthorizationList software_enforced = 7;
+  // Optional. The Keymaster authorization list that is enforced by the device's
+  // TEE.
+  AuthorizationList tee_enforced = 8;
+}
