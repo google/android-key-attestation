@@ -26,4 +26,4 @@ local.properties
 .gradle/
 # Sandbox stuff
 _sandbox
-
+bazel-*/
