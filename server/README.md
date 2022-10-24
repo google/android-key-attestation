@@ -13,12 +13,7 @@ Introduction
 This example demonstrates the following tasks:
 
 1. Loading the certificates from [PEM/DER][2]-encoded strings.
-1. Verifying the [X.509][3] certificate chain, up to the root. Note that this example
-   does NOT require the root certificate to appear within Google's list of
-   root certificates. However, if you're verifying the properties of
-   hardware-backed keys on a device that ships with hardware-level key
-   attestation, Android 7.0 (API level 24) or higher, and Google Play
-   services, your production code should enforce this requirement.
+1. Verifying the [X.509][3] certificate chain, up to the root. This includes checking that the root certificate is one of Google's root certificates listed in https://developer.android.com/training/articles/security-key-attestation.
 1. Extracting the attestation extension data from the attestation
    certificate.
 1. Verifying (and printing) data elements from the attestation extension.
