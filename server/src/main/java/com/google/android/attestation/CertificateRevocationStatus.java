@@ -41,10 +41,20 @@ public class CertificateRevocationStatus {
   public final String comment;
   public final String expires;
 
-  public static HashMap<String, CertificateRevocationStatus> fetchAllEntriesAsMap()
+  public static HashMap<String, CertificateRevocationStatus> fetchAllEntries() throws IOException {
+    URL url = new URL(STATUS_URL);
+    InputStreamReader statusListReader = new InputStreamReader(url.openStream());
+    return getEntryToStatusMap(statusListReader);
+  }
+
+  public static HashMap<String, CertificateRevocationStatus> loadAllEntriesFromFile(String filePath)
           throws IOException {
-    URL statusUrl = new URL(STATUS_URL);
-    InputStreamReader statusListReader = new InputStreamReader(statusUrl.openStream());
+    FileReader reader = new FileReader(filePath);
+    return getEntryToStatusMap(reader);
+  }
+
+  private static HashMap<String, CertificateRevocationStatus> getEntryToStatusMap(
+          Reader statusListReader) {
     JsonObject entries =
             new JsonParser().parse(statusListReader).getAsJsonObject().getAsJsonObject("entries");
 
