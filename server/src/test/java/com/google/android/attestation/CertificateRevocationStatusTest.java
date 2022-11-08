@@ -24,6 +24,8 @@ import java.io.ByteArrayInputStream;
 import java.math.BigInteger;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.HashMap;
+import java.util.HashSet;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -72,5 +74,30 @@ public final class CertificateRevocationStatusTest {
         .isNull();
     assertThat(CertificateRevocationStatus.loadStatusFromFile(BigInteger.valueOf(0xbadbeef), TEST_STATUS_LIST_PATH))
         .isNull();
+  }
+
+  @Test
+  public void loadAllTestEntries() throws Exception {
+    HashSet<String> allTestSerialNumbers = new HashSet<>();
+    allTestSerialNumbers.add("6681152659205225093");
+    allTestSerialNumbers.add("8350192447815228107");
+    allTestSerialNumbers.add("9408173275444922801");
+    allTestSerialNumbers.add("11244410301401252959");
+    allTestSerialNumbers.add("cc66e9a93713b6e643b26c15879786f7");
+
+    HashMap<String, CertificateRevocationStatus> statusMap =
+            CertificateRevocationStatus.loadAllEntriesFromFile(TEST_STATUS_LIST_PATH);
+
+    assertThat(statusMap.keySet()).isEqualTo(allTestSerialNumbers);
+    assertThat(statusMap.get("8350192447815228107").status)
+            .isEqualTo(CertificateRevocationStatus.Status.REVOKED);
+    assertThat(statusMap.get("8350192447815228107").reason)
+            .isEqualTo(CertificateRevocationStatus.Reason.KEY_COMPROMISE);
+    assertThat(statusMap.get("cc66e9a93713b6e643b26c15879786f7").status)
+            .isEqualTo(CertificateRevocationStatus.Status.SUSPENDED);
+    assertThat(statusMap.get("cc66e9a93713b6e643b26c15879786f7").reason)
+            .isEqualTo(CertificateRevocationStatus.Reason.KEY_COMPROMISE);
+    assertThat(statusMap.get("cc66e9a93713b6e643b26c15879786f7").comment)
+            .isEqualTo("Entry for testing only");
   }
 }
