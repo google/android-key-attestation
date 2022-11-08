@@ -27,6 +27,7 @@ import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.util.HashMap;
 
 
 /**
@@ -39,6 +40,23 @@ public class CertificateRevocationStatus {
   public final Reason reason;
   public final String comment;
   public final String expires;
+
+  public static HashMap<String, CertificateRevocationStatus> fetchAllEntriesAsMap()
+          throws IOException {
+    URL statusUrl = new URL(STATUS_URL);
+    InputStreamReader statusListReader = new InputStreamReader(statusUrl.openStream());
+    JsonObject entries =
+            new JsonParser().parse(statusListReader).getAsJsonObject().getAsJsonObject("entries");
+
+    HashMap<String, CertificateRevocationStatus> serialNumberToStatus = new HashMap<>();
+    for (String serialNumber : entries.keySet()) {
+      serialNumberToStatus.put(
+              serialNumber,
+              new Gson().fromJson(entries.get(serialNumber), CertificateRevocationStatus.class));
+    }
+
+    return serialNumberToStatus;
+  }
 
   public static CertificateRevocationStatus loadStatusFromFile(BigInteger serialNumber,
       String filePath)
