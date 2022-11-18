@@ -30,9 +30,14 @@ import static com.google.android.attestation.Constants.UNIQUE_ID_INDEX;
 
 import java.io.IOException;
 import java.security.cert.X509Certificate;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1Enumerated;
 import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.DERSequence;
 
 /** Java representation of Key Attestation extension data. */
 public class ParsedAttestationRecord {
@@ -72,10 +77,53 @@ public class ParsedAttestationRecord {
             attestationVersion);
   }
 
+  private ParsedAttestationRecord(
+      int attestationVersion,
+      SecurityLevel attestationSecurityLevel,
+      int keymasterVersion,
+      SecurityLevel keymasterSecurityLevel,
+      byte[] attestationChallenge,
+      byte[] uniqueId,
+      AuthorizationList softwareEnforced,
+      AuthorizationList teeEnforced) {
+    this.attestationVersion = attestationVersion;
+    this.attestationSecurityLevel = attestationSecurityLevel;
+    this.keymasterVersion = keymasterVersion;
+    this.keymasterSecurityLevel = keymasterSecurityLevel;
+    this.attestationChallenge = attestationChallenge;
+    this.uniqueId = uniqueId;
+    this.softwareEnforced = softwareEnforced;
+    this.teeEnforced = teeEnforced;
+  }
+
   public static ParsedAttestationRecord createParsedAttestationRecord(X509Certificate cert)
       throws IOException {
     ASN1Sequence extensionData = extractAttestationSequence(cert);
     return new ParsedAttestationRecord(extensionData);
+  }
+
+  public static ParsedAttestationRecord create(ASN1Sequence extensionData) {
+    return new ParsedAttestationRecord(extensionData);
+  }
+
+  public static ParsedAttestationRecord create(
+      int attestationVersion,
+      SecurityLevel attestationSecurityLevel,
+      int keymasterVersion,
+      SecurityLevel keymasterSecurityLevel,
+      byte[] attestationChallenge,
+      byte[] uniqueId,
+      AuthorizationList softwareEnforced,
+      AuthorizationList teeEnforced) {
+    return new ParsedAttestationRecord(
+        attestationVersion,
+        attestationSecurityLevel,
+        keymasterVersion,
+        keymasterSecurityLevel,
+        attestationChallenge,
+        uniqueId,
+        softwareEnforced,
+        teeEnforced);
   }
 
   private static SecurityLevel securityLevelToEnum(int securityLevel) {
@@ -89,6 +137,18 @@ public class ParsedAttestationRecord {
       default:
         throw new IllegalArgumentException("Invalid security level.");
     }
+  }
+
+  private static int securityLevelToInt(SecurityLevel securityLevel) {
+    switch (securityLevel) {
+      case SOFTWARE:
+        return KM_SECURITY_LEVEL_SOFTWARE;
+      case TRUSTED_ENVIRONMENT:
+        return KM_SECURITY_LEVEL_TRUSTED_ENVIRONMENT;
+      case STRONG_BOX:
+        return KM_SECURITY_LEVEL_STRONG_BOX;
+    }
+    throw new IllegalArgumentException("Invalid security level.");
   }
 
   private static ASN1Sequence extractAttestationSequence(X509Certificate attestationCert)
@@ -110,6 +170,25 @@ public class ParsedAttestationRecord {
       }
     }
     return decodedSequence;
+  }
+
+  public ASN1Sequence toAsn1Sequence() {
+    ASN1Encodable[] vector = new ASN1Encodable[8];
+    vector[ATTESTATION_VERSION_INDEX] = new ASN1Integer(this.attestationVersion);
+    vector[ATTESTATION_SECURITY_LEVEL_INDEX] =
+        new ASN1Enumerated(securityLevelToInt(this.attestationSecurityLevel));
+    vector[KEYMASTER_VERSION_INDEX] = new ASN1Integer(this.keymasterVersion);
+    vector[KEYMASTER_SECURITY_LEVEL_INDEX] =
+        new ASN1Enumerated(securityLevelToInt(this.keymasterSecurityLevel));
+    vector[ATTESTATION_CHALLENGE_INDEX] = new DEROctetString(this.attestationChallenge);
+    vector[UNIQUE_ID_INDEX] = new DEROctetString(this.uniqueId);
+    if (this.softwareEnforced != null) {
+      vector[SW_ENFORCED_INDEX] = this.softwareEnforced.toAsn1Sequence();
+    }
+    if (this.teeEnforced != null) {
+      vector[TEE_ENFORCED_INDEX] = this.teeEnforced.toAsn1Sequence();
+    }
+    return new DERSequence(vector);
   }
 
   /**

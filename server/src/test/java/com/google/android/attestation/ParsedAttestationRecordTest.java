@@ -18,12 +18,15 @@ package com.google.android.attestation;
 import static com.google.common.truth.Truth.assertThat;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import com.google.android.attestation.AuthorizationList.UserAuthType;
 import com.google.android.attestation.ParsedAttestationRecord.SecurityLevel;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.Set;
+import org.bouncycastle.asn1.ASN1Sequence;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -99,5 +102,33 @@ public class ParsedAttestationRecordTest {
     assertThat(attestationRecord.uniqueId).isEqualTo(EXPECTED_UNIQUE_ID);
     assertThat(attestationRecord.softwareEnforced).isNotNull();
     assertThat(attestationRecord.teeEnforced).isNotNull();
+  }
+
+  @Test
+  public void testCreateAndParseAttestationRecord() {
+    AuthorizationList.Builder teeEnforcedBuilder = AuthorizationList.builder();
+    teeEnforcedBuilder.userAuthType = Set.of(UserAuthType.FINGERPRINT);
+    teeEnforcedBuilder.attestationIdBrand = "free food".getBytes(UTF_8);
+    ParsedAttestationRecord expected =
+        ParsedAttestationRecord.create(
+            /* attestationVersion= */ 2,
+            /* attestationSecurityLevel= */ SecurityLevel.TRUSTED_ENVIRONMENT,
+            /* keymasterVersion= */ 4,
+            /* keymasterSecurityLevel= */ SecurityLevel.SOFTWARE,
+            /* attestationChallenge= */ "abc".getBytes(UTF_8),
+            /* uniqueId= */ "foodplease".getBytes(UTF_8),
+            /* softwareEnforced= */ AuthorizationList.builder().build(),
+            /* teeEnforced= */ teeEnforcedBuilder.build());
+    ASN1Sequence seq = expected.toAsn1Sequence();
+    ParsedAttestationRecord actual = ParsedAttestationRecord.create(seq);
+    assertThat(actual.attestationVersion).isEqualTo(expected.attestationVersion);
+    assertThat(actual.attestationSecurityLevel).isEqualTo(expected.attestationSecurityLevel);
+    assertThat(actual.keymasterVersion).isEqualTo(expected.keymasterVersion);
+    assertThat(actual.keymasterSecurityLevel).isEqualTo(expected.keymasterSecurityLevel);
+    assertThat(actual.attestationChallenge).isEqualTo(expected.attestationChallenge);
+    assertThat(actual.uniqueId).isEqualTo(expected.uniqueId);
+    assertThat(actual.teeEnforced.userAuthType).isEqualTo(expected.teeEnforced.userAuthType);
+    assertThat(actual.teeEnforced.attestationIdBrand)
+        .isEqualTo(expected.teeEnforced.attestationIdBrand);
   }
 }

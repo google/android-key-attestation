@@ -67,13 +67,18 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1TaggedObject;
+import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.DERSet;
+import org.bouncycastle.asn1.DERTaggedObject;
 
 /**
  * This data structure contains the key pair's properties themselves, as defined in the Keymaster
@@ -216,6 +221,48 @@ public class AuthorizationList {
         findBooleanAuthorizationListEntry(authorizationMap, KM_TAG_DEVICE_UNIQUE_ATTESTATION);
   }
 
+  private AuthorizationList(Builder builder) {
+    this.purpose = Optional.ofNullable(builder.purpose);
+    this.algorithm = Optional.ofNullable(builder.algorithm);
+    this.keySize = Optional.ofNullable(builder.keySize);
+    this.digest = Optional.ofNullable(builder.digest);
+    this.padding = Optional.ofNullable(builder.padding);
+    this.ecCurve = Optional.ofNullable(builder.ecCurve);
+    this.rsaPublicExponent = Optional.ofNullable(builder.rsaPublicExponent);
+    this.rollbackResistance = builder.rollbackResistance;
+    this.activeDateTime = Optional.ofNullable(builder.activeDateTime);
+    this.originationExpireDateTime = Optional.ofNullable(builder.originationExpireDateTime);
+    this.usageExpireDateTime = Optional.ofNullable(builder.usageExpireDateTime);
+    this.noAuthRequired = builder.noAuthRequired;
+    this.userAuthType = Optional.ofNullable(builder.userAuthType);
+    this.authTimeout = Optional.ofNullable(builder.authTimeout);
+    this.allowWhileOnBody = builder.allowWhileOnBody;
+    this.trustedUserPresenceRequired = builder.trustedUserPresenceRequired;
+    this.trustedConfirmationRequired = builder.trustedConfirmationRequired;
+    this.unlockedDeviceRequired = builder.unlockedDeviceRequired;
+    this.allApplications = builder.allApplications;
+    this.applicationId = Optional.ofNullable(builder.applicationId);
+    this.creationDateTime = Optional.ofNullable(builder.creationDateTime);
+    this.origin = Optional.ofNullable(builder.origin);
+    this.rollbackResistant = builder.rollbackResistant;
+    this.rootOfTrust = Optional.ofNullable(builder.rootOfTrust);
+    this.osVersion = Optional.ofNullable(builder.osVersion);
+    this.osPatchLevel = Optional.ofNullable(builder.osPatchLevel);
+    this.attestationApplicationId = Optional.ofNullable(builder.attestationApplicationId);
+    this.attestationApplicationIdBytes = Optional.ofNullable(builder.attestationApplicationIdBytes);
+    this.attestationIdBrand = Optional.ofNullable(builder.attestationIdBrand);
+    this.attestationIdDevice = Optional.ofNullable(builder.attestationIdDevice);
+    this.attestationIdProduct = Optional.ofNullable(builder.attestationIdProduct);
+    this.attestationIdSerial = Optional.ofNullable(builder.attestationIdSerial);
+    this.attestationIdImei = Optional.ofNullable(builder.attestationIdImei);
+    this.attestationIdMeid = Optional.ofNullable(builder.attestationIdMeid);
+    this.attestationIdManufacturer = Optional.ofNullable(builder.attestationIdManufacturer);
+    this.attestationIdModel = Optional.ofNullable(builder.attestationIdModel);
+    this.vendorPatchLevel = Optional.ofNullable(builder.vendorPatchLevel);
+    this.bootPatchLevel = Optional.ofNullable(builder.bootPatchLevel);
+    this.individualAttestation = builder.individualAttestation;
+  }
+
   static AuthorizationList createAuthorizationList(
       ASN1Encodable[] authorizationList, int attestationVersion) {
     return new AuthorizationList(authorizationList, attestationVersion);
@@ -313,5 +360,198 @@ public class AuthorizationList {
     }
 
     return result;
+  }
+
+  private static Long userAuthTypeToLong(Set<UserAuthType> userAuthType) {
+    if (userAuthType.contains(USER_AUTH_TYPE_NONE)) {
+      return 0L;
+    }
+
+    Long result = 0L;
+
+    for (UserAuthType type : userAuthType) {
+      switch (type) {
+        case PASSWORD:
+          result |= 1L;
+          break;
+        case FINGERPRINT:
+          result |= 2L;
+          break;
+        case USER_AUTH_TYPE_ANY:
+          result |= UINT32_MAX;
+          break;
+        default:
+          break;
+      }
+    }
+
+    if (result == 0) {
+      throw new IllegalArgumentException("Invalid User Auth Type.");
+    }
+
+    return result;
+  }
+
+  public ASN1Sequence toAsn1Sequence() {
+    ASN1EncodableVector vector = new ASN1EncodableVector();
+    addOptionalIntegerSet(KM_TAG_PURPOSE, this.purpose, vector);
+    addOptionalInteger(KM_TAG_ALGORITHM, this.algorithm, vector);
+    addOptionalInteger(KM_TAG_KEY_SIZE, this.keySize, vector);
+    addOptionalIntegerSet(KM_TAG_DIGEST, this.digest, vector);
+    addOptionalIntegerSet(KM_TAG_PADDING, this.padding, vector);
+    addOptionalInteger(KM_TAG_EC_CURVE, this.ecCurve, vector);
+    addOptionalLong(KM_TAG_RSA_PUBLIC_EXPONENT, this.rsaPublicExponent, vector);
+    addBoolean(KM_TAG_ROLLBACK_RESISTANCE, this.rollbackResistance, vector);
+    addOptionalInstant(KM_TAG_ACTIVE_DATE_TIME, this.activeDateTime, vector);
+    addOptionalInstant(KM_TAG_ORIGINATION_EXPIRE_DATE_TIME, this.originationExpireDateTime, vector);
+    addOptionalInstant(KM_TAG_USAGE_EXPIRE_DATE_TIME, this.usageExpireDateTime, vector);
+    addBoolean(KM_TAG_NO_AUTH_REQUIRED, this.noAuthRequired, vector);
+    addOptionalUserAuthType(KM_TAG_USER_AUTH_TYPE, this.userAuthType, vector);
+    addOptionalDuration(KM_TAG_AUTH_TIMEOUT, this.authTimeout, vector);
+    addBoolean(KM_TAG_ALLOW_WHILE_ON_BODY, this.allowWhileOnBody, vector);
+    addBoolean(KM_TAG_TRUSTED_USER_PRESENCE_REQUIRED, this.trustedUserPresenceRequired, vector);
+    addBoolean(KM_TAG_TRUSTED_CONFIRMATION_REQUIRED, this.trustedConfirmationRequired, vector);
+    addBoolean(KM_TAG_UNLOCKED_DEVICE_REQUIRED, this.unlockedDeviceRequired, vector);
+    addBoolean(KM_TAG_ALL_APPLICATIONS, this.allApplications, vector);
+    addOptionalOctetString(KM_TAG_APPLICATION_ID, this.applicationId, vector);
+    addOptionalInstant(KM_TAG_CREATION_DATE_TIME, this.creationDateTime, vector);
+    addOptionalInteger(KM_TAG_ORIGIN, this.origin, vector);
+    addBoolean(KM_TAG_ROLLBACK_RESISTANT, this.rollbackResistant, vector);
+    addOptionalRootOfTrust(KM_TAG_ROOT_OF_TRUST, this.rootOfTrust, vector);
+    addOptionalInteger(KM_TAG_OS_VERSION, this.osVersion, vector);
+    addOptionalInteger(KM_TAG_OS_PATCH_LEVEL, this.osPatchLevel, vector);
+    addOptionalOctetString(
+        KM_TAG_ATTESTATION_APPLICATION_ID, this.attestationApplicationIdBytes, vector);
+    addOptionalOctetString(KM_TAG_ATTESTATION_ID_BRAND, this.attestationIdBrand, vector);
+    addOptionalOctetString(KM_TAG_ATTESTATION_ID_DEVICE, this.attestationIdDevice, vector);
+    addOptionalOctetString(KM_TAG_ATTESTATION_ID_PRODUCT, this.attestationIdProduct, vector);
+    addOptionalOctetString(KM_TAG_ATTESTATION_ID_SERIAL, this.attestationIdSerial, vector);
+    addOptionalOctetString(KM_TAG_ATTESTATION_ID_IMEI, this.attestationIdImei, vector);
+    addOptionalOctetString(KM_TAG_ATTESTATION_ID_MEID, this.attestationIdMeid, vector);
+    addOptionalOctetString(
+        KM_TAG_ATTESTATION_ID_MANUFACTURER, this.attestationIdManufacturer, vector);
+    addOptionalOctetString(KM_TAG_ATTESTATION_ID_MODEL, this.attestationIdModel, vector);
+    addOptionalInteger(KM_TAG_VENDOR_PATCH_LEVEL, this.vendorPatchLevel, vector);
+    addOptionalInteger(KM_TAG_BOOT_PATCH_LEVEL, this.bootPatchLevel, vector);
+    addBoolean(KM_TAG_DEVICE_UNIQUE_ATTESTATION, this.individualAttestation, vector);
+    return new DERSequence(vector);
+  }
+
+  private static void addOptionalIntegerSet(
+      int tag, Optional<Set<Integer>> entry, ASN1EncodableVector vector) {
+    if (entry.isPresent()) {
+      ASN1EncodableVector tmp = new ASN1EncodableVector();
+      entry.get().forEach((Integer value) -> tmp.add(new ASN1Integer(value.longValue())));
+      vector.add(new DERTaggedObject(tag, new DERSet(tmp)));
+    }
+  }
+
+  private static void addOptionalInstant(
+      int tag, Optional<Instant> entry, ASN1EncodableVector vector) {
+    if (entry.isPresent()) {
+      vector.add(new DERTaggedObject(tag, new ASN1Integer(entry.get().toEpochMilli())));
+    }
+  }
+
+  private static void addOptionalDuration(
+      int tag, Optional<Duration> entry, ASN1EncodableVector vector) {
+    if (entry.isPresent()) {
+      vector.add(new DERTaggedObject(tag, new ASN1Integer(entry.get().getSeconds())));
+    }
+  }
+
+  private static void addBoolean(int tag, boolean entry, ASN1EncodableVector vector) {
+    if (entry) {
+      vector.add(new DERTaggedObject(tag, DERNull.INSTANCE));
+    }
+  }
+
+  private static void addOptionalInteger(
+      int tag, Optional<Integer> entry, ASN1EncodableVector vector) {
+    if (entry.isPresent()) {
+      vector.add(new DERTaggedObject(tag, new ASN1Integer(entry.get())));
+    }
+  }
+
+  private static void addOptionalLong(int tag, Optional<Long> entry, ASN1EncodableVector vector) {
+    if (entry.isPresent()) {
+      vector.add(new DERTaggedObject(tag, new ASN1Integer(entry.get())));
+    }
+  }
+
+  private static void addOptionalOctetString(
+      int tag, Optional<byte[]> entry, ASN1EncodableVector vector) {
+    if (entry.isPresent()) {
+      vector.add(new DERTaggedObject(tag, new DEROctetString(entry.get())));
+    }
+  }
+
+  private static void addOptionalUserAuthType(
+      int tag, Optional<Set<UserAuthType>> entry, ASN1EncodableVector vector) {
+    if (entry.isPresent()) {
+      vector.add(new DERTaggedObject(tag, new ASN1Integer(userAuthTypeToLong(entry.get()))));
+    }
+  }
+
+  private static void addOptionalRootOfTrust(
+      int tag, Optional<RootOfTrust> entry, ASN1EncodableVector vector) {
+    if (entry.isPresent()) {
+      vector.add(new DERTaggedObject(tag, entry.get().toAsn1Sequence()));
+    }
+  }
+
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  /**
+   * Builder for an AuthorizationList. Any field not set will be made an Optional.empty or set with
+   * the default value.
+   */
+  public static final class Builder {
+
+    public Set<Integer> purpose;
+    public Integer algorithm;
+    public Integer keySize;
+    public Set<Integer> digest;
+    public Set<Integer> padding;
+    public Integer ecCurve;
+    public Long rsaPublicExponent;
+    public boolean rollbackResistance;
+    public Instant activeDateTime;
+    public Instant originationExpireDateTime;
+    public Instant usageExpireDateTime;
+    public boolean noAuthRequired;
+    public Set<UserAuthType> userAuthType;
+    public Duration authTimeout;
+    public boolean allowWhileOnBody;
+    public boolean trustedUserPresenceRequired;
+    public boolean trustedConfirmationRequired;
+    public boolean unlockedDeviceRequired;
+    public boolean allApplications;
+    public byte[] applicationId;
+    public Instant creationDateTime;
+    public Integer origin;
+    public boolean rollbackResistant;
+    public RootOfTrust rootOfTrust;
+    public Integer osVersion;
+    public Integer osPatchLevel;
+    public AttestationApplicationId attestationApplicationId;
+    public byte[] attestationApplicationIdBytes;
+    public byte[] attestationIdBrand;
+    public byte[] attestationIdDevice;
+    public byte[] attestationIdProduct;
+    public byte[] attestationIdSerial;
+    public byte[] attestationIdImei;
+    public byte[] attestationIdMeid;
+    public byte[] attestationIdManufacturer;
+    public byte[] attestationIdModel;
+    public Integer vendorPatchLevel;
+    public Integer bootPatchLevel;
+    public boolean individualAttestation;
+
+    public AuthorizationList build() {
+      return new AuthorizationList(this);
+    }
   }
 }

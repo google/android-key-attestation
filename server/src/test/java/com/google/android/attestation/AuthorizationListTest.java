@@ -26,6 +26,7 @@ import static com.google.common.truth.Truth8.assertThat;
 import static org.junit.Assert.fail;
 
 import com.google.common.collect.ImmutableSet;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Set;
@@ -158,13 +159,25 @@ public class AuthorizationListTest {
           + "BCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEBAAoBAgQgEvR7Lf1t9nD6P2qyUmgiQ0mG+RixYn"
           + "glj2TaAMZmHn2/hUEFAgMBrbC/hUIFAgMDFRi/hUYIBAZnb29nbGW/hUcHBAVzYXJnb7+FSAcEBXNhcmdvv4VM"
           + "CAQGR29vZ2xlv4VNCgQIUGl4ZWwgM2G/hU4GAgQBND1lv4VPBgIEATQ9Zb+FUAIFAA==";
+
   @Test
-  public void testCanParseIndividualAttestation() throws IOException{
+  public void testCanParseIndividualAttestation() throws IOException {
     AuthorizationList authorizationList =
         AuthorizationList.createAuthorizationList(
             getEncodableAuthorizationList(EXTENTION_DATA_WITH_INDIVIDUAL_ATTESTATION),
             ATTESTATION_VERSION);
 
     assertThat(authorizationList.individualAttestation).isTrue();
+  }
+
+  @Test
+  public void testCreateAndParse() throws IOException {
+    AuthorizationList authorizationList =
+        AuthorizationList.createAuthorizationList(
+            getEncodableAuthorizationList(EXTENTION_DATA_WITH_INDIVIDUAL_ATTESTATION),
+            ATTESTATION_VERSION);
+    ASN1Sequence seq = authorizationList.toAsn1Sequence();
+    assertThat(seq.getEncoded("DER"))
+        .isEqualTo(Base64.decode(EXTENTION_DATA_WITH_INDIVIDUAL_ATTESTATION));
   }
 }
