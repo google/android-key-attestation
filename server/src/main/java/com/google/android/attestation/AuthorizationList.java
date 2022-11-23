@@ -510,45 +510,235 @@ public class AuthorizationList {
    */
   public static final class Builder {
 
-    public Set<Integer> purpose;
-    public Integer algorithm;
-    public Integer keySize;
-    public Set<Integer> digest;
-    public Set<Integer> padding;
-    public Integer ecCurve;
-    public Long rsaPublicExponent;
-    public boolean rollbackResistance;
-    public Instant activeDateTime;
-    public Instant originationExpireDateTime;
-    public Instant usageExpireDateTime;
-    public boolean noAuthRequired;
-    public Set<UserAuthType> userAuthType;
-    public Duration authTimeout;
-    public boolean allowWhileOnBody;
-    public boolean trustedUserPresenceRequired;
-    public boolean trustedConfirmationRequired;
-    public boolean unlockedDeviceRequired;
-    public boolean allApplications;
-    public byte[] applicationId;
-    public Instant creationDateTime;
-    public Integer origin;
-    public boolean rollbackResistant;
-    public RootOfTrust rootOfTrust;
-    public Integer osVersion;
-    public Integer osPatchLevel;
-    public AttestationApplicationId attestationApplicationId;
-    public byte[] attestationApplicationIdBytes;
-    public byte[] attestationIdBrand;
-    public byte[] attestationIdDevice;
-    public byte[] attestationIdProduct;
-    public byte[] attestationIdSerial;
-    public byte[] attestationIdImei;
-    public byte[] attestationIdMeid;
-    public byte[] attestationIdManufacturer;
-    public byte[] attestationIdModel;
-    public Integer vendorPatchLevel;
-    public Integer bootPatchLevel;
-    public boolean individualAttestation;
+    Set<Integer> purpose;
+    Integer algorithm;
+    Integer keySize;
+    Set<Integer> digest;
+    Set<Integer> padding;
+    Integer ecCurve;
+    Long rsaPublicExponent;
+    boolean rollbackResistance;
+    Instant activeDateTime;
+    Instant originationExpireDateTime;
+    Instant usageExpireDateTime;
+    boolean noAuthRequired;
+    Set<UserAuthType> userAuthType;
+    Duration authTimeout;
+    boolean allowWhileOnBody;
+    boolean trustedUserPresenceRequired;
+    boolean trustedConfirmationRequired;
+    boolean unlockedDeviceRequired;
+    boolean allApplications;
+    byte[] applicationId;
+    Instant creationDateTime;
+    Integer origin;
+    boolean rollbackResistant;
+    RootOfTrust rootOfTrust;
+    Integer osVersion;
+    Integer osPatchLevel;
+    AttestationApplicationId attestationApplicationId;
+    byte[] attestationApplicationIdBytes;
+    byte[] attestationIdBrand;
+    byte[] attestationIdDevice;
+    byte[] attestationIdProduct;
+    byte[] attestationIdSerial;
+    byte[] attestationIdImei;
+    byte[] attestationIdMeid;
+    byte[] attestationIdManufacturer;
+    byte[] attestationIdModel;
+    Integer vendorPatchLevel;
+    Integer bootPatchLevel;
+    boolean individualAttestation;
+
+    public Builder setPurpose(Set<Integer> purpose) {
+      this.purpose = purpose;
+      return this;
+    }
+
+    public Builder setAlgorithm(Integer algorithm) {
+      this.algorithm = algorithm;
+      return this;
+    }
+
+    public Builder setKeySize(Integer keySize) {
+      this.keySize = keySize;
+      return this;
+    }
+
+    public Builder setDigest(Set<Integer> digest) {
+      this.digest = digest;
+      return this;
+    }
+
+    public Builder setPadding(Set<Integer> padding) {
+      this.padding = padding;
+      return this;
+    }
+
+    public Builder setEcCurve(Integer ecCurve) {
+      this.ecCurve = ecCurve;
+      return this;
+    }
+
+    public Builder setRsaPublicExponent(Long rsaPublicExponent) {
+      this.rsaPublicExponent = rsaPublicExponent;
+      return this;
+    }
+
+    public Builder setRollbackResistance(boolean rollbackResistance) {
+      this.rollbackResistance = rollbackResistance;
+      return this;
+    }
+
+    public Builder setActiveDateTime(Instant activeDateTime) {
+      this.activeDateTime = activeDateTime;
+      return this;
+    }
+
+    public Builder setOriginationExpireDateTime(Instant originationExpireDateTime) {
+      this.originationExpireDateTime = originationExpireDateTime;
+      return this;
+    }
+
+    public Builder setUsageExpireDateTime(Instant usageExpireDateTime) {
+      this.usageExpireDateTime = usageExpireDateTime;
+      return this;
+    }
+
+    public Builder setNoAuthRequired(boolean noAuthRequired) {
+      this.noAuthRequired = noAuthRequired;
+      return this;
+    }
+
+    public Builder setUserAuthType(Set<UserAuthType> userAuthType) {
+      this.userAuthType = userAuthType;
+      return this;
+    }
+
+    public Builder setAuthTimeout(Duration authTimeout) {
+      this.authTimeout = authTimeout;
+      return this;
+    }
+
+    public Builder setAllowWhileOnBody(boolean allowWhileOnBody) {
+      this.allowWhileOnBody = allowWhileOnBody;
+      return this;
+    }
+
+    public Builder setTrustedUserPresenceRequired(boolean trustedUserPresenceRequired) {
+      this.trustedUserPresenceRequired = trustedUserPresenceRequired;
+      return this;
+    }
+
+    public Builder setTrustedConfirmationRequired(boolean trustedConfirmationRequired) {
+      this.trustedConfirmationRequired = trustedConfirmationRequired;
+      return this;
+    }
+
+    public Builder setUnlockedDeviceRequired(boolean unlockedDeviceRequired) {
+      this.unlockedDeviceRequired = unlockedDeviceRequired;
+      return this;
+    }
+
+    public Builder setAllApplications(boolean allApplications) {
+      this.allApplications = allApplications;
+      return this;
+    }
+
+    public Builder setApplicationId(byte[] applicationId) {
+      this.applicationId = applicationId;
+      return this;
+    }
+
+    public Builder setCreationDateTime(Instant creationDateTime) {
+      this.creationDateTime = creationDateTime;
+      return this;
+    }
+
+    public Builder setOrigin(Integer origin) {
+      this.origin = origin;
+      return this;
+    }
+
+    public Builder setRollbackResistant(boolean rollbackResistant) {
+      this.rollbackResistant = rollbackResistant;
+      return this;
+    }
+
+    public Builder setRootOfTrust(RootOfTrust rootOfTrust) {
+      this.rootOfTrust = rootOfTrust;
+      return this;
+    }
+
+    public Builder setOsVersion(Integer osVersion) {
+      this.osVersion = osVersion;
+      return this;
+    }
+
+    public Builder setOsPatchLevel(Integer osPatchLevel) {
+      this.osPatchLevel = osPatchLevel;
+      return this;
+    }
+
+    public Builder setAttestationApplicationId(AttestationApplicationId attestationApplicationId) {
+      this.attestationApplicationId = attestationApplicationId;
+      return this;
+    }
+
+    public Builder setAttestationApplicationIdBytes(byte[] attestationApplicationIdBytes) {
+      this.attestationApplicationIdBytes = attestationApplicationIdBytes;
+      return this;
+    }
+
+    public Builder setAttestationIdBrand(byte[] attestationIdBrand) {
+      this.attestationIdBrand = attestationIdBrand;
+      return this;
+    }
+
+    public Builder setAttestationIdProduct(byte[] attestationIdProduct) {
+      this.attestationIdProduct = attestationIdProduct;
+      return this;
+    }
+
+    public Builder setAttestationIdSerial(byte[] attestationIdSerial) {
+      this.attestationIdSerial = attestationIdSerial;
+      return this;
+    }
+
+    public Builder setAttestationIdImei(byte[] attestationIdImei) {
+      this.attestationIdImei = attestationIdImei;
+      return this;
+    }
+
+    public Builder setAttestationIdMeid(byte[] attestationIdMeid) {
+      this.attestationIdMeid = attestationIdMeid;
+      return this;
+    }
+
+    public Builder setAttestationIdManufacturer(byte[] attestationIdManufacturer) {
+      this.attestationIdManufacturer = attestationIdManufacturer;
+      return this;
+    }
+
+    public Builder setAttestationIdModel(byte[] attestationIdModel) {
+      this.attestationIdModel = attestationIdModel;
+      return this;
+    }
+
+    public Builder setVendorPatchLevel(Integer vendorPatchLevel) {
+      this.vendorPatchLevel = vendorPatchLevel;
+      return this;
+    }
+
+    public Builder setBootPatchLevel(Integer bootPatchLevel) {
+      this.bootPatchLevel = bootPatchLevel;
+      return this;
+    }
+
+    public Builder setIndividualAttestation(boolean individualAttestation) {
+      this.individualAttestation = individualAttestation;
+      return this;
+    }
 
     public AuthorizationList build() {
       return new AuthorizationList(this);

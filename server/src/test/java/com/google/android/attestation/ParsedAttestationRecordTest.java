@@ -118,7 +118,9 @@ public class ParsedAttestationRecordTest {
             /* attestationChallenge= */ "abc".getBytes(UTF_8),
             /* uniqueId= */ "foodplease".getBytes(UTF_8),
             /* softwareEnforced= */ AuthorizationList.builder().build(),
-            /* teeEnforced= */ teeEnforcedBuilder.build());
+            /* teeEnforced= */ AuthorizationList.builder()
+                .setUserAuthType(Set.of(UserAuthType.FINGERPRINT))
+                .setAttestationIdBrand("free food".getBytes(UTF_8)).build());
     ASN1Sequence seq = expected.toAsn1Sequence();
     ParsedAttestationRecord actual = ParsedAttestationRecord.create(seq);
     assertThat(actual.attestationVersion).isEqualTo(expected.attestationVersion);
