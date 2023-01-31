@@ -695,6 +695,11 @@ public class AuthorizationList {
       return this;
     }
 
+    public Builder setAttestationIdDevice(byte[] attestationIdDevice) {
+      this.attestationIdDevice = attestationIdDevice;
+      return this;
+    }
+
     public Builder setAttestationIdProduct(byte[] attestationIdProduct) {
       this.attestationIdProduct = attestationIdProduct;
       return this;
