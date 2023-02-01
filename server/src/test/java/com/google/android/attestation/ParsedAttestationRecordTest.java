@@ -25,7 +25,8 @@ import java.io.IOException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.Set;
+
+import com.google.common.collect.ImmutableSet;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -107,7 +108,7 @@ public class ParsedAttestationRecordTest {
   @Test
   public void testCreateAndParseAttestationRecord() {
     AuthorizationList.Builder teeEnforcedBuilder = AuthorizationList.builder();
-    teeEnforcedBuilder.userAuthType = Set.of(UserAuthType.FINGERPRINT);
+    teeEnforcedBuilder.userAuthType = ImmutableSet.of(UserAuthType.FINGERPRINT);
     teeEnforcedBuilder.attestationIdBrand = "free food".getBytes(UTF_8);
     ParsedAttestationRecord expected =
         ParsedAttestationRecord.create(
@@ -119,7 +120,7 @@ public class ParsedAttestationRecordTest {
             /* uniqueId= */ "foodplease".getBytes(UTF_8),
             /* softwareEnforced= */ AuthorizationList.builder().build(),
             /* teeEnforced= */ AuthorizationList.builder()
-                .setUserAuthType(Set.of(UserAuthType.FINGERPRINT))
+                .setUserAuthType(ImmutableSet.of(UserAuthType.FINGERPRINT))
                 .setAttestationIdBrand("free food".getBytes(UTF_8)).build());
     ASN1Sequence seq = expected.toAsn1Sequence();
     ParsedAttestationRecord actual = ParsedAttestationRecord.create(seq);
