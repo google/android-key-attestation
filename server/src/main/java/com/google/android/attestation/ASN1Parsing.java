@@ -27,7 +27,7 @@ class ASN1Parsing {
     if (asn1Value instanceof ASN1Boolean) {
       return ((ASN1Boolean) asn1Value).isTrue();
     } else {
-      throw new RuntimeException(
+      throw new IllegalArgumentException(
           "Boolean value expected; found " + asn1Value.getClass().getName() + " instead.");
     }
   }
