@@ -19,7 +19,6 @@ import static com.google.android.attestation.Constants.GOOGLE_ROOT_CA_PUB_KEY;
 import static com.google.android.attestation.ParsedAttestationRecord.createParsedAttestationRecord;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import android.util.Base64;
 import com.google.android.attestation.AttestationApplicationId;
 import com.google.android.attestation.AttestationApplicationId.AttestationPackageInfo;
 import com.google.android.attestation.CertificateRevocationStatus;
@@ -236,7 +235,7 @@ public class KeyAttestationExample {
     // backed key attestation, Android 7.0 (API level 24) or higher, and
     // Google Play services, the root certificate should be signed with the
     // Google attestation root key.
-    byte[] googleRootCaPubKey = Base64.decode(GOOGLE_ROOT_CA_PUB_KEY, Base64.DEFAULT);
+    byte[] googleRootCaPubKey = Base64.decode(GOOGLE_ROOT_CA_PUB_KEY);
     if (Arrays.equals(
         googleRootCaPubKey,
         certs[certs.length - 1].getPublicKey().getEncoded())) {
