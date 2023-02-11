@@ -68,6 +68,31 @@ public class ParsedAttestationRecordTest {
           + "OIkXEoFqqGi9GKJXUT1KYi5NsigaYqu7FoN4Qsvs61pMUEfZSPP2AFwkA8uNFbmb9uxcxaGHCA8i"
           + "3i9VM6yOLIrP\n"
           + "-----END CERTIFICATE-----";
+  private static final String CERT2 =
+      "-----BEGIN CERTIFICATE-----\n"
+          + "MIIEFDCCAnygAwIBAgIVAKZFQPAXr5VWrosuqx4C8tai2XbHMA0GCSqGSIb3DQEB\n"
+          + "CwUAMBgxFjAUBgNVBAMMDVVua25vd25Jc3N1ZXIwHhcNMjMwMjE1MTU0MzIwWhcN\n"
+          + "MjMwMjE1MTU0ODIwWjAdMRswGQYDVQQDDBJBbmRyb2lkQXR0ZXN0ZWRLZXkwggGi\n"
+          + "MA0GCSqGSIb3DQEBAQUAA4IBjwAwggGKAoIBgQDJAVfP/7F1bUbDqxMnOVXpSjt5\n"
+          + "NJwYemBJkN7l7TTbAhTfMW91006Si/snd79Y6bsJklVoiEN9LGL7tQrJEf5lSSLX\n"
+          + "ZeppjsbLqKnogFHhDJy2vaSiypV2wZdX+kO0qqIKjRvgSqHuTz3gemI1rWilrG3C\n"
+          + "vd3iHGlkw/4X5PpHQKz99/20p85HP6f/jydMHewFDRQCbkbo2pJ5WrJsyPe9me3o\n"
+          + "QE0O3lgij7jJ/UBHyb9iH0w13yi+1yZ/jgyojL4QNUeWZnxW656zfHCB8weePD+l\n"
+          + "tX4AAztZTziJQwk3zVClw4xIPTeztQV6ddRQgjSjGvWanpXqhJx8mq11gWaVJoCl\n"
+          + "q/I0KOguVsKq42M25uhF7/iAQjC+6lOUUfi2+aPwyTUfGHc5Bw/rTSw2LzvZDnUW\n"
+          + "8/yw4OUTyDravVcQLeoBES4+O5cVL0yTKDY0THG+ymgsFNgFS7PXUnAbXczYzvg8\n"
+          + "ldXKOXxnF5nWgg55n2iSQ6mqtHDEUsjcxjmuFcMCAwEAAaNQME4wTAYKKwYBBAHW\n"
+          + "eQIBEQQ+MDwCAQEKAQECAQIKAQEEEkEgcmFuZG9tIGNoYWxsZW5nZQQAMAAwFr+F\n"
+          + "SQgEBlNFUklBTL+FSgYEBElNRUkwDQYJKoZIhvcNAQELBQADggGBAHSms4IBjkc8\n"
+          + "1ZLHu5l70Ih2RrNU4XAc2E/oJX8OsBte9ZRwDT3TdcfLeg0rSneS+aB4xN1BGfmL\n"
+          + "DPZ1epRzMY4RagVhzBEauHpTaM2imRT9RN5TxbFvuMC4ELICYr5qHfqeALIlMET3\n"
+          + "TbCAo3njpNh5ids6qdlmpZRoYBQNMKfWJn8SUtCmVMk87FA7RZZCqCiRk+PBnciT\n"
+          + "O3LLbwT4aBlMinQ84gBfVXRqOvGAeGOgojDqGyK3tDMjIS7itpGb23vGogxHiHjA\n"
+          + "i8hiQhsHA+C89duCdeGyWZGmxwln7QRsosFI7G4ZOufXPLZt/DauNAC2Mb2OPcDw\n"
+          + "4tSKQvzQiL9UG4X3Cck0JnATxjT5sLttshJl98V6jQHcWSnjg8+oa3B8WgcePX8E\n"
+          + "QgcLhYaEGo9WDYJQvHfuUE5AquTxdTRbeiDbV7W+FAOQ5zi/wiGit86gF26120OQ\n"
+          + "KzQHP94/ORuAT/lkv3Fp3HytF4n3scur1nI0WqrfKpbUuPkmndCIbg==\n"
+          + "-----END CERTIFICATE-----\n";
 
   private static final int EXPECTED_ATTESTATION_VERSION = 3;
   private static final SecurityLevel EXPECTED_ATTESTATION_SECURITY_LEVEL =
@@ -83,15 +108,15 @@ public class ParsedAttestationRecordTest {
     X509Certificate cert =
         (X509Certificate)
             factory.generateCertificate(new ByteArrayInputStream(certStr.getBytes(UTF_8)));
-    cert.checkValidity();
     return cert;
   }
 
   @Test
   public void testParseAttestationRecord() throws CertificateException, IOException {
     X509Certificate x509Certificate = getAttestationRecord(CERT);
+    X509Certificate x509Certificate2 = getAttestationRecord(CERT2);
     ParsedAttestationRecord attestationRecord =
-        ParsedAttestationRecord.createParsedAttestationRecord(x509Certificate);
+        ParsedAttestationRecord.createParsedAttestationRecord(new X509Certificate[] {x509Certificate2, x509Certificate});
 
     assertThat(attestationRecord.attestationVersion).isEqualTo(EXPECTED_ATTESTATION_VERSION);
     assertThat(attestationRecord.attestationSecurityLevel)
