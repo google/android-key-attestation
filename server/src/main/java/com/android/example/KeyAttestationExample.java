@@ -88,7 +88,7 @@ public class KeyAttestationExample {
 
     verifyCertificateChain(certs);
 
-    ParsedAttestationRecord parsedAttestationRecord = createParsedAttestationRecord(certs[0]);
+    ParsedAttestationRecord parsedAttestationRecord = createParsedAttestationRecord(certs);
 
     System.out.println("Attestation version: " + parsedAttestationRecord.attestationVersion);
     System.out.println(
