@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 
 import com.google.common.collect.ImmutableSet;
 import org.bouncycastle.asn1.ASN1Sequence;
@@ -116,7 +117,7 @@ public class ParsedAttestationRecordTest {
     X509Certificate x509Certificate = getAttestationRecord(CERT);
     X509Certificate x509Certificate2 = getAttestationRecord(CERT2);
     ParsedAttestationRecord attestationRecord =
-        ParsedAttestationRecord.createParsedAttestationRecord(new X509Certificate[] {x509Certificate2, x509Certificate});
+        ParsedAttestationRecord.createParsedAttestationRecord(Arrays.asList(x509Certificate2, x509Certificate));
 
     assertThat(attestationRecord.attestationVersion).isEqualTo(EXPECTED_ATTESTATION_VERSION);
     assertThat(attestationRecord.attestationSecurityLevel)

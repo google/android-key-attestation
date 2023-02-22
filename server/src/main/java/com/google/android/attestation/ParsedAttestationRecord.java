@@ -30,6 +30,7 @@ import static com.google.android.attestation.Constants.UNIQUE_ID_INDEX;
 
 import java.io.IOException;
 import java.security.cert.X509Certificate;
+import java.util.List;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Enumerated;
 import org.bouncycastle.asn1.ASN1InputStream;
@@ -96,7 +97,7 @@ public class ParsedAttestationRecord {
     this.teeEnforced = teeEnforced;
   }
 
-  public static ParsedAttestationRecord createParsedAttestationRecord(X509Certificate[] certs)
+  public static ParsedAttestationRecord createParsedAttestationRecord(List<X509Certificate> certs)
       throws IOException {
 
     // Parse the attestation record that is closest to the root. This prevents an adversary from
@@ -105,8 +106,8 @@ public class ParsedAttestationRecord {
     // 1) having the TEE attest a key under the adversary's control,
     // 2) using that key to sign a new leaf certificate with an attestation extension that has their chosen attestation record, then
     // 3) appending that certificate to the original certificate chain.
-    for (int i = certs.length - 1; i >= 0; i--) {
-      byte[] attestationExtensionBytes = certs[i].getExtensionValue(KEY_DESCRIPTION_OID);
+    for (int i = certs.size() - 1; i >= 0; i--) {
+      byte[] attestationExtensionBytes = certs.get(i).getExtensionValue(KEY_DESCRIPTION_OID);
       if (attestationExtensionBytes != null && attestationExtensionBytes.length != 0) {
         return new ParsedAttestationRecord(extractAttestationSequence(attestationExtensionBytes));
       }
