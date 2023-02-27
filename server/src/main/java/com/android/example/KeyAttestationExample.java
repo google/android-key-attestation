@@ -25,6 +25,8 @@ import com.google.android.attestation.CertificateRevocationStatus;
 import com.google.android.attestation.AuthorizationList;
 import com.google.android.attestation.ParsedAttestationRecord;
 import com.google.android.attestation.RootOfTrust;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableList.Builder;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -78,7 +80,7 @@ public class KeyAttestationExample {
   public static void main(String[] args)
       throws CertificateException, IOException, NoSuchProviderException, NoSuchAlgorithmException,
           InvalidKeyException, SignatureException {
-    X509Certificate[] certs;
+    List<X509Certificate> certs;
     if (args.length == 1) {
       String certFilesDir = args[0];
       certs = loadCertificates(certFilesDir);
@@ -167,6 +169,8 @@ public class KeyAttestationExample {
     printOptional(authorizationList.attestationIdModel, indent + "Attestation ID Model");
     printOptional(authorizationList.vendorPatchLevel, indent + "Vendor Patch Level");
     printOptional(authorizationList.bootPatchLevel, indent + "Boot Patch Level");
+    System.out.println(
+        indent + "Identity Credential Key: " + authorizationList.identityCredentialKey);
   }
 
   private static void printRootOfTrust(Optional<RootOfTrust> rootOfTrust, String indent) {
@@ -209,12 +213,12 @@ public class KeyAttestationExample {
     }
   }
 
-  private static void verifyCertificateChain(X509Certificate[] certs)
+  private static void verifyCertificateChain(List<X509Certificate> certs)
       throws CertificateException, NoSuchAlgorithmException, InvalidKeyException,
       NoSuchProviderException, SignatureException, IOException {
-    X509Certificate parent = certs[certs.length - 1];
-    for (int i = certs.length - 1; i >= 0; i--) {
-      X509Certificate cert = certs[i];
+    X509Certificate parent = certs.get(certs.size() - 1);
+    for (int i = certs.size() - 1; i >= 0; i--) {
+      X509Certificate cert = certs.get(i);
       // Verify that the certificate has not expired.
       cert.checkValidity();
       cert.verify(parent.getPublicKey());
@@ -238,7 +242,7 @@ public class KeyAttestationExample {
     byte[] googleRootCaPubKey = Base64.decode(GOOGLE_ROOT_CA_PUB_KEY);
     if (Arrays.equals(
         googleRootCaPubKey,
-        certs[certs.length - 1].getPublicKey().getEncoded())) {
+        certs.get(certs.size() - 1).getPublicKey().getEncoded())) {
       System.out.println(
           "The root certificate is correct, so this attestation is trustworthy, as long as none of"
               + " the certificates in the chain have been revoked.");
@@ -252,20 +256,20 @@ public class KeyAttestationExample {
     }
   }
 
-  private static X509Certificate[] loadCertificates(String certFilesDir)
+  private static ImmutableList<X509Certificate> loadCertificates(String certFilesDir)
       throws CertificateException, IOException {
     // Load the attestation certificates from the directory in alphabetic order.
     List<Path> records;
     try (Stream<Path> pathStream = Files.walk(Paths.get(certFilesDir))) {
       records = pathStream.filter(Files::isRegularFile).sorted().collect(Collectors.toList());
     }
-    X509Certificate[] certs = new X509Certificate[records.size()];
+    ImmutableList.Builder<X509Certificate> certs = new ImmutableList.Builder<>();
     CertificateFactory factory = CertificateFactory.getInstance("X.509");
     for (int i = 0; i < records.size(); ++i) {
       byte[] encodedCert = Files.readAllBytes(records.get(i));
       ByteArrayInputStream inputStream = new ByteArrayInputStream(encodedCert);
-      certs[i] = (X509Certificate) factory.generateCertificate(inputStream);
+      certs.add((X509Certificate) factory.generateCertificate(inputStream));
     }
-    return certs;
+    return certs.build();
   }
 }
