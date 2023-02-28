@@ -268,6 +268,7 @@ public class AuthorizationList {
     this.vendorPatchLevel = Optional.ofNullable(builder.vendorPatchLevel);
     this.bootPatchLevel = Optional.ofNullable(builder.bootPatchLevel);
     this.individualAttestation = builder.individualAttestation;
+    this.identityCredentialKey = builder.identityCredentialKey;
   }
 
   static AuthorizationList createAuthorizationList(
@@ -556,6 +557,7 @@ public class AuthorizationList {
     Integer vendorPatchLevel;
     Integer bootPatchLevel;
     boolean individualAttestation;
+    boolean identityCredentialKey;
 
     @CanIgnoreReturnValue
     public Builder setPurpose(Set<Integer> purpose) {
@@ -788,6 +790,12 @@ public class AuthorizationList {
     @CanIgnoreReturnValue
     public Builder setIndividualAttestation(boolean individualAttestation) {
       this.individualAttestation = individualAttestation;
+      return this;
+    }
+
+    @CanIgnoreReturnValue
+    public Builder setIdentityCredentialKey(boolean identityCredentialKey) {
+      this.identityCredentialKey = identityCredentialKey;
       return this;
     }
 
