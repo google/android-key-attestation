@@ -1,0 +1,24 @@
+
+name: Java CI with Bazel
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: run
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+
+    - name: run
+      uses: ngalaiko/bazel-action/2.0@master
+      with:
+        working_dir: server/src/main/
+        args: build //...
