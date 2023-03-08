@@ -32,6 +32,7 @@ import static com.google.android.attestation.Constants.KM_TAG_ATTESTATION_ID_MAN
 import static com.google.android.attestation.Constants.KM_TAG_ATTESTATION_ID_MEID;
 import static com.google.android.attestation.Constants.KM_TAG_ATTESTATION_ID_MODEL;
 import static com.google.android.attestation.Constants.KM_TAG_ATTESTATION_ID_PRODUCT;
+import static com.google.android.attestation.Constants.KM_TAG_ATTESTATION_ID_SECOND_IMEI;
 import static com.google.android.attestation.Constants.KM_TAG_ATTESTATION_ID_SERIAL;
 import static com.google.android.attestation.Constants.KM_TAG_AUTH_TIMEOUT;
 import static com.google.android.attestation.Constants.KM_TAG_BOOT_PATCH_LEVEL;
@@ -131,6 +132,7 @@ public class AuthorizationList {
   public final Optional<byte[]> attestationIdProduct;
   public final Optional<byte[]> attestationIdSerial;
   public final Optional<byte[]> attestationIdImei;
+  public final Optional<byte[]> attestationIdSecondImei;
   public final Optional<byte[]> attestationIdMeid;
   public final Optional<byte[]> attestationIdManufacturer;
   public final Optional<byte[]> attestationIdModel;
@@ -210,6 +212,8 @@ public class AuthorizationList {
         findOptionalByteArrayAuthorizationListEntry(authorizationMap, KM_TAG_ATTESTATION_ID_SERIAL);
     this.attestationIdImei =
         findOptionalByteArrayAuthorizationListEntry(authorizationMap, KM_TAG_ATTESTATION_ID_IMEI);
+    this.attestationIdSecondImei =
+            findOptionalByteArrayAuthorizationListEntry(authorizationMap, KM_TAG_ATTESTATION_ID_SECOND_IMEI);
     this.attestationIdMeid =
         findOptionalByteArrayAuthorizationListEntry(authorizationMap, KM_TAG_ATTESTATION_ID_MEID);
     this.attestationIdManufacturer =
@@ -262,6 +266,7 @@ public class AuthorizationList {
     this.attestationIdProduct = Optional.ofNullable(builder.attestationIdProduct);
     this.attestationIdSerial = Optional.ofNullable(builder.attestationIdSerial);
     this.attestationIdImei = Optional.ofNullable(builder.attestationIdImei);
+    this.attestationIdSecondImei = Optional.ofNullable(builder.attestationIdSecondImei);
     this.attestationIdMeid = Optional.ofNullable(builder.attestationIdMeid);
     this.attestationIdManufacturer = Optional.ofNullable(builder.attestationIdManufacturer);
     this.attestationIdModel = Optional.ofNullable(builder.attestationIdModel);
@@ -435,6 +440,7 @@ public class AuthorizationList {
     addOptionalOctetString(KM_TAG_ATTESTATION_ID_PRODUCT, this.attestationIdProduct, vector);
     addOptionalOctetString(KM_TAG_ATTESTATION_ID_SERIAL, this.attestationIdSerial, vector);
     addOptionalOctetString(KM_TAG_ATTESTATION_ID_IMEI, this.attestationIdImei, vector);
+    addOptionalOctetString(KM_TAG_ATTESTATION_ID_SECOND_IMEI, this.attestationIdSecondImei, vector);
     addOptionalOctetString(KM_TAG_ATTESTATION_ID_MEID, this.attestationIdMeid, vector);
     addOptionalOctetString(
         KM_TAG_ATTESTATION_ID_MANUFACTURER, this.attestationIdManufacturer, vector);
@@ -551,6 +557,7 @@ public class AuthorizationList {
     byte[] attestationIdProduct;
     byte[] attestationIdSerial;
     byte[] attestationIdImei;
+    byte[] attestationIdSecondImei;
     byte[] attestationIdMeid;
     byte[] attestationIdManufacturer;
     byte[] attestationIdModel;
@@ -754,6 +761,12 @@ public class AuthorizationList {
     @CanIgnoreReturnValue
     public Builder setAttestationIdImei(byte[] attestationIdImei) {
       this.attestationIdImei = attestationIdImei;
+      return this;
+    }
+
+    @CanIgnoreReturnValue
+    public Builder setAttestationIdSecondImei(byte[] attestationIdSecondImei) {
+      this.attestationIdSecondImei = attestationIdSecondImei;
       return this;
     }
 
