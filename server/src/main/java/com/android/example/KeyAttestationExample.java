@@ -163,6 +163,8 @@ public class KeyAttestationExample {
     printOptional(authorizationList.attestationIdProduct, indent + "Attestation ID Product");
     printOptional(authorizationList.attestationIdSerial, indent + "Attestation ID Serial");
     printOptional(authorizationList.attestationIdImei, indent + "Attestation ID IMEI");
+    printOptional(
+        authorizationList.attestationIdSecondImei, indent + "Attestation ID SECOND IMEI");
     printOptional(authorizationList.attestationIdMeid, indent + "Attestation ID MEID");
     printOptional(
         authorizationList.attestationIdManufacturer, indent + "Attestation ID Manufacturer");
