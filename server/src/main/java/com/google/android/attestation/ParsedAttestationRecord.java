@@ -101,7 +101,7 @@ public class ParsedAttestationRecord {
     this.teeEnforced = teeEnforced;
   }
 
-  public static ParsedAttestationRecord extractFreshestAttestation(List<X509Certificate> certs)
+  public static ParsedAttestationRecord createParsedAttestationRecord(List<X509Certificate> certs)
       throws IOException {
 
     if (certs.isEmpty()) {

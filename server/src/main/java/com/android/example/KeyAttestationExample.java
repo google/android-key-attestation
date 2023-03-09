@@ -16,7 +16,7 @@
 package com.android.example;
 
 import static com.google.android.attestation.Constants.GOOGLE_ROOT_CA_PUB_KEY;
-import static com.google.android.attestation.ParsedAttestationRecord.extractFreshestAttestation;
+import static com.google.android.attestation.ParsedAttestationRecord.createParsedAttestationRecord;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.android.attestation.AttestationApplicationId;
@@ -90,7 +90,7 @@ public class KeyAttestationExample {
 
     verifyCertificateChain(certs);
 
-    ParsedAttestationRecord parsedAttestationRecord = extractFreshestAttestation(certs);
+    ParsedAttestationRecord parsedAttestationRecord = createParsedAttestationRecord(certs);
 
     System.out.println("Attestation version: " + parsedAttestationRecord.attestationVersion);
     System.out.println(

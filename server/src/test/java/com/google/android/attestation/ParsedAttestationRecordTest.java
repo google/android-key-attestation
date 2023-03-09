@@ -75,7 +75,7 @@ public class ParsedAttestationRecordTest {
   @Test
   public void testParseAttestationRecord() throws CertificateException, IOException {
     ParsedAttestationRecord attestationRecord =
-        ParsedAttestationRecord.extractFreshestAttestation(
+        ParsedAttestationRecord.createParsedAttestationRecord(
             loadCertificateChain(TEST_NORMAL_CERT_CHAIN_PATH));
 
     assertThat(attestationRecord.attestationVersion).isEqualTo(EXPECTED_ATTESTATION_VERSION);
@@ -95,7 +95,7 @@ public class ParsedAttestationRecordTest {
   @Test
   public void testParseAttestationRecordWithAttestKeys() throws IOException, CertificateException {
     ParsedAttestationRecord attestationRecord =
-        ParsedAttestationRecord.extractFreshestAttestation(
+        ParsedAttestationRecord.createParsedAttestationRecord(
             loadCertificateChain(TEST_ATTEST_KEY_CERT_CHAIN_PATH));
 
     assertThat(attestationRecord.attestationVersion).isEqualTo(EXPECTED_ATTESTATION_VERSION);
@@ -116,7 +116,7 @@ public class ParsedAttestationRecordTest {
   public void testParseAttestationRecordWithAttestKeysAndFakeLeaf() throws Exception {
     fakeLeafException.expect(IllegalArgumentException.class);
     fakeLeafException.expectMessage("Found non-ATTEST_KEY attestation after leaf.");
-    ParsedAttestationRecord.extractFreshestAttestation(
+    ParsedAttestationRecord.createParsedAttestationRecord(
         loadCertificateChain(TEST_FAKE_KEY_CERT_CHAIN_PATH));
   }
 
