@@ -21,6 +21,7 @@ import static com.google.android.attestation.Constants.ATTESTATION_VERSION_INDEX
 import static com.google.android.attestation.Constants.KEYMASTER_SECURITY_LEVEL_INDEX;
 import static com.google.android.attestation.Constants.KEYMASTER_VERSION_INDEX;
 import static com.google.android.attestation.Constants.KEY_DESCRIPTION_OID;
+import static com.google.android.attestation.Constants.KM_KEY_PURPOSE_ATTEST_KEY;
 import static com.google.android.attestation.Constants.KM_SECURITY_LEVEL_SOFTWARE;
 import static com.google.android.attestation.Constants.KM_SECURITY_LEVEL_STRONG_BOX;
 import static com.google.android.attestation.Constants.KM_SECURITY_LEVEL_TRUSTED_ENVIRONMENT;
@@ -30,7 +31,10 @@ import static com.google.android.attestation.Constants.UNIQUE_ID_INDEX;
 
 import java.io.IOException;
 import java.security.cert.X509Certificate;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Enumerated;
 import org.bouncycastle.asn1.ASN1InputStream;
@@ -100,20 +104,51 @@ public class ParsedAttestationRecord {
   public static ParsedAttestationRecord createParsedAttestationRecord(List<X509Certificate> certs)
       throws IOException {
 
-    // Parse the attestation record that is closest to the root. This prevents an adversary from
-    // attesting an attestation record of their choice with an otherwise trusted chain using the
-    // following attack:
-    // 1) having the TEE attest a key under the adversary's control,
-    // 2) using that key to sign a new leaf certificate with an attestation extension that has their chosen attestation record, then
-    // 3) appending that certificate to the original certificate chain.
-    for (int i = certs.size() - 1; i >= 0; i--) {
-      byte[] attestationExtensionBytes = certs.get(i).getExtensionValue(KEY_DESCRIPTION_OID);
-      if (attestationExtensionBytes != null && attestationExtensionBytes.length != 0) {
-        return new ParsedAttestationRecord(extractAttestationSequence(attestationExtensionBytes));
+    if (certs.isEmpty()) {
+      throw new IllegalArgumentException("Empty certificate list, couldn't get attestation data.");
+    }
+
+    // Leaf certificate should contain the attestation record we're looking for.
+    final ParsedAttestationRecord retval = extractParsedAttestationRecord(certs.get(0));
+    if (retval == null) {
+      throw new IllegalArgumentException("Leaf certificate doesn't contain attestation data.");
+    }
+
+    // Make sure the rest of the chain is correct.  After the leaf we can have zero or more
+    // attestations of ATTEST_KEYs, then the remaining certificates must not be attestations.  So if
+    // we find any attestations after the first non-attestation, or if we find any attestations that
+    // aren't for ATTEST_KEYs, throw.
+    boolean foundNonAttestationCert = false;
+    for (X509Certificate cert : certs.stream().skip(1).collect(Collectors.toList())) {
+      final ParsedAttestationRecord record = extractParsedAttestationRecord(cert);
+      if (record == null) {
+        foundNonAttestationCert = true;
+      } else {
+        if (foundNonAttestationCert) {
+          throw new IllegalArgumentException(
+              "Found an attestation certificate after non-attestation cert(s). This should be impossible.");
+        }
+        if (!isAttestKeyAttestation(record)) {
+          throw new IllegalArgumentException("Found non-ATTEST_KEY attestation after leaf.");
+        }
       }
     }
 
-    throw new IllegalArgumentException("Couldn't find the keystore attestation extension data.");
+    return retval;
+  }
+
+  private static ParsedAttestationRecord extractParsedAttestationRecord(X509Certificate cert)
+      throws IOException {
+    byte[] attestationExtensionBytes = cert.getExtensionValue(KEY_DESCRIPTION_OID);
+    if (attestationExtensionBytes == null) {
+      return null;
+    }
+    return new ParsedAttestationRecord(extractAttestationSequence(attestationExtensionBytes));
+  }
+
+  private static boolean isAttestKeyAttestation(ParsedAttestationRecord record) {
+    Set<Integer> purposes = record.teeEnforced.purpose.orElse(Collections.emptySet());
+    return purposes.size() == 1 && purposes.contains(KM_KEY_PURPOSE_ATTEST_KEY);
   }
 
   public static ParsedAttestationRecord create(ASN1Sequence extensionData) {
