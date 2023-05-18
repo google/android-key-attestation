@@ -28,7 +28,7 @@ java_test(
     srcs = ["ParsedAttestationRecordTest.java"],
     deps = [
         "//server/src/main/java/com/google/android/attestation",
-        "@maven//:com_google_testparameterinjector",
+        "@maven//:com_google_testparameterinjector_test_parameter_injector",
         "@maven//:com_google_truth_extensions_truth_java8_extension",
         "@maven//:com_google_truth_truth",
         "@maven//:junit_junit",
