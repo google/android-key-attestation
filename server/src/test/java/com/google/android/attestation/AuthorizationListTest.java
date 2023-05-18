@@ -26,18 +26,18 @@ import static com.google.common.truth.Truth8.assertThat;
 import static org.junit.Assert.fail;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.testing.junit.testparameterinjector.TestParameter;
+import com.google.testing.junit.testparameterinjector.TestParameterInjector;
 import java.io.IOException;
 import java.time.Instant;
-
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.util.encoders.Base64;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
 /** Test for {@link AuthorizationList}. */
-@RunWith(JUnit4.class)
+@RunWith(TestParameterInjector.class)
 public class AuthorizationListTest {
 
   // Generated from certificate with RSA Algorithm and StrongBox Security Level
@@ -198,5 +198,52 @@ public class AuthorizationListTest {
     ASN1Sequence seq = authorizationList.toAsn1Sequence();
     assertThat(seq.getEncoded("DER"))
         .isEqualTo(Base64.decode(EXTENTION_DATA_WITH_INDIVIDUAL_ATTESTATION));
+  }
+
+  @Test
+  public void testAlgorithmMap(@TestParameter AuthorizationList.Algorithm algorithm) {
+    assertThat(
+            AuthorizationList.ASN1_TO_ALGORITHM.get(
+                AuthorizationList.ALGORITHM_TO_ASN1.get(algorithm)))
+        .isEqualTo(algorithm);
+  }
+
+  @Test
+  public void testEcCurveMap(@TestParameter AuthorizationList.EcCurve ecCurve) {
+    assertThat(
+            AuthorizationList.ASN1_TO_EC_CURVE.get(AuthorizationList.EC_CURVE_TO_ASN1.get(ecCurve)))
+        .isEqualTo(ecCurve);
+  }
+
+  @Test
+  public void testPaddingModeMap(@TestParameter AuthorizationList.PaddingMode paddingMode) {
+    assertThat(
+            AuthorizationList.ASN1_TO_PADDING_MODE.get(
+                AuthorizationList.PADDING_MODE_TO_ASN1.get(paddingMode)))
+        .isEqualTo(paddingMode);
+  }
+
+  @Test
+  public void testDigestModeMap(@TestParameter AuthorizationList.DigestMode digestMode) {
+    assertThat(
+            AuthorizationList.ASN1_TO_DIGEST_MODE.get(
+                AuthorizationList.DIGEST_MODE_TO_ASN1.get(digestMode)))
+        .isEqualTo(digestMode);
+  }
+
+  @Test
+  public void testKeyOriginMap(@TestParameter AuthorizationList.KeyOrigin keyOrigin) {
+    assertThat(
+            AuthorizationList.ASN1_TO_KEY_ORIGIN.get(
+                AuthorizationList.KEY_ORIGIN_TO_ASN1.get(keyOrigin)))
+        .isEqualTo(keyOrigin);
+  }
+
+  @Test
+  public void testOperationPurposeMap(@TestParameter AuthorizationList.OperationPurpose purpose) {
+    assertThat(
+            AuthorizationList.ASN1_TO_OPERATION_PURPOSE.get(
+                AuthorizationList.OPERATION_PURPOSE_TO_ASN1.get(purpose)))
+        .isEqualTo(purpose);
   }
 }
