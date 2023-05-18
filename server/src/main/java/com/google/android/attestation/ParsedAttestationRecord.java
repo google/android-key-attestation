@@ -28,6 +28,7 @@ import static com.google.android.attestation.Constants.SW_ENFORCED_INDEX;
 import static com.google.android.attestation.Constants.TEE_ENFORCED_INDEX;
 import static com.google.android.attestation.Constants.UNIQUE_ID_INDEX;
 
+import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
 import java.security.cert.X509Certificate;
 import java.util.List;
@@ -209,4 +210,79 @@ public class ParsedAttestationRecord {
     TRUSTED_ENVIRONMENT,
     STRONG_BOX
   }
+
+  /** This indicates the version of the key attestation feature. */
+  public enum AttestationVersion {
+    KEYMASTER_2_0,
+    KEYMASTER_3_0,
+    KEYMASTER_4_0,
+    KEYMASTER_4_1,
+    KEYMINT_1_0,
+    KEYMINT_2_0,
+  }
+
+  public static final ImmutableMap<AttestationVersion, Integer> ATTESTATION_VERSION_TO_ASN1 =
+      ImmutableMap.of(
+          AttestationVersion.KEYMASTER_2_0,
+          1,
+          AttestationVersion.KEYMASTER_3_0,
+          2,
+          AttestationVersion.KEYMASTER_4_0,
+          3,
+          AttestationVersion.KEYMASTER_4_1,
+          4,
+          AttestationVersion.KEYMINT_1_0,
+          100,
+          AttestationVersion.KEYMINT_2_0,
+          200);
+  public static final ImmutableMap<Integer, AttestationVersion> ASN1_TO_ATTESTATION_VERSION =
+      ImmutableMap.of(
+          1, AttestationVersion.KEYMASTER_2_0,
+          2, AttestationVersion.KEYMASTER_3_0,
+          3, AttestationVersion.KEYMASTER_4_0,
+          4, AttestationVersion.KEYMASTER_4_1,
+          100, AttestationVersion.KEYMINT_1_0,
+          200, AttestationVersion.KEYMINT_2_0);
+
+  /** This indicates the version of the key mint or key master feature. */
+  public enum KeyMintVersion {
+    KEYMASTER_0_2_OR_3,
+    KEYMASTER_1_0,
+    KEYMASTER_2_0,
+    KEYMASTER_3_0,
+    KEYMASTER_4_0,
+    KEYMASTER_4_1,
+    KEYMINT_1_0,
+    KEYMINT_2_0,
+  }
+
+  public static final ImmutableMap<KeyMintVersion, Integer> KEYMINT_VERSION_TO_ASN1 =
+      ImmutableMap.of(
+          KeyMintVersion.KEYMASTER_0_2_OR_3,
+          0,
+          KeyMintVersion.KEYMASTER_1_0,
+          1,
+          KeyMintVersion.KEYMASTER_2_0,
+          2,
+          KeyMintVersion.KEYMASTER_3_0,
+          3,
+          KeyMintVersion.KEYMASTER_4_0,
+          4,
+          KeyMintVersion.KEYMASTER_4_1,
+          41,
+          KeyMintVersion.KEYMINT_1_0,
+          100,
+          KeyMintVersion.KEYMINT_2_0,
+          200);
+
+  public static final ImmutableMap<Integer, KeyMintVersion> ASN1_TO_KEYMINT_VERSION =
+      ImmutableMap.of(
+          0, KeyMintVersion.KEYMASTER_0_2_OR_3,
+          1, KeyMintVersion.KEYMASTER_1_0,
+          2, KeyMintVersion.KEYMASTER_2_0,
+          3, KeyMintVersion.KEYMASTER_3_0,
+          4, KeyMintVersion.KEYMASTER_4_0,
+          41, KeyMintVersion.KEYMASTER_4_1,
+          100, KeyMintVersion.KEYMINT_1_0,
+          200, KeyMintVersion.KEYMINT_2_0);
 }

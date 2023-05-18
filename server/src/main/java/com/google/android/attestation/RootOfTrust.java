@@ -59,11 +59,30 @@ public class RootOfTrust {
     }
   }
 
+  private RootOfTrust(
+      byte[] verifiedBootKey,
+      boolean deviceLocked,
+      VerifiedBootState verifiedBootState,
+      byte[] verifiedBootHash) {
+    this.verifiedBootKey = verifiedBootKey;
+    this.deviceLocked = deviceLocked;
+    this.verifiedBootState = verifiedBootState;
+    this.verifiedBootHash = verifiedBootHash;
+  }
+
   static RootOfTrust createRootOfTrust(ASN1Sequence rootOfTrust, int attestationVersion) {
     if (rootOfTrust == null) {
       return null;
     }
     return new RootOfTrust(rootOfTrust, attestationVersion);
+  }
+
+  public static RootOfTrust create(
+      byte[] verifiedBootKey,
+      boolean deviceLocked,
+      VerifiedBootState verifiedBootState,
+      byte[] verifiedBootHash) {
+    return new RootOfTrust(verifiedBootKey, deviceLocked, verifiedBootState, verifiedBootHash);
   }
 
   private static VerifiedBootState verifiedBootStateToEnum(int securityLevel) {
