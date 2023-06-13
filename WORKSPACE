@@ -31,8 +31,8 @@ maven_install(
         "com.google.errorprone:error_prone_annotations:2.3.1",
         "com.google.guava:guava:32.0.1-jre",
         "com.squareup.okhttp3:okhttp:4.10.0",
-        "org.bouncycastle:bcpkix-jdk15on:1.61",
-        "org.bouncycastle:bcprov-jdk15on:1.61",
+        "org.bouncycastle:bcpkix-jdk18on:1.73",
+        "org.bouncycastle:bcprov-jdk18on:1.73",
         "org.jspecify:jspecify:0.2.0",
 
         "com.google.testparameterinjector:test-parameter-injector:1.11",

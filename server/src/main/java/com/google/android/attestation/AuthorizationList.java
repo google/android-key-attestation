@@ -77,11 +77,12 @@ import java.util.stream.Stream;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
+import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1TaggedObject;
+import org.bouncycastle.asn1.ASN1Util;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
@@ -370,7 +371,7 @@ public class AuthorizationList {
   public final boolean identityCredentialKey;
 
   private AuthorizationList(ASN1Encodable[] authorizationList, int attestationVersion) {
-    Map<Integer, ASN1Primitive> authorizationMap = getAuthorizationMap(authorizationList);
+    Map<Integer, ASN1Object> authorizationMap = getAuthorizationMap(authorizationList);
     this.purpose =
         findIntegerSetAuthorizationListEntry(authorizationMap, KM_TAG_PURPOSE).stream()
             .flatMap(key -> Stream.ofNullable(ASN1_TO_OPERATION_PURPOSE.get(key)))
@@ -523,23 +524,25 @@ public class AuthorizationList {
     return new AuthorizationList(authorizationList, attestationVersion);
   }
 
-  private static Map<Integer, ASN1Primitive> getAuthorizationMap(
+  private static Map<Integer, ASN1Object> getAuthorizationMap(
       ASN1Encodable[] authorizationList) {
-    Map<Integer, ASN1Primitive> authorizationMap = new HashMap<>();
+    Map<Integer, ASN1Object> authorizationMap = new HashMap<>();
     for (ASN1Encodable entry : authorizationList) {
-      ASN1TaggedObject taggedEntry = (ASN1TaggedObject) entry;
-      authorizationMap.put(taggedEntry.getTagNo(), taggedEntry.getObject());
+      ASN1TaggedObject taggedEntry = ASN1TaggedObject.getInstance(entry);
+      authorizationMap.put(
+          taggedEntry.getTagNo(),
+          ASN1Util.getExplicitContextBaseObject(taggedEntry, taggedEntry.getTagNo()));
     }
     return authorizationMap;
   }
 
-  private static Optional<ASN1Primitive> findAuthorizationListEntry(
-      Map<Integer, ASN1Primitive> authorizationMap, int tag) {
+  private static Optional<ASN1Object> findAuthorizationListEntry(
+      Map<Integer, ASN1Object> authorizationMap, int tag) {
     return Optional.ofNullable(authorizationMap.get(tag));
   }
 
   private static ImmutableSet<Integer> findIntegerSetAuthorizationListEntry(
-      Map<Integer, ASN1Primitive> authorizationMap, int tag) {
+      Map<Integer, ASN1Object> authorizationMap, int tag) {
     ASN1Set asn1Set =
         findAuthorizationListEntry(authorizationMap, tag).map(ASN1Set.class::cast).orElse(null);
     if (asn1Set == null) {
@@ -549,45 +552,45 @@ public class AuthorizationList {
   }
 
   private static Optional<Duration> findOptionalDurationSecondsAuthorizationListEntry(
-      Map<Integer, ASN1Primitive> authorizationMap, int tag) {
+      Map<Integer, ASN1Object> authorizationMap, int tag) {
     Optional<Integer> seconds = findOptionalIntegerAuthorizationListEntry(authorizationMap, tag);
     return seconds.map(Duration::ofSeconds);
   }
 
   private static Optional<Integer> findOptionalIntegerAuthorizationListEntry(
-      Map<Integer, ASN1Primitive> authorizationMap, int tag) {
+      Map<Integer, ASN1Object> authorizationMap, int tag) {
     return findAuthorizationListEntry(authorizationMap, tag)
         .map(ASN1Integer.class::cast)
         .map(ASN1Parsing::getIntegerFromAsn1);
   }
 
   private static Optional<Instant> findOptionalInstantMillisAuthorizationListEntry(
-      Map<Integer, ASN1Primitive> authorizationMap, int tag) {
+      Map<Integer, ASN1Object> authorizationMap, int tag) {
     Optional<Long> millis = findOptionalLongAuthorizationListEntry(authorizationMap, tag);
     return millis.map(Instant::ofEpochMilli);
   }
 
   private static Optional<Long> findOptionalLongAuthorizationListEntry(
-      Map<Integer, ASN1Primitive> authorizationMap, int tag) {
+      Map<Integer, ASN1Object> authorizationMap, int tag) {
     return findAuthorizationListEntry(authorizationMap, tag)
         .map(ASN1Integer.class::cast)
         .map(value -> value.getValue().longValue());
   }
 
   private static boolean findBooleanAuthorizationListEntry(
-      Map<Integer, ASN1Primitive> authorizationMap, int tag) {
+      Map<Integer, ASN1Object> authorizationMap, int tag) {
     return findAuthorizationListEntry(authorizationMap, tag).isPresent();
   }
 
   private static Optional<byte[]> findOptionalByteArrayAuthorizationListEntry(
-      Map<Integer, ASN1Primitive> authorizationMap, int tag) {
+      Map<Integer, ASN1Object> authorizationMap, int tag) {
     return findAuthorizationListEntry(authorizationMap, tag)
         .map(ASN1OctetString.class::cast)
         .map(ASN1OctetString::getOctets);
   }
 
   private static ImmutableSet<UserAuthType> findUserAuthType(
-      Map<Integer, ASN1Primitive> authorizationMap, int tag) {
+      Map<Integer, ASN1Object> authorizationMap, int tag) {
     Optional<Long> userAuthType = findOptionalLongAuthorizationListEntry(authorizationMap, tag);
     return userAuthType.map(AuthorizationList::userAuthTypeToEnum).orElse(ImmutableSet.of());
   }
