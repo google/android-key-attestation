@@ -63,7 +63,6 @@ import static com.google.android.attestation.Constants.UINT32_MAX;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
@@ -90,7 +89,6 @@ import org.bouncycastle.asn1.DERTaggedObject;
  * hardware abstraction layer (HAL). You compare these values to the device's current state or to a
  * set of expected values to verify that a key pair is still valid for use in your app.
  */
-@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class AuthorizationList {
   /** Specifies the types of user authenticators that may be used to authorize this key. */
   public enum UserAuthType {
@@ -813,247 +811,206 @@ public class AuthorizationList {
     boolean individualAttestation;
     boolean identityCredentialKey;
 
-    @CanIgnoreReturnValue
     public Builder setPurpose(Set<Integer> purpose) {
       this.purpose = purpose;
       return this;
     }
 
-    @CanIgnoreReturnValue
     public Builder setAlgorithm(Integer algorithm) {
       this.algorithm = algorithm;
       return this;
     }
 
-    @CanIgnoreReturnValue
     public Builder setKeySize(Integer keySize) {
       this.keySize = keySize;
       return this;
     }
 
-    @CanIgnoreReturnValue
     public Builder setDigest(Set<Integer> digest) {
       this.digest = digest;
       return this;
     }
 
-    @CanIgnoreReturnValue
     public Builder setPadding(Set<Integer> padding) {
       this.padding = padding;
       return this;
     }
 
-    @CanIgnoreReturnValue
     public Builder setEcCurve(Integer ecCurve) {
       this.ecCurve = ecCurve;
       return this;
     }
 
-    @CanIgnoreReturnValue
     public Builder setRsaPublicExponent(Long rsaPublicExponent) {
       this.rsaPublicExponent = rsaPublicExponent;
       return this;
     }
 
-    @CanIgnoreReturnValue
     public Builder setRollbackResistance(boolean rollbackResistance) {
       this.rollbackResistance = rollbackResistance;
       return this;
     }
 
-    @CanIgnoreReturnValue
     public Builder setActiveDateTime(Instant activeDateTime) {
       this.activeDateTime = activeDateTime;
       return this;
     }
 
-    @CanIgnoreReturnValue
     public Builder setOriginationExpireDateTime(Instant originationExpireDateTime) {
       this.originationExpireDateTime = originationExpireDateTime;
       return this;
     }
 
-    @CanIgnoreReturnValue
     public Builder setUsageExpireDateTime(Instant usageExpireDateTime) {
       this.usageExpireDateTime = usageExpireDateTime;
       return this;
     }
 
-    @CanIgnoreReturnValue
     public Builder setNoAuthRequired(boolean noAuthRequired) {
       this.noAuthRequired = noAuthRequired;
       return this;
     }
 
-    @CanIgnoreReturnValue
     public Builder setUserAuthType(Set<UserAuthType> userAuthType) {
       this.userAuthType = userAuthType;
       return this;
     }
 
-    @CanIgnoreReturnValue
     public Builder setAuthTimeout(Duration authTimeout) {
       this.authTimeout = authTimeout;
       return this;
     }
 
-    @CanIgnoreReturnValue
     public Builder setAllowWhileOnBody(boolean allowWhileOnBody) {
       this.allowWhileOnBody = allowWhileOnBody;
       return this;
     }
 
-    @CanIgnoreReturnValue
     public Builder setTrustedUserPresenceRequired(boolean trustedUserPresenceRequired) {
       this.trustedUserPresenceRequired = trustedUserPresenceRequired;
       return this;
     }
 
-    @CanIgnoreReturnValue
     public Builder setTrustedConfirmationRequired(boolean trustedConfirmationRequired) {
       this.trustedConfirmationRequired = trustedConfirmationRequired;
       return this;
     }
 
-    @CanIgnoreReturnValue
     public Builder setUnlockedDeviceRequired(boolean unlockedDeviceRequired) {
       this.unlockedDeviceRequired = unlockedDeviceRequired;
       return this;
     }
 
-    @CanIgnoreReturnValue
     public Builder setAllApplications(boolean allApplications) {
       this.allApplications = allApplications;
       return this;
     }
 
-    @CanIgnoreReturnValue
     public Builder setApplicationId(byte[] applicationId) {
       this.applicationId = applicationId;
       return this;
     }
 
-    @CanIgnoreReturnValue
     public Builder setCreationDateTime(Instant creationDateTime) {
       this.creationDateTime = creationDateTime;
       return this;
     }
 
-    @CanIgnoreReturnValue
     public Builder setOrigin(Integer origin) {
       this.origin = origin;
       return this;
     }
 
-    @CanIgnoreReturnValue
     public Builder setRollbackResistant(boolean rollbackResistant) {
       this.rollbackResistant = rollbackResistant;
       return this;
     }
 
-    @CanIgnoreReturnValue
     public Builder setRootOfTrust(RootOfTrust rootOfTrust) {
       this.rootOfTrust = rootOfTrust;
       return this;
     }
 
-    @CanIgnoreReturnValue
     public Builder setOsVersion(Integer osVersion) {
       this.osVersion = osVersion;
       return this;
     }
 
-    @CanIgnoreReturnValue
     public Builder setOsPatchLevel(Integer osPatchLevel) {
       this.osPatchLevel = osPatchLevel;
       return this;
     }
 
-    @CanIgnoreReturnValue
     public Builder setAttestationApplicationId(AttestationApplicationId attestationApplicationId) {
       this.attestationApplicationId = attestationApplicationId;
       return this;
     }
 
-    @CanIgnoreReturnValue
     public Builder setAttestationApplicationIdBytes(byte[] attestationApplicationIdBytes) {
       this.attestationApplicationIdBytes = attestationApplicationIdBytes;
       return this;
     }
 
-    @CanIgnoreReturnValue
     public Builder setAttestationIdBrand(byte[] attestationIdBrand) {
       this.attestationIdBrand = attestationIdBrand;
       return this;
     }
 
-    @CanIgnoreReturnValue
     public Builder setAttestationIdDevice(byte[] attestationIdDevice) {
       this.attestationIdDevice = attestationIdDevice;
       return this;
     }
 
-    @CanIgnoreReturnValue
     public Builder setAttestationIdProduct(byte[] attestationIdProduct) {
       this.attestationIdProduct = attestationIdProduct;
       return this;
     }
 
-    @CanIgnoreReturnValue
     public Builder setAttestationIdSerial(byte[] attestationIdSerial) {
       this.attestationIdSerial = attestationIdSerial;
       return this;
     }
 
-    @CanIgnoreReturnValue
     public Builder setAttestationIdImei(byte[] attestationIdImei) {
       this.attestationIdImei = attestationIdImei;
       return this;
     }
 
-    @CanIgnoreReturnValue
     public Builder setAttestationIdSecondImei(byte[] attestationIdSecondImei) {
       this.attestationIdSecondImei = attestationIdSecondImei;
       return this;
     }
 
-    @CanIgnoreReturnValue
     public Builder setAttestationIdMeid(byte[] attestationIdMeid) {
       this.attestationIdMeid = attestationIdMeid;
       return this;
     }
 
-    @CanIgnoreReturnValue
     public Builder setAttestationIdManufacturer(byte[] attestationIdManufacturer) {
       this.attestationIdManufacturer = attestationIdManufacturer;
       return this;
     }
 
-    @CanIgnoreReturnValue
     public Builder setAttestationIdModel(byte[] attestationIdModel) {
       this.attestationIdModel = attestationIdModel;
       return this;
     }
 
-    @CanIgnoreReturnValue
     public Builder setVendorPatchLevel(Integer vendorPatchLevel) {
       this.vendorPatchLevel = vendorPatchLevel;
       return this;
     }
 
-    @CanIgnoreReturnValue
     public Builder setBootPatchLevel(Integer bootPatchLevel) {
       this.bootPatchLevel = bootPatchLevel;
       return this;
     }
 
-    @CanIgnoreReturnValue
     public Builder setIndividualAttestation(boolean individualAttestation) {
       this.individualAttestation = individualAttestation;
       return this;
     }
 
-    @CanIgnoreReturnValue
     public Builder setIdentityCredentialKey(boolean identityCredentialKey) {
       this.identityCredentialKey = identityCredentialKey;
       return this;

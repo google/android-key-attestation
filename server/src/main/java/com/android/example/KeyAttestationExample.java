@@ -21,12 +21,11 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.android.attestation.AttestationApplicationId;
 import com.google.android.attestation.AttestationApplicationId.AttestationPackageInfo;
-import com.google.android.attestation.CertificateRevocationStatus;
 import com.google.android.attestation.AuthorizationList;
+import com.google.android.attestation.CertificateRevocationStatus;
 import com.google.android.attestation.ParsedAttestationRecord;
 import com.google.android.attestation.RootOfTrust;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableList.Builder;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -70,9 +69,7 @@ import org.bouncycastle.util.encoders.Base64;
  * <p>4. Extracting the attestation extension data from the attestation certificate.
  *
  * <p>5. Verifying (and printing) several important data elements from the attestation extension.
- *
  */
-@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class KeyAttestationExample {
 
   private KeyAttestationExample() {}

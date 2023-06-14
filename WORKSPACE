@@ -35,7 +35,6 @@ maven_install(
         "com.google.code.gson:gson:2.8.5",
 
         "com.google.guava:guava:31.1-android",
-        "com.google.errorprone:error_prone_annotations:2.3.1",
 
         "com.squareup.okhttp3:okhttp:4.10.0",
 
