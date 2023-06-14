@@ -60,14 +60,16 @@ import static com.google.android.attestation.Constants.KM_TAG_USAGE_EXPIRE_DATE_
 import static com.google.android.attestation.Constants.KM_TAG_USER_AUTH_TYPE;
 import static com.google.android.attestation.Constants.KM_TAG_VENDOR_PATCH_LEVEL;
 import static com.google.android.attestation.Constants.UINT32_MAX;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static com.google.common.collect.Streams.stream;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -324,11 +326,11 @@ public class AuthorizationList {
           7,
           OperationPurpose.ATTEST_KEY);
 
-  public final Optional<Set<Integer>> purpose;
+  public final ImmutableSet<Integer> purpose;
   public final Optional<Integer> algorithm;
   public final Optional<Integer> keySize;
-  public final Optional<Set<Integer>> digest;
-  public final Optional<Set<Integer>> padding;
+  public final ImmutableSet<Integer> digest;
+  public final ImmutableSet<Integer> padding;
   public final Optional<Integer> ecCurve;
   public final Optional<Long> rsaPublicExponent;
   public final boolean rollbackResistance;
@@ -336,7 +338,7 @@ public class AuthorizationList {
   public final Optional<Instant> originationExpireDateTime;
   public final Optional<Instant> usageExpireDateTime;
   public final boolean noAuthRequired;
-  public final Optional<Set<UserAuthType>> userAuthType;
+  public final ImmutableSet<UserAuthType> userAuthType;
   public final Optional<Duration> authTimeout;
   public final boolean allowWhileOnBody;
   public final boolean trustedUserPresenceRequired;
@@ -368,11 +370,11 @@ public class AuthorizationList {
 
   private AuthorizationList(ASN1Encodable[] authorizationList, int attestationVersion) {
     Map<Integer, ASN1Primitive> authorizationMap = getAuthorizationMap(authorizationList);
-    this.purpose = findOptionalIntegerSetAuthorizationListEntry(authorizationMap, KM_TAG_PURPOSE);
+    this.purpose = findIntegerSetAuthorizationListEntry(authorizationMap, KM_TAG_PURPOSE);
     this.algorithm = findOptionalIntegerAuthorizationListEntry(authorizationMap, KM_TAG_ALGORITHM);
     this.keySize = findOptionalIntegerAuthorizationListEntry(authorizationMap, KM_TAG_KEY_SIZE);
-    this.digest = findOptionalIntegerSetAuthorizationListEntry(authorizationMap, KM_TAG_DIGEST);
-    this.padding = findOptionalIntegerSetAuthorizationListEntry(authorizationMap, KM_TAG_PADDING);
+    this.digest = findIntegerSetAuthorizationListEntry(authorizationMap, KM_TAG_DIGEST);
+    this.padding = findIntegerSetAuthorizationListEntry(authorizationMap, KM_TAG_PADDING);
     this.ecCurve = findOptionalIntegerAuthorizationListEntry(authorizationMap, KM_TAG_EC_CURVE);
     this.rsaPublicExponent =
         findOptionalLongAuthorizationListEntry(authorizationMap, KM_TAG_RSA_PUBLIC_EXPONENT);
@@ -388,7 +390,7 @@ public class AuthorizationList {
             authorizationMap, KM_TAG_USAGE_EXPIRE_DATE_TIME);
     this.noAuthRequired =
         findBooleanAuthorizationListEntry(authorizationMap, KM_TAG_NO_AUTH_REQUIRED);
-    this.userAuthType = findOptionalUserAuthType(authorizationMap, KM_TAG_USER_AUTH_TYPE);
+    this.userAuthType = findUserAuthType(authorizationMap, KM_TAG_USER_AUTH_TYPE);
     this.authTimeout =
         findOptionalDurationSecondsAuthorizationListEntry(authorizationMap, KM_TAG_AUTH_TIMEOUT);
     this.allowWhileOnBody =
@@ -459,11 +461,11 @@ public class AuthorizationList {
   }
 
   private AuthorizationList(Builder builder) {
-    this.purpose = Optional.ofNullable(builder.purpose);
+    this.purpose = builder.purpose;
     this.algorithm = Optional.ofNullable(builder.algorithm);
     this.keySize = Optional.ofNullable(builder.keySize);
-    this.digest = Optional.ofNullable(builder.digest);
-    this.padding = Optional.ofNullable(builder.padding);
+    this.digest = builder.digest;
+    this.padding = builder.padding;
     this.ecCurve = Optional.ofNullable(builder.ecCurve);
     this.rsaPublicExponent = Optional.ofNullable(builder.rsaPublicExponent);
     this.rollbackResistance = builder.rollbackResistance;
@@ -471,7 +473,7 @@ public class AuthorizationList {
     this.originationExpireDateTime = Optional.ofNullable(builder.originationExpireDateTime);
     this.usageExpireDateTime = Optional.ofNullable(builder.usageExpireDateTime);
     this.noAuthRequired = builder.noAuthRequired;
-    this.userAuthType = Optional.ofNullable(builder.userAuthType);
+    this.userAuthType = builder.userAuthType;
     this.authTimeout = Optional.ofNullable(builder.authTimeout);
     this.allowWhileOnBody = builder.allowWhileOnBody;
     this.trustedUserPresenceRequired = builder.trustedUserPresenceRequired;
@@ -522,17 +524,13 @@ public class AuthorizationList {
     return authorizationMap.getOrDefault(tag, null);
   }
 
-  private static Optional<Set<Integer>> findOptionalIntegerSetAuthorizationListEntry(
+  private static ImmutableSet<Integer> findIntegerSetAuthorizationListEntry(
       Map<Integer, ASN1Primitive> authorizationMap, int tag) {
     ASN1Set asn1Set = (ASN1Set) findAuthorizationListEntry(authorizationMap, tag);
     if (asn1Set == null) {
-      return Optional.empty();
+      return ImmutableSet.of();
     }
-    Set<Integer> entrySet = new HashSet<>();
-    for (ASN1Encodable value : asn1Set) {
-      entrySet.add(ASN1Parsing.getIntegerFromAsn1(value));
-    }
-    return Optional.of(entrySet);
+    return stream(asn1Set).map(ASN1Parsing::getIntegerFromAsn1).collect(toImmutableSet());
   }
 
   private static Optional<Duration> findOptionalDurationSecondsAuthorizationListEntry(
@@ -570,30 +568,31 @@ public class AuthorizationList {
     return Optional.ofNullable(entry).map(ASN1OctetString::getOctets);
   }
 
-  private static Optional<Set<UserAuthType>> findOptionalUserAuthType(
+  private static ImmutableSet<UserAuthType> findUserAuthType(
       Map<Integer, ASN1Primitive> authorizationMap, int tag) {
     Optional<Long> userAuthType = findOptionalLongAuthorizationListEntry(authorizationMap, tag);
-    return userAuthType.map(AuthorizationList::userAuthTypeToEnum);
+    return userAuthType.map(AuthorizationList::userAuthTypeToEnum).orElse(ImmutableSet.of());
   }
 
-  // Visible for testing.
-  static Set<UserAuthType> userAuthTypeToEnum(long userAuthType) {
+  @VisibleForTesting
+  static ImmutableSet<UserAuthType> userAuthTypeToEnum(long userAuthType) {
     if (userAuthType == 0) {
       return ImmutableSet.of(USER_AUTH_TYPE_NONE);
     }
 
-    Set<UserAuthType> result = new HashSet<>();
+    ImmutableSet.Builder<UserAuthType> builder = ImmutableSet.builder();
 
     if ((userAuthType & 1L) == 1L) {
-      result.add(PASSWORD);
+      builder.add(PASSWORD);
     }
     if ((userAuthType & 2L) == 2L) {
-      result.add(FINGERPRINT);
+      builder.add(FINGERPRINT);
     }
     if (userAuthType == UINT32_MAX) {
-      result.add(USER_AUTH_TYPE_ANY);
+      builder.add(USER_AUTH_TYPE_ANY);
     }
 
+    ImmutableSet<UserAuthType> result = builder.build();
     if (result.isEmpty()) {
       throw new IllegalArgumentException("Invalid User Auth Type.");
     }
@@ -681,10 +680,10 @@ public class AuthorizationList {
   }
 
   private static void addOptionalIntegerSet(
-      int tag, Optional<Set<Integer>> entry, ASN1EncodableVector vector) {
-    if (entry.isPresent()) {
+      int tag, Set<Integer> entry, ASN1EncodableVector vector) {
+    if (!entry.isEmpty()) {
       ASN1EncodableVector tmp = new ASN1EncodableVector();
-      entry.get().forEach((Integer value) -> tmp.add(new ASN1Integer(value.longValue())));
+      entry.forEach((Integer value) -> tmp.add(new ASN1Integer(value.longValue())));
       vector.add(new DERTaggedObject(tag, new DERSet(tmp)));
     }
   }
@@ -730,9 +729,9 @@ public class AuthorizationList {
   }
 
   private static void addOptionalUserAuthType(
-      int tag, Optional<Set<UserAuthType>> entry, ASN1EncodableVector vector) {
-    if (entry.isPresent()) {
-      vector.add(new DERTaggedObject(tag, new ASN1Integer(userAuthTypeToLong(entry.get()))));
+      int tag, Set<UserAuthType> entry, ASN1EncodableVector vector) {
+    if (!entry.isEmpty()) {
+      vector.add(new DERTaggedObject(tag, new ASN1Integer(userAuthTypeToLong(entry))));
     }
   }
 
@@ -771,11 +770,11 @@ public class AuthorizationList {
    */
   public static final class Builder {
 
-    Set<Integer> purpose;
+    ImmutableSet<Integer> purpose = ImmutableSet.of();
     Integer algorithm;
     Integer keySize;
-    Set<Integer> digest;
-    Set<Integer> padding;
+    ImmutableSet<Integer> digest = ImmutableSet.of();
+    ImmutableSet<Integer> padding = ImmutableSet.of();
     Integer ecCurve;
     Long rsaPublicExponent;
     boolean rollbackResistance;
@@ -783,7 +782,7 @@ public class AuthorizationList {
     Instant originationExpireDateTime;
     Instant usageExpireDateTime;
     boolean noAuthRequired;
-    Set<UserAuthType> userAuthType;
+    ImmutableSet<UserAuthType> userAuthType = ImmutableSet.of();
     Duration authTimeout;
     boolean allowWhileOnBody;
     boolean trustedUserPresenceRequired;
@@ -815,7 +814,7 @@ public class AuthorizationList {
 
     @CanIgnoreReturnValue
     public Builder setPurpose(Set<Integer> purpose) {
-      this.purpose = purpose;
+      this.purpose = ImmutableSet.copyOf(purpose);
       return this;
     }
 
@@ -833,13 +832,13 @@ public class AuthorizationList {
 
     @CanIgnoreReturnValue
     public Builder setDigest(Set<Integer> digest) {
-      this.digest = digest;
+      this.digest = ImmutableSet.copyOf(digest);
       return this;
     }
 
     @CanIgnoreReturnValue
     public Builder setPadding(Set<Integer> padding) {
-      this.padding = padding;
+      this.padding = ImmutableSet.copyOf(padding);
       return this;
     }
 
@@ -887,7 +886,7 @@ public class AuthorizationList {
 
     @CanIgnoreReturnValue
     public Builder setUserAuthType(Set<UserAuthType> userAuthType) {
-      this.userAuthType = userAuthType;
+      this.userAuthType = ImmutableSet.copyOf(userAuthType);
       return this;
     }
 
