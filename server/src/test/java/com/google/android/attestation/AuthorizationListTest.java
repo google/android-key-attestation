@@ -120,11 +120,11 @@ public class AuthorizationListTest {
         AuthorizationList.createAuthorizationList(
             getEncodableAuthorizationList(TEE_ENFORCED_EXTENSION_DATA), ATTESTATION_VERSION);
 
-    assertThat(authorizationList.purpose).hasValue(EXPECTED_TEE_PURPOSE);
+    assertThat(authorizationList.purpose).isEqualTo(EXPECTED_TEE_PURPOSE);
     assertThat(authorizationList.algorithm).hasValue(EXPECTED_TEE_ALGORITHM);
     assertThat(authorizationList.keySize).hasValue(EXPECTED_TEE_KEY_SIZE);
-    assertThat(authorizationList.digest).hasValue(EXPECTED_TEE_DIGEST);
-    assertThat(authorizationList.padding).hasValue(EXPECTED_TEE_PADDING);
+    assertThat(authorizationList.digest).isEqualTo(EXPECTED_TEE_DIGEST);
+    assertThat(authorizationList.padding).isEqualTo(EXPECTED_TEE_PADDING);
     assertThat(authorizationList.rsaPublicExponent).hasValue(EXPECTED_TEE_RSA_PUBLIC_COMPONENT);
     assertThat(authorizationList.noAuthRequired).isTrue();
     assertThat(authorizationList.origin).hasValue(EXPECTED_TEE_ORIGIN);
