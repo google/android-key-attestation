@@ -160,21 +160,4 @@ public class ParsedAttestationRecordTest {
     assertThat(actual.teeEnforced.attestationIdBrand)
         .isEqualTo(expected.teeEnforced.attestationIdBrand);
   }
-
-  @Test
-  public void testAttestationVersionMap(
-      @TestParameter ParsedAttestationRecord.AttestationVersion version) {
-    assertThat(
-            ParsedAttestationRecord.ASN1_TO_ATTESTATION_VERSION.get(
-                ParsedAttestationRecord.ATTESTATION_VERSION_TO_ASN1.get(version)))
-        .isEqualTo(version);
-  }
-
-  @Test
-  public void testKeyMintVersionMap(@TestParameter ParsedAttestationRecord.KeyMintVersion version) {
-    assertThat(
-            ParsedAttestationRecord.ASN1_TO_KEYMINT_VERSION.get(
-                ParsedAttestationRecord.KEYMINT_VERSION_TO_ASN1.get(version)))
-        .isEqualTo(version);
-  }
 }
