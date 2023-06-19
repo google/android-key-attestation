@@ -16,6 +16,8 @@
 package com.google.android.attestation;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth8.assertThat;
+import static org.junit.Assert.assertThrows;
 
 import com.google.android.attestation.RootOfTrust.VerifiedBootState;
 import java.io.IOException;
@@ -58,11 +60,12 @@ public class RootOfTrustTest {
     assertThat(rootOfTrust.verifiedBootKey).isEqualTo(EXPECTED_VERIFIED_BOOT_KEY);
     assertThat(rootOfTrust.deviceLocked).isEqualTo(EXPECTED_DEVICE_LOCKED);
     assertThat(rootOfTrust.verifiedBootState).isEqualTo(EXPECTED_VERIFIED_BOOT_STATE);
-    assertThat(rootOfTrust.verifiedBootHash).isEqualTo(EXPECTED_VERIFIED_BOOT_HASH);
+    assertThat(rootOfTrust.verifiedBootHash).hasValue(EXPECTED_VERIFIED_BOOT_HASH);
   }
 
   @Test
   public void testCreateEmptyRootOfTrust() {
-    assertThat(RootOfTrust.createRootOfTrust(null, ATTESTATION_VERSION)).isNull();
+    assertThrows(
+        NullPointerException.class, () -> RootOfTrust.createRootOfTrust(null, ATTESTATION_VERSION));
   }
 }

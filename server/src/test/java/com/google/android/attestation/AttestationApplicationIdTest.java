@@ -17,10 +17,10 @@ package com.google.android.attestation;
 
 import static com.google.common.truth.Truth.assertThat;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.junit.Assert.assertThrows;
 
 import com.google.android.attestation.AttestationApplicationId.AttestationPackageInfo;
 import com.google.common.collect.ImmutableList;
-import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.util.encoders.Base64;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,17 +31,16 @@ import org.junit.runners.JUnit4;
 public class AttestationApplicationIdTest {
 
   // Generated from certificate with RSA Algorithm and StrongBox Security Level
-  private static final DEROctetString ATTESTATION_APPLICATION_ID =
-      new DEROctetString(
-          Base64.decode(
-              "MIIBszGCAYswDAQHYW5kcm9pZAIBHTAZBBRjb20uYW5kcm9pZC5rZXljaGFpbgIBHTAZBBRjb20uYW5kcm9p"
-                  + "ZC5zZXR0aW5ncwIBHTAZBBRjb20ucXRpLmRpYWdzZXJ2aWNlcwIBHTAaBBVjb20uYW5kcm9pZC5keW"
-                  + "5zeXN0ZW0CAR0wHQQYY29tLmFuZHJvaWQuaW5wdXRkZXZpY2VzAgEdMB8EGmNvbS5hbmRyb2lkLmxv"
-                  + "Y2FsdHJhbnNwb3J0AgEdMB8EGmNvbS5hbmRyb2lkLmxvY2F0aW9uLmZ1c2VkAgEdMB8EGmNvbS5hbm"
-                  + "Ryb2lkLnNlcnZlci50ZWxlY29tAgEdMCAEG2NvbS5hbmRyb2lkLndhbGxwYXBlcmJhY2t1cAIBHTAh"
-                  + "BBxjb20uZ29vZ2xlLlNTUmVzdGFydERldGVjdG9yAgEdMCIEHWNvbS5nb29nbGUuYW5kcm9pZC5oaW"
-                  + "RkZW5tZW51AgEBMCMEHmNvbS5hbmRyb2lkLnByb3ZpZGVycy5zZXR0aW5ncwIBHTEiBCAwGqPLCBE0"
-                  + "UBxF8UIqvGbCQiT9Xe1f3I8X5pcXb9hmqg=="));
+  private static final byte[] ATTESTATION_APPLICATION_ID =
+      Base64.decode(
+          "MIIBszGCAYswDAQHYW5kcm9pZAIBHTAZBBRjb20uYW5kcm9pZC5rZXljaGFpbgIBHTAZBBRjb20uYW5kcm9p"
+              + "ZC5zZXR0aW5ncwIBHTAZBBRjb20ucXRpLmRpYWdzZXJ2aWNlcwIBHTAaBBVjb20uYW5kcm9pZC5keW"
+              + "5zeXN0ZW0CAR0wHQQYY29tLmFuZHJvaWQuaW5wdXRkZXZpY2VzAgEdMB8EGmNvbS5hbmRyb2lkLmxv"
+              + "Y2FsdHJhbnNwb3J0AgEdMB8EGmNvbS5hbmRyb2lkLmxvY2F0aW9uLmZ1c2VkAgEdMB8EGmNvbS5hbm"
+              + "Ryb2lkLnNlcnZlci50ZWxlY29tAgEdMCAEG2NvbS5hbmRyb2lkLndhbGxwYXBlcmJhY2t1cAIBHTAh"
+              + "BBxjb20uZ29vZ2xlLlNTUmVzdGFydERldGVjdG9yAgEdMCIEHWNvbS5nb29nbGUuYW5kcm9pZC5oaW"
+              + "RkZW5tZW51AgEBMCMEHmNvbS5hbmRyb2lkLnByb3ZpZGVycy5zZXR0aW5ncwIBHTEiBCAwGqPLCBE0"
+              + "UBxF8UIqvGbCQiT9Xe1f3I8X5pcXb9hmqg==");
 
   private static final ImmutableList<AttestationPackageInfo> EXPECTED_PACKAGE_INFOS =
       ImmutableList.of(
@@ -72,12 +71,15 @@ public class AttestationApplicationIdTest {
   }
 
   @Test
-  public void testCreateEmptyAttestationApplicationIdFromEmptyOrInvalidInput() {
-    assertThat(AttestationApplicationId.createAttestationApplicationId(null)).isNull();
-    assertThat(
+  public void createAttestationApplicationId_nullOrInvalidInput_throwsException() {
+    assertThrows(
+        NullPointerException.class,
+        () -> AttestationApplicationId.createAttestationApplicationId(null));
+    assertThrows(
+        IllegalArgumentException.class,
+        () ->
             AttestationApplicationId.createAttestationApplicationId(
-                new DEROctetString("Invalid DEROctet String".getBytes(UTF_8))))
-        .isNull();
+                "Invalid DEROctet String".getBytes(UTF_8)));
   }
 
   @Test

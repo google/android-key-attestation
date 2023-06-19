@@ -27,23 +27,18 @@ load("@rules_jvm_external//:defs.bzl", "maven_install")
 
 maven_install(
     artifacts = [
-        # Bouncy Castle Cryptography APIs used for certificate verification
+        "com.google.code.gson:gson:2.8.5",
+        "com.google.errorprone:error_prone_annotations:2.3.1",
+        "com.google.guava:guava:32.0.1-jre",
+        "com.squareup.okhttp3:okhttp:4.10.0",
         "org.bouncycastle:bcpkix-jdk15on:1.61",
         "org.bouncycastle:bcprov-jdk15on:1.61",
+        "org.jspecify:jspecify:0.2.0",
 
-        # Gson used for decoding certificate status list
-        "com.google.code.gson:gson:2.8.5",
-
-        "com.google.guava:guava:32.0.1-jre",
-        "com.google.errorprone:error_prone_annotations:2.3.1",
-
-        "com.squareup.okhttp3:okhttp:4.10.0",
-
-        # Test libraries
-        "junit:junit:4.12",
+        "com.google.testparameterinjector:test-parameter-injector:1.11",
         "com.google.truth:truth:1.0",
         "com.google.truth.extensions:truth-java8-extension:1.0",
-        "com.google.testparameterinjector:test-parameter-injector:1.11",
+        "junit:junit:4.12",
     ],
     repositories = [
         "https://repo1.maven.org/maven2/",

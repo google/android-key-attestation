@@ -18,5 +18,6 @@ java_library(
         "@maven//:com_squareup_okhttp3_okhttp",
         "@maven//:org_bouncycastle_bcpkix_jdk15on",
         "@maven//:org_bouncycastle_bcprov_jdk15on",
+        "@maven//:org_jspecify_jspecify",
     ],
 )

@@ -147,7 +147,7 @@ public class KeyAttestationExample {
     authorizationList.rootOfTrust.ifPresent(
         rootOfTrust -> {
           System.out.println(indent + "Root Of Trust:");
-          print(authorizationList.rootOfTrust, indent + "\t");
+          print(rootOfTrust, indent + "\t");
         });
     print(authorizationList.osVersion, indent + "OS Version");
     print(authorizationList.osPatchLevel, indent + "OS Patch Level");
@@ -179,8 +179,10 @@ public class KeyAttestationExample {
         indent + "Verified Boot Key: " + Base64.toBase64String(rootOfTrust.verifiedBootKey));
     System.out.println(indent + "Device Locked: " + rootOfTrust.deviceLocked);
     System.out.println(indent + "Verified Boot State: " + rootOfTrust.verifiedBootState.name());
-    System.out.println(
-        indent + "Verified Boot Hash: " + Base64.toBase64String(rootOfTrust.verifiedBootHash));
+    rootOfTrust.verifiedBootHash.ifPresent(
+        verifiedBootHash ->
+            System.out.println(
+                indent + "Verified Boot Hash: " + Base64.toBase64String(verifiedBootHash)));
   }
 
   private static void print(AttestationApplicationId attestationApplicationId, String indent) {
