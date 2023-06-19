@@ -412,19 +412,17 @@ public class AuthorizationList {
     this.rollbackResistant =
         findBooleanAuthorizationListEntry(authorizationMap, KM_TAG_ROLLBACK_RESISTANT);
     this.rootOfTrust =
-        Optional.ofNullable(
-            RootOfTrust.createRootOfTrust(
-                (ASN1Sequence) findAuthorizationListEntry(authorizationMap, KM_TAG_ROOT_OF_TRUST),
-                attestationVersion));
+        findAuthorizationListEntry(authorizationMap, KM_TAG_ROOT_OF_TRUST)
+            .map(ASN1Sequence.class::cast)
+            .map(rootOfTrust -> RootOfTrust.createRootOfTrust(rootOfTrust, attestationVersion));
     this.osVersion = findOptionalIntegerAuthorizationListEntry(authorizationMap, KM_TAG_OS_VERSION);
     this.osPatchLevel =
         findOptionalIntegerAuthorizationListEntry(authorizationMap, KM_TAG_OS_PATCH_LEVEL);
     this.attestationApplicationId =
-        Optional.ofNullable(
-            AttestationApplicationId.createAttestationApplicationId(
-                (DEROctetString)
-                    findAuthorizationListEntry(
-                        authorizationMap, KM_TAG_ATTESTATION_APPLICATION_ID)));
+        findAuthorizationListEntry(authorizationMap, KM_TAG_ATTESTATION_APPLICATION_ID)
+            .map(ASN1OctetString.class::cast)
+            .map(ASN1OctetString::getOctets)
+            .map(AttestationApplicationId::createAttestationApplicationId);
     this.attestationApplicationIdBytes =
         findOptionalByteArrayAuthorizationListEntry(
             authorizationMap, KM_TAG_ATTESTATION_APPLICATION_ID);
@@ -519,14 +517,15 @@ public class AuthorizationList {
     return authorizationMap;
   }
 
-  private static ASN1Primitive findAuthorizationListEntry(
+  private static Optional<ASN1Primitive> findAuthorizationListEntry(
       Map<Integer, ASN1Primitive> authorizationMap, int tag) {
-    return authorizationMap.getOrDefault(tag, null);
+    return Optional.ofNullable(authorizationMap.get(tag));
   }
 
   private static ImmutableSet<Integer> findIntegerSetAuthorizationListEntry(
       Map<Integer, ASN1Primitive> authorizationMap, int tag) {
-    ASN1Set asn1Set = (ASN1Set) findAuthorizationListEntry(authorizationMap, tag);
+    ASN1Set asn1Set =
+        findAuthorizationListEntry(authorizationMap, tag).map(ASN1Set.class::cast).orElse(null);
     if (asn1Set == null) {
       return ImmutableSet.of();
     }
@@ -541,8 +540,9 @@ public class AuthorizationList {
 
   private static Optional<Integer> findOptionalIntegerAuthorizationListEntry(
       Map<Integer, ASN1Primitive> authorizationMap, int tag) {
-    ASN1Primitive entry = findAuthorizationListEntry(authorizationMap, tag);
-    return Optional.ofNullable(entry).map(ASN1Parsing::getIntegerFromAsn1);
+    return findAuthorizationListEntry(authorizationMap, tag)
+        .map(ASN1Integer.class::cast)
+        .map(ASN1Parsing::getIntegerFromAsn1);
   }
 
   private static Optional<Instant> findOptionalInstantMillisAuthorizationListEntry(
@@ -553,19 +553,21 @@ public class AuthorizationList {
 
   private static Optional<Long> findOptionalLongAuthorizationListEntry(
       Map<Integer, ASN1Primitive> authorizationMap, int tag) {
-    ASN1Integer longEntry = ((ASN1Integer) findAuthorizationListEntry(authorizationMap, tag));
-    return Optional.ofNullable(longEntry).map(value -> value.getValue().longValue());
+    return findAuthorizationListEntry(authorizationMap, tag)
+        .map(ASN1Integer.class::cast)
+        .map(value -> value.getValue().longValue());
   }
 
   private static boolean findBooleanAuthorizationListEntry(
       Map<Integer, ASN1Primitive> authorizationMap, int tag) {
-    return null != findAuthorizationListEntry(authorizationMap, tag);
+    return findAuthorizationListEntry(authorizationMap, tag).isPresent();
   }
 
   private static Optional<byte[]> findOptionalByteArrayAuthorizationListEntry(
       Map<Integer, ASN1Primitive> authorizationMap, int tag) {
-    ASN1OctetString entry = (ASN1OctetString) findAuthorizationListEntry(authorizationMap, tag);
-    return Optional.ofNullable(entry).map(ASN1OctetString::getOctets);
+    return findAuthorizationListEntry(authorizationMap, tag)
+        .map(ASN1OctetString.class::cast)
+        .map(ASN1OctetString::getOctets);
   }
 
   private static ImmutableSet<UserAuthType> findUserAuthType(

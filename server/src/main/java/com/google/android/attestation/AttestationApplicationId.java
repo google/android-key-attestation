@@ -21,7 +21,6 @@ import static com.google.android.attestation.Constants.ATTESTATION_PACKAGE_INFO_
 import static com.google.android.attestation.Constants.ATTESTATION_PACKAGE_INFO_VERSION_INDEX;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -35,6 +34,7 @@ import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERSet;
+import org.jspecify.nullness.Nullable;
 
 /**
  * This data structure reflects the Android platform's belief as to which apps are allowed to use
@@ -47,9 +47,9 @@ public class AttestationApplicationId {
   public final List<AttestationPackageInfo> packageInfos;
   public final List<byte[]> signatureDigests;
 
-  private AttestationApplicationId(DEROctetString attestationApplicationId) throws IOException {
+  private AttestationApplicationId(byte[] attestationApplicationId) {
     ASN1Sequence attestationApplicationIdSequence =
-        (ASN1Sequence) ASN1Sequence.fromByteArray(attestationApplicationId.getOctets());
+        ASN1Sequence.getInstance(attestationApplicationId);
     ASN1Set attestationPackageInfos =
         (ASN1Set)
             attestationApplicationIdSequence.getObjectAt(
@@ -75,16 +75,8 @@ public class AttestationApplicationId {
     this.signatureDigests = signatureDigests;
   }
 
-  static AttestationApplicationId createAttestationApplicationId(
-      DEROctetString attestationApplicationId) {
-    if (attestationApplicationId == null) {
-      return null;
-    }
-    try {
-      return new AttestationApplicationId(attestationApplicationId);
-    } catch (IOException e) {
-      return null;
-    }
+  static AttestationApplicationId createAttestationApplicationId(byte[] attestationApplicationId) {
+    return new AttestationApplicationId(attestationApplicationId);
   }
 
   ASN1Sequence toAsn1Sequence() {
@@ -103,7 +95,7 @@ public class AttestationApplicationId {
   }
 
   @Override
-  public boolean equals(Object object) {
+  public boolean equals(@Nullable Object object) {
     if (object instanceof AttestationApplicationId) {
       AttestationApplicationId that = (AttestationApplicationId) object;
       return this.packageInfos.equals(that.packageInfos)
@@ -149,7 +141,7 @@ public class AttestationApplicationId {
     }
 
     @Override
-    public boolean equals(Object object) {
+    public boolean equals(@Nullable Object object) {
       if (object instanceof AttestationPackageInfo) {
         AttestationPackageInfo that = (AttestationPackageInfo) object;
         return this.packageName.equals(that.packageName) && this.version == that.version;
