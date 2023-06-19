@@ -73,6 +73,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
@@ -108,12 +109,12 @@ public class AuthorizationList {
    */
   public enum Algorithm {
     RSA,
-    EC
+    EC,
   }
 
-  public static final ImmutableMap<Algorithm, Integer> ALGORITHM_TO_ASN1 =
+  private static final ImmutableMap<Algorithm, Integer> ALGORITHM_TO_ASN1 =
       ImmutableMap.of(Algorithm.RSA, 1, Algorithm.EC, 3);
-  public static final ImmutableMap<Integer, Algorithm> ASN1_TO_ALGORITHM =
+  private static final ImmutableMap<Integer, Algorithm> ASN1_TO_ALGORITHM =
       ImmutableMap.of(1, Algorithm.RSA, 3, Algorithm.EC);
 
   /**
@@ -128,7 +129,7 @@ public class AuthorizationList {
     CURVE_25519
   }
 
-  public static final ImmutableMap<EcCurve, Integer> EC_CURVE_TO_ASN1 =
+  private static final ImmutableMap<EcCurve, Integer> EC_CURVE_TO_ASN1 =
       ImmutableMap.of(
           EcCurve.P_224,
           0,
@@ -140,7 +141,7 @@ public class AuthorizationList {
           3,
           EcCurve.CURVE_25519,
           4);
-  public static final ImmutableMap<Integer, EcCurve> ASN1_TO_EC_CURVE =
+  private static final ImmutableMap<Integer, EcCurve> ASN1_TO_EC_CURVE =
       ImmutableMap.of(
           0,
           EcCurve.P_224,
@@ -166,7 +167,7 @@ public class AuthorizationList {
     PKCS7
   }
 
-  public static final ImmutableMap<PaddingMode, Integer> PADDING_MODE_TO_ASN1 =
+  static final ImmutableMap<PaddingMode, Integer> PADDING_MODE_TO_ASN1 =
       ImmutableMap.of(
           PaddingMode.NONE,
           1,
@@ -180,7 +181,7 @@ public class AuthorizationList {
           5,
           PaddingMode.PKCS7,
           64);
-  public static final ImmutableMap<Integer, PaddingMode> ASN1_TO_PADDING_MODE =
+  static final ImmutableMap<Integer, PaddingMode> ASN1_TO_PADDING_MODE =
       ImmutableMap.of(
           1,
           PaddingMode.NONE,
@@ -209,7 +210,7 @@ public class AuthorizationList {
     SHA_2_512
   }
 
-  public static final ImmutableMap<DigestMode, Integer> DIGEST_MODE_TO_ASN1 =
+  static final ImmutableMap<DigestMode, Integer> DIGEST_MODE_TO_ASN1 =
       ImmutableMap.of(
           DigestMode.NONE,
           0,
@@ -225,7 +226,7 @@ public class AuthorizationList {
           5,
           DigestMode.SHA_2_512,
           6);
-  public static final ImmutableMap<Integer, DigestMode> ASN1_TO_DIGEST_MODE =
+  static final ImmutableMap<Integer, DigestMode> ASN1_TO_DIGEST_MODE =
       ImmutableMap.of(
           0,
           DigestMode.NONE,
@@ -254,7 +255,7 @@ public class AuthorizationList {
     SECURELY_IMPORTED
   }
 
-  public static final ImmutableMap<KeyOrigin, Integer> KEY_ORIGIN_TO_ASN1 =
+  static final ImmutableMap<KeyOrigin, Integer> KEY_ORIGIN_TO_ASN1 =
       ImmutableMap.of(
           KeyOrigin.GENERATED,
           0,
@@ -266,7 +267,7 @@ public class AuthorizationList {
           3,
           KeyOrigin.SECURELY_IMPORTED,
           4);
-  public static final ImmutableMap<Integer, KeyOrigin> ASN1_TO_KEY_ORIGIN =
+  static final ImmutableMap<Integer, KeyOrigin> ASN1_TO_KEY_ORIGIN =
       ImmutableMap.of(
           0,
           KeyOrigin.GENERATED,
@@ -293,7 +294,7 @@ public class AuthorizationList {
     ATTEST_KEY
   }
 
-  public static final ImmutableMap<OperationPurpose, Integer> OPERATION_PURPOSE_TO_ASN1 =
+  static final ImmutableMap<OperationPurpose, Integer> OPERATION_PURPOSE_TO_ASN1 =
       ImmutableMap.of(
           OperationPurpose.ENCRYPT,
           0,
@@ -309,7 +310,7 @@ public class AuthorizationList {
           6,
           OperationPurpose.ATTEST_KEY,
           7);
-  public static final ImmutableMap<Integer, OperationPurpose> ASN1_TO_OPERATION_PURPOSE =
+  static final ImmutableMap<Integer, OperationPurpose> ASN1_TO_OPERATION_PURPOSE =
       ImmutableMap.of(
           0,
           OperationPurpose.ENCRYPT,
@@ -326,12 +327,12 @@ public class AuthorizationList {
           7,
           OperationPurpose.ATTEST_KEY);
 
-  public final ImmutableSet<Integer> purpose;
-  public final Optional<Integer> algorithm;
+  public final ImmutableSet<OperationPurpose> purpose;
+  public final Optional<Algorithm> algorithm;
   public final Optional<Integer> keySize;
-  public final ImmutableSet<Integer> digest;
-  public final ImmutableSet<Integer> padding;
-  public final Optional<Integer> ecCurve;
+  public final ImmutableSet<DigestMode> digest;
+  public final ImmutableSet<PaddingMode> padding;
+  public final Optional<EcCurve> ecCurve;
   public final Optional<Long> rsaPublicExponent;
   public final boolean rollbackResistance;
   public final Optional<Instant> activeDateTime;
@@ -347,7 +348,7 @@ public class AuthorizationList {
   public final boolean allApplications;
   public final Optional<byte[]> applicationId;
   public final Optional<Instant> creationDateTime;
-  public final Optional<Integer> origin;
+  public final Optional<KeyOrigin> origin;
   public final boolean rollbackResistant;
   public final Optional<RootOfTrust> rootOfTrust;
   public final Optional<Integer> osVersion;
@@ -370,12 +371,25 @@ public class AuthorizationList {
 
   private AuthorizationList(ASN1Encodable[] authorizationList, int attestationVersion) {
     Map<Integer, ASN1Primitive> authorizationMap = getAuthorizationMap(authorizationList);
-    this.purpose = findIntegerSetAuthorizationListEntry(authorizationMap, KM_TAG_PURPOSE);
-    this.algorithm = findOptionalIntegerAuthorizationListEntry(authorizationMap, KM_TAG_ALGORITHM);
+    this.purpose =
+        findIntegerSetAuthorizationListEntry(authorizationMap, KM_TAG_PURPOSE).stream()
+            .flatMap(key -> Stream.ofNullable(ASN1_TO_OPERATION_PURPOSE.get(key)))
+            .collect(toImmutableSet());
+    this.algorithm =
+        findOptionalIntegerAuthorizationListEntry(authorizationMap, KM_TAG_ALGORITHM)
+            .map(ASN1_TO_ALGORITHM::get);
     this.keySize = findOptionalIntegerAuthorizationListEntry(authorizationMap, KM_TAG_KEY_SIZE);
-    this.digest = findIntegerSetAuthorizationListEntry(authorizationMap, KM_TAG_DIGEST);
-    this.padding = findIntegerSetAuthorizationListEntry(authorizationMap, KM_TAG_PADDING);
-    this.ecCurve = findOptionalIntegerAuthorizationListEntry(authorizationMap, KM_TAG_EC_CURVE);
+    this.digest =
+        findIntegerSetAuthorizationListEntry(authorizationMap, KM_TAG_DIGEST).stream()
+            .flatMap(key -> Stream.ofNullable(ASN1_TO_DIGEST_MODE.get(key)))
+            .collect(toImmutableSet());
+    this.padding =
+        findIntegerSetAuthorizationListEntry(authorizationMap, KM_TAG_PADDING).stream()
+            .flatMap(key -> Stream.ofNullable(ASN1_TO_PADDING_MODE.get(key)))
+            .collect(toImmutableSet());
+    this.ecCurve =
+        findOptionalIntegerAuthorizationListEntry(authorizationMap, KM_TAG_EC_CURVE)
+            .map(ASN1_TO_EC_CURVE::get);
     this.rsaPublicExponent =
         findOptionalLongAuthorizationListEntry(authorizationMap, KM_TAG_RSA_PUBLIC_EXPONENT);
     this.rollbackResistance =
@@ -408,7 +422,9 @@ public class AuthorizationList {
     this.creationDateTime =
         findOptionalInstantMillisAuthorizationListEntry(
             authorizationMap, KM_TAG_CREATION_DATE_TIME);
-    this.origin = findOptionalIntegerAuthorizationListEntry(authorizationMap, KM_TAG_ORIGIN);
+    this.origin =
+        findOptionalIntegerAuthorizationListEntry(authorizationMap, KM_TAG_ORIGIN)
+            .map(ASN1_TO_KEY_ORIGIN::get);
     this.rollbackResistant =
         findBooleanAuthorizationListEntry(authorizationMap, KM_TAG_ROLLBACK_RESISTANT);
     this.rootOfTrust =
@@ -634,12 +650,27 @@ public class AuthorizationList {
 
   public ASN1Sequence toAsn1Sequence() {
     ASN1EncodableVector vector = new ASN1EncodableVector();
-    addOptionalIntegerSet(KM_TAG_PURPOSE, this.purpose, vector);
-    addOptionalInteger(KM_TAG_ALGORITHM, this.algorithm, vector);
+    addOptionalIntegerSet(
+        KM_TAG_PURPOSE,
+        this.purpose.stream()
+            .flatMap(key -> Stream.ofNullable(OPERATION_PURPOSE_TO_ASN1.get(key)))
+            .collect(toImmutableSet()),
+        vector);
+    addOptionalInteger(KM_TAG_ALGORITHM, this.algorithm.map(ALGORITHM_TO_ASN1::get), vector);
     addOptionalInteger(KM_TAG_KEY_SIZE, this.keySize, vector);
-    addOptionalIntegerSet(KM_TAG_DIGEST, this.digest, vector);
-    addOptionalIntegerSet(KM_TAG_PADDING, this.padding, vector);
-    addOptionalInteger(KM_TAG_EC_CURVE, this.ecCurve, vector);
+    addOptionalIntegerSet(
+        KM_TAG_DIGEST,
+        this.digest.stream()
+            .flatMap(key -> Stream.ofNullable(DIGEST_MODE_TO_ASN1.get(key)))
+            .collect(toImmutableSet()),
+        vector);
+    addOptionalIntegerSet(
+        KM_TAG_PADDING,
+        this.padding.stream()
+            .flatMap(key -> Stream.ofNullable(PADDING_MODE_TO_ASN1.get(key)))
+            .collect(toImmutableSet()),
+        vector);
+    addOptionalInteger(KM_TAG_EC_CURVE, this.ecCurve.map(EC_CURVE_TO_ASN1::get), vector);
     addOptionalLong(KM_TAG_RSA_PUBLIC_EXPONENT, this.rsaPublicExponent, vector);
     addBoolean(KM_TAG_ROLLBACK_RESISTANCE, this.rollbackResistance, vector);
     addOptionalInstant(KM_TAG_ACTIVE_DATE_TIME, this.activeDateTime, vector);
@@ -655,7 +686,7 @@ public class AuthorizationList {
     addBoolean(KM_TAG_ALL_APPLICATIONS, this.allApplications, vector);
     addOptionalOctetString(KM_TAG_APPLICATION_ID, this.applicationId, vector);
     addOptionalInstant(KM_TAG_CREATION_DATE_TIME, this.creationDateTime, vector);
-    addOptionalInteger(KM_TAG_ORIGIN, this.origin, vector);
+    addOptionalInteger(KM_TAG_ORIGIN, this.origin.map(KEY_ORIGIN_TO_ASN1::get), vector);
     addBoolean(KM_TAG_ROLLBACK_RESISTANT, this.rollbackResistant, vector);
     addOptionalRootOfTrust(KM_TAG_ROOT_OF_TRUST, this.rootOfTrust, vector);
     addOptionalInteger(KM_TAG_OS_VERSION, this.osVersion, vector);
@@ -772,12 +803,12 @@ public class AuthorizationList {
    */
   public static final class Builder {
 
-    ImmutableSet<Integer> purpose = ImmutableSet.of();
-    Integer algorithm;
+    ImmutableSet<OperationPurpose> purpose = ImmutableSet.of();
+    Algorithm algorithm;
     Integer keySize;
-    ImmutableSet<Integer> digest = ImmutableSet.of();
-    ImmutableSet<Integer> padding = ImmutableSet.of();
-    Integer ecCurve;
+    ImmutableSet<DigestMode> digest = ImmutableSet.of();
+    ImmutableSet<PaddingMode> padding = ImmutableSet.of();
+    EcCurve ecCurve;
     Long rsaPublicExponent;
     boolean rollbackResistance;
     Instant activeDateTime;
@@ -793,7 +824,7 @@ public class AuthorizationList {
     boolean allApplications;
     byte[] applicationId;
     Instant creationDateTime;
-    Integer origin;
+    KeyOrigin origin;
     boolean rollbackResistant;
     RootOfTrust rootOfTrust;
     Integer osVersion;
@@ -815,13 +846,13 @@ public class AuthorizationList {
     boolean identityCredentialKey;
 
     @CanIgnoreReturnValue
-    public Builder setPurpose(Set<Integer> purpose) {
+    public Builder setPurpose(Set<OperationPurpose> purpose) {
       this.purpose = ImmutableSet.copyOf(purpose);
       return this;
     }
 
     @CanIgnoreReturnValue
-    public Builder setAlgorithm(Integer algorithm) {
+    public Builder setAlgorithm(Algorithm algorithm) {
       this.algorithm = algorithm;
       return this;
     }
@@ -833,19 +864,19 @@ public class AuthorizationList {
     }
 
     @CanIgnoreReturnValue
-    public Builder setDigest(Set<Integer> digest) {
+    public Builder setDigest(Set<DigestMode> digest) {
       this.digest = ImmutableSet.copyOf(digest);
       return this;
     }
 
     @CanIgnoreReturnValue
-    public Builder setPadding(Set<Integer> padding) {
+    public Builder setPadding(Set<PaddingMode> padding) {
       this.padding = ImmutableSet.copyOf(padding);
       return this;
     }
 
     @CanIgnoreReturnValue
-    public Builder setEcCurve(Integer ecCurve) {
+    public Builder setEcCurve(EcCurve ecCurve) {
       this.ecCurve = ecCurve;
       return this;
     }
@@ -941,7 +972,7 @@ public class AuthorizationList {
     }
 
     @CanIgnoreReturnValue
-    public Builder setOrigin(Integer origin) {
+    public Builder setOrigin(KeyOrigin origin) {
       this.origin = origin;
       return this;
     }

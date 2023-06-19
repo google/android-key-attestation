@@ -15,6 +15,11 @@
 
 package com.google.android.attestation;
 
+import static com.google.android.attestation.AuthorizationList.DigestMode.SHA_2_256;
+import static com.google.android.attestation.AuthorizationList.OperationPurpose.SIGN;
+import static com.google.android.attestation.AuthorizationList.OperationPurpose.VERIFY;
+import static com.google.android.attestation.AuthorizationList.PaddingMode.RSA_PKCS1_1_5_SIGN;
+import static com.google.android.attestation.AuthorizationList.PaddingMode.RSA_PSS;
 import static com.google.android.attestation.AuthorizationList.UserAuthType.FINGERPRINT;
 import static com.google.android.attestation.AuthorizationList.UserAuthType.PASSWORD;
 import static com.google.android.attestation.AuthorizationList.UserAuthType.USER_AUTH_TYPE_ANY;
@@ -25,6 +30,11 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth8.assertThat;
 import static org.junit.Assert.fail;
 
+import com.google.android.attestation.AuthorizationList.Algorithm;
+import com.google.android.attestation.AuthorizationList.DigestMode;
+import com.google.android.attestation.AuthorizationList.KeyOrigin;
+import com.google.android.attestation.AuthorizationList.OperationPurpose;
+import com.google.android.attestation.AuthorizationList.PaddingMode;
 import com.google.common.collect.ImmutableSet;
 import com.google.testing.junit.testparameterinjector.TestParameter;
 import com.google.testing.junit.testparameterinjector.TestParameterInjector;
@@ -56,16 +66,6 @@ public class AuthorizationListTest {
           + "NVCDUpCEqTeAG/hUEDAgEAv4VCBQIDAxSzv4VOBgIEATQV8b+FTwYCBAE0Few=";
   private static final int ATTESTATION_VERSION = 3;
 
-  // Some enum values, complete list can be found at:
-  // https://source.android.com/security/keystore/tags
-  private static final int PURPOSE_SIGN = 2;
-  private static final int PURPOSE_VERIFY = 3;
-  private static final int ALGORITHM_RSA = 1;
-  private static final int DIGEST_SHA_2_256 = 4;
-  private static final int PADDING_RSA_PSS = 3;
-  private static final int PADDING_RSA_1_5_SIGN = 5;
-  private static final int ORIGIN_GENERATED = 0;
-
   // 2019-07-15T14:56:32.972Z
   private static final Instant EXPECTED_SW_CREATION_DATETIME = Instant.ofEpochMilli(1563202592972L);
   private static final byte[] EXPECTED_SW_ATTESTATION_APPLICATION_ID_BYTES =
@@ -78,16 +78,15 @@ public class AuthorizationListTest {
               + "UmVzdGFydERldGVjdG9yAgEdMCIEHWNvbS5nb29nbGUuYW5kcm9pZC5oaWRkZW5tZW51AgEBMCMEHmNvbS"
               + "5hbmRyb2lkLnByb3ZpZGVycy5zZXR0aW5ncwIBHTEiBCAwGqPLCBE0UBxF8UIqvGbCQiT9Xe1f3I8X5pcX"
               + "b9hmqg==");
-  private static final ImmutableSet<Integer> EXPECTED_TEE_PURPOSE =
-      ImmutableSet.of(PURPOSE_SIGN, PURPOSE_VERIFY);
-  private static final Integer EXPECTED_TEE_ALGORITHM = ALGORITHM_RSA;
+  private static final ImmutableSet<OperationPurpose> EXPECTED_TEE_PURPOSE =
+      ImmutableSet.of(SIGN, VERIFY);
+  private static final Algorithm EXPECTED_TEE_ALGORITHM = Algorithm.RSA;
   private static final Integer EXPECTED_TEE_KEY_SIZE = 2048;
-  private static final ImmutableSet<Integer> EXPECTED_TEE_DIGEST =
-      ImmutableSet.of(DIGEST_SHA_2_256);
-  private static final ImmutableSet<Integer> EXPECTED_TEE_PADDING =
-      ImmutableSet.of(PADDING_RSA_PSS, PADDING_RSA_1_5_SIGN);
+  private static final ImmutableSet<DigestMode> EXPECTED_TEE_DIGEST = ImmutableSet.of(SHA_2_256);
+  private static final ImmutableSet<PaddingMode> EXPECTED_TEE_PADDING =
+      ImmutableSet.of(RSA_PSS, RSA_PKCS1_1_5_SIGN);
   private static final Long EXPECTED_TEE_RSA_PUBLIC_COMPONENT = 65537L;
-  private static final Integer EXPECTED_TEE_ORIGIN = ORIGIN_GENERATED;
+  private static final KeyOrigin EXPECTED_TEE_ORIGIN = KeyOrigin.GENERATED;
   private static final Integer EXPECTED_TEE_OS_VERSION = 0;
   private static final Integer EXPECTED_TEE_OS_PATCH_LEVEL = 201907;
   private static final Integer EXPECTED_TEE_VENDOR_PATCH_LEVEL = 20190705;
@@ -198,21 +197,6 @@ public class AuthorizationListTest {
     ASN1Sequence seq = authorizationList.toAsn1Sequence();
     assertThat(seq.getEncoded("DER"))
         .isEqualTo(Base64.decode(EXTENTION_DATA_WITH_INDIVIDUAL_ATTESTATION));
-  }
-
-  @Test
-  public void testAlgorithmMap(@TestParameter AuthorizationList.Algorithm algorithm) {
-    assertThat(
-            AuthorizationList.ASN1_TO_ALGORITHM.get(
-                AuthorizationList.ALGORITHM_TO_ASN1.get(algorithm)))
-        .isEqualTo(algorithm);
-  }
-
-  @Test
-  public void testEcCurveMap(@TestParameter AuthorizationList.EcCurve ecCurve) {
-    assertThat(
-            AuthorizationList.ASN1_TO_EC_CURVE.get(AuthorizationList.EC_CURVE_TO_ASN1.get(ecCurve)))
-        .isEqualTo(ecCurve);
   }
 
   @Test
