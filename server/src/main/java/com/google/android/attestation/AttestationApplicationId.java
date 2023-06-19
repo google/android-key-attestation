@@ -43,7 +43,7 @@ import org.bouncycastle.asn1.DERSet;
  *
  * <p>The Attestation Application ID data from KeyMint will not exceed 1K bytes.
  */
-public class AttestationApplicationId implements Comparable<AttestationApplicationId> {
+public class AttestationApplicationId {
   public final List<AttestationPackageInfo> packageInfos;
   public final List<byte[]> signatureDigests;
 
@@ -103,35 +103,13 @@ public class AttestationApplicationId implements Comparable<AttestationApplicati
   }
 
   @Override
-  public int compareTo(AttestationApplicationId other) {
-    int res = Integer.compare(packageInfos.size(), other.packageInfos.size());
-    if (res != 0) {
-      return res;
+  public boolean equals(Object object) {
+    if (object instanceof AttestationApplicationId) {
+      AttestationApplicationId that = (AttestationApplicationId) object;
+      return this.packageInfos.equals(that.packageInfos)
+          && Arrays.deepEquals(this.signatureDigests.toArray(), that.signatureDigests.toArray());
     }
-    for (int i = 0; i < packageInfos.size(); ++i) {
-      res = packageInfos.get(i).compareTo(other.packageInfos.get(i));
-      if (res != 0) {
-        return res;
-      }
-    }
-    res = Integer.compare(signatureDigests.size(), other.signatureDigests.size());
-    if (res != 0) {
-      return res;
-    }
-    ByteArrayComparator cmp = new ByteArrayComparator();
-    for (int i = 0; i < signatureDigests.size(); ++i) {
-      res = cmp.compare(signatureDigests.get(i), other.signatureDigests.get(i));
-      if (res != 0) {
-        return res;
-      }
-    }
-    return res;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    return (o instanceof AttestationApplicationId)
-        && (compareTo((AttestationApplicationId) o) == 0);
+    return false;
   }
 
   @Override
@@ -140,7 +118,7 @@ public class AttestationApplicationId implements Comparable<AttestationApplicati
   }
 
   /** Provides package's name and version number. */
-  public static class AttestationPackageInfo implements Comparable<AttestationPackageInfo> {
+  public static class AttestationPackageInfo {
     public final String packageName;
     public final long version;
 
@@ -171,43 +149,17 @@ public class AttestationApplicationId implements Comparable<AttestationApplicati
     }
 
     @Override
-    public int compareTo(AttestationPackageInfo other) {
-      int res = packageName.compareTo(other.packageName);
-      if (res != 0) {
-        return res;
+    public boolean equals(Object object) {
+      if (object instanceof AttestationPackageInfo) {
+        AttestationPackageInfo that = (AttestationPackageInfo) object;
+        return this.packageName.equals(that.packageName) && this.version == that.version;
       }
-      res = Long.compare(version, other.version);
-      if (res != 0) {
-        return res;
-      }
-      return res;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-      return (o instanceof AttestationPackageInfo) && (compareTo((AttestationPackageInfo) o) == 0);
+      return false;
     }
 
     @Override
     public int hashCode() {
       return Objects.hash(packageName, version);
-    }
-  }
-
-  private static class ByteArrayComparator implements java.util.Comparator<byte[]> {
-    @Override
-    public int compare(byte[] a, byte[] b) {
-      int res = Integer.compare(a.length, b.length);
-      if (res != 0) {
-        return res;
-      }
-      for (int i = 0; i < a.length; ++i) {
-        res = Byte.compare(a[i], b[i]);
-        if (res != 0) {
-          return res;
-        }
-      }
-      return res;
     }
   }
 }
