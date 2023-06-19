@@ -66,7 +66,7 @@ public class CertificateRevocationStatus {
   private static HashMap<String, CertificateRevocationStatus> getEntryToStatusMap(
           Reader statusListReader) {
     JsonObject entries =
-            new JsonParser().parse(statusListReader).getAsJsonObject().getAsJsonObject("entries");
+            JsonParser.parseReader(statusListReader).getAsJsonObject().getAsJsonObject("entries");
 
     HashMap<String, CertificateRevocationStatus> serialNumberToStatus = new HashMap<>();
     for (String serialNumber : entries.keySet()) {
@@ -120,7 +120,7 @@ public class CertificateRevocationStatus {
     }
     serialNumber = serialNumber.toLowerCase();
 
-    JsonObject entries = new JsonParser().parse(statusListReader)
+    JsonObject entries = JsonParser.parseReader(statusListReader)
         .getAsJsonObject()
         .getAsJsonObject("entries");
 

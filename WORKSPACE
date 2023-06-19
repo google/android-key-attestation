@@ -27,7 +27,7 @@ load("@rules_jvm_external//:defs.bzl", "maven_install")
 
 maven_install(
     artifacts = [
-        "com.google.code.gson:gson:2.8.5",
+        "com.google.code.gson:gson:2.10.1",
         "com.google.errorprone:error_prone_annotations:2.3.1",
         "com.google.guava:guava:32.0.1-jre",
         "com.squareup.okhttp3:okhttp:4.10.0",
