@@ -17,6 +17,8 @@ package com.android.example;
 
 import static com.google.android.attestation.Constants.GOOGLE_ROOT_CA_PUB_KEY;
 import static com.google.android.attestation.ParsedAttestationRecord.createParsedAttestationRecord;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.android.attestation.AttestationApplicationId;
@@ -42,8 +44,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.bouncycastle.util.encoders.Base64;
 
 /**
@@ -80,13 +80,10 @@ public class KeyAttestationExample {
   public static void main(String[] args)
       throws CertificateException, IOException, NoSuchProviderException, NoSuchAlgorithmException,
           InvalidKeyException, SignatureException {
-    List<X509Certificate> certs;
-    if (args.length == 1) {
-      String certFilesDir = args[0];
-      certs = loadCertificates(certFilesDir);
-    } else {
-      throw new IOException("Expected path to a directory containing certificates as an argument.");
-    }
+    checkArgument(
+        args.length == 1, "expected path to a directory containing certificates as an argument");
+
+    ImmutableList<X509Certificate> certs = loadCertificates(args[0]);
 
     verifyCertificateChain(certs);
 
@@ -257,11 +254,11 @@ public class KeyAttestationExample {
 
   private static ImmutableList<X509Certificate> loadCertificates(String certFilesDir)
       throws CertificateException, IOException {
-    // Load the attestation certificates from the directory in alphabetic order.
-    List<Path> records;
-    try (Stream<Path> pathStream = Files.walk(Paths.get(certFilesDir))) {
-      records = pathStream.filter(Files::isRegularFile).sorted().collect(Collectors.toList());
-    }
+    ImmutableList<Path> records =
+        Files.walk(Paths.get(certFilesDir))
+            .filter(Files::isRegularFile)
+            .sorted()
+            .collect(toImmutableList());
     ImmutableList.Builder<X509Certificate> certs = new ImmutableList.Builder<>();
     CertificateFactory factory = CertificateFactory.getInstance("X.509");
     for (int i = 0; i < records.size(); ++i) {
