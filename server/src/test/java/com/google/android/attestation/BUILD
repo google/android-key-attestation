@@ -6,7 +6,7 @@ java_test(
         "@maven//:com_google_truth_extensions_truth_java8_extension",
         "@maven//:com_google_truth_truth",
         "@maven//:junit_junit",
-        "@maven//:org_bouncycastle_bcprov_jdk15on",
+        "@maven//:org_bouncycastle_bcprov_jdk18on",
     ],
 )
 
@@ -19,7 +19,7 @@ java_test(
         "@maven//:com_google_truth_extensions_truth_java8_extension",
         "@maven//:com_google_truth_truth",
         "@maven//:junit_junit",
-        "@maven//:org_bouncycastle_bcprov_jdk15on",
+        "@maven//:org_bouncycastle_bcprov_jdk18on",
     ],
 )
 
@@ -32,7 +32,7 @@ java_test(
         "@maven//:com_google_truth_extensions_truth_java8_extension",
         "@maven//:com_google_truth_truth",
         "@maven//:junit_junit",
-        "@maven//:org_bouncycastle_bcprov_jdk15on",
+        "@maven//:org_bouncycastle_bcprov_jdk18on",
     ],
 )
 
@@ -44,6 +44,6 @@ java_test(
         "@maven//:com_google_truth_extensions_truth_java8_extension",
         "@maven//:com_google_truth_truth",
         "@maven//:junit_junit",
-        "@maven//:org_bouncycastle_bcprov_jdk15on",
+        "@maven//:org_bouncycastle_bcprov_jdk18on",
     ],
 )

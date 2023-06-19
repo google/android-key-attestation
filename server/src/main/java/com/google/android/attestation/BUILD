@@ -16,8 +16,8 @@ java_library(
         "@maven//:com_google_errorprone_error_prone_annotations",
         "@maven//:com_google_guava_guava",
         "@maven//:com_squareup_okhttp3_okhttp",
-        "@maven//:org_bouncycastle_bcpkix_jdk15on",
-        "@maven//:org_bouncycastle_bcprov_jdk15on",
+        "@maven//:org_bouncycastle_bcpkix_jdk18on",
+        "@maven//:org_bouncycastle_bcprov_jdk18on",
         "@maven//:org_jspecify_jspecify",
     ],
 )
