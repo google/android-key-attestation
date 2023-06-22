@@ -21,10 +21,12 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import com.google.android.attestation.AuthorizationList.UserAuthType;
 import com.google.android.attestation.ParsedAttestationRecord.SecurityLevel;
 import com.google.common.collect.ImmutableSet;
-import com.google.testing.junit.testparameterinjector.TestParameter;
 import com.google.testing.junit.testparameterinjector.TestParameterInjector;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -132,7 +134,10 @@ public class ParsedAttestationRecordTest {
   }
 
   @Test
-  public void testCreateAndParseAttestationRecord() {
+  public void testCreateAndParseAttestationRecord() throws NoSuchAlgorithmException {
+    KeyPairGenerator generator = KeyPairGenerator.getInstance("EC");
+    generator.initialize(384);
+    PublicKey attestedKey = generator.generateKeyPair().getPublic();
     AuthorizationList.Builder teeEnforcedBuilder = AuthorizationList.builder();
     teeEnforcedBuilder.userAuthType = ImmutableSet.of(UserAuthType.FINGERPRINT);
     teeEnforcedBuilder.attestationIdBrand = "free food".getBytes(UTF_8);
@@ -145,11 +150,10 @@ public class ParsedAttestationRecordTest {
             /* attestationChallenge= */ "abc".getBytes(UTF_8),
             /* uniqueId= */ "foodplease".getBytes(UTF_8),
             /* softwareEnforced= */ AuthorizationList.builder().build(),
-            /* teeEnforced= */ AuthorizationList.builder()
-                .setUserAuthType(ImmutableSet.of(UserAuthType.FINGERPRINT))
-                .setAttestationIdBrand("free food".getBytes(UTF_8)).build());
+            teeEnforcedBuilder.build(),
+            attestedKey);
     ASN1Sequence seq = expected.toAsn1Sequence();
-    ParsedAttestationRecord actual = ParsedAttestationRecord.create(seq);
+    ParsedAttestationRecord actual = ParsedAttestationRecord.create(seq, attestedKey);
     assertThat(actual.attestationVersion).isEqualTo(expected.attestationVersion);
     assertThat(actual.attestationSecurityLevel).isEqualTo(expected.attestationSecurityLevel);
     assertThat(actual.keymasterVersion).isEqualTo(expected.keymasterVersion);
@@ -159,5 +163,6 @@ public class ParsedAttestationRecordTest {
     assertThat(actual.teeEnforced.userAuthType).isEqualTo(expected.teeEnforced.userAuthType);
     assertThat(actual.teeEnforced.attestationIdBrand)
         .isEqualTo(expected.teeEnforced.attestationIdBrand);
+    assertThat(actual.attestedKey).isEqualTo(expected.attestedKey);
   }
 }
