@@ -29,6 +29,7 @@ import static com.google.android.attestation.Constants.TEE_ENFORCED_INDEX;
 import static com.google.android.attestation.Constants.UNIQUE_ID_INDEX;
 
 import java.io.IOException;
+import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import org.bouncycastle.asn1.ASN1Encodable;
@@ -51,8 +52,9 @@ public class ParsedAttestationRecord {
   public final byte[] uniqueId;
   public final AuthorizationList softwareEnforced;
   public final AuthorizationList teeEnforced;
+  public final PublicKey attestedKey;
 
-  private ParsedAttestationRecord(ASN1Sequence extensionData) {
+  private ParsedAttestationRecord(ASN1Sequence extensionData, PublicKey attestedKey) {
     this.attestationVersion =
         ASN1Parsing.getIntegerFromAsn1(extensionData.getObjectAt(ATTESTATION_VERSION_INDEX));
     this.attestationSecurityLevel =
@@ -76,6 +78,7 @@ public class ParsedAttestationRecord {
         AuthorizationList.createAuthorizationList(
             ((ASN1Sequence) extensionData.getObjectAt(TEE_ENFORCED_INDEX)).toArray(),
             attestationVersion);
+    this.attestedKey = attestedKey;
   }
 
   private ParsedAttestationRecord(
@@ -86,7 +89,8 @@ public class ParsedAttestationRecord {
       byte[] attestationChallenge,
       byte[] uniqueId,
       AuthorizationList softwareEnforced,
-      AuthorizationList teeEnforced) {
+      AuthorizationList teeEnforced,
+      PublicKey attestedKey) {
     this.attestationVersion = attestationVersion;
     this.attestationSecurityLevel = attestationSecurityLevel;
     this.keymasterVersion = keymasterVersion;
@@ -95,6 +99,7 @@ public class ParsedAttestationRecord {
     this.uniqueId = uniqueId;
     this.softwareEnforced = softwareEnforced;
     this.teeEnforced = teeEnforced;
+    this.attestedKey = attestedKey;
   }
 
   public static ParsedAttestationRecord createParsedAttestationRecord(List<X509Certificate> certs)
@@ -104,20 +109,22 @@ public class ParsedAttestationRecord {
     // attesting an attestation record of their choice with an otherwise trusted chain using the
     // following attack:
     // 1) having the TEE attest a key under the adversary's control,
-    // 2) using that key to sign a new leaf certificate with an attestation extension that has their chosen attestation record, then
+    // 2) using that key to sign a new leaf certificate with an attestation extension that has their
+    //    chosen attestation record, then
     // 3) appending that certificate to the original certificate chain.
     for (int i = certs.size() - 1; i >= 0; i--) {
       byte[] attestationExtensionBytes = certs.get(i).getExtensionValue(KEY_DESCRIPTION_OID);
       if (attestationExtensionBytes != null && attestationExtensionBytes.length != 0) {
-        return new ParsedAttestationRecord(extractAttestationSequence(attestationExtensionBytes));
+        return new ParsedAttestationRecord(
+            extractAttestationSequence(attestationExtensionBytes), certs.get(i).getPublicKey());
       }
     }
 
     throw new IllegalArgumentException("Couldn't find the keystore attestation extension data.");
   }
 
-  public static ParsedAttestationRecord create(ASN1Sequence extensionData) {
-    return new ParsedAttestationRecord(extensionData);
+  public static ParsedAttestationRecord create(ASN1Sequence extensionData, PublicKey attestedKey) {
+    return new ParsedAttestationRecord(extensionData, attestedKey);
   }
 
   public static ParsedAttestationRecord create(
@@ -128,7 +135,8 @@ public class ParsedAttestationRecord {
       byte[] attestationChallenge,
       byte[] uniqueId,
       AuthorizationList softwareEnforced,
-      AuthorizationList teeEnforced) {
+      AuthorizationList teeEnforced,
+      PublicKey attestedKey) {
     return new ParsedAttestationRecord(
         attestationVersion,
         attestationSecurityLevel,
@@ -137,7 +145,8 @@ public class ParsedAttestationRecord {
         attestationChallenge,
         uniqueId,
         softwareEnforced,
-        teeEnforced);
+        teeEnforced,
+        attestedKey);
   }
 
   private static SecurityLevel securityLevelToEnum(int securityLevel) {
