@@ -15,24 +15,26 @@
 
 package com.google.android.attestation;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
+import com.google.common.base.Ascii;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-
 
 /**
  * Utils for fetching and decoding attestation certificate status.
@@ -53,18 +55,16 @@ public class CertificateRevocationStatus {
 
   public static HashMap<String, CertificateRevocationStatus> fetchAllEntries() throws IOException {
     URL url = new URL(STATUS_URL);
-    InputStreamReader statusListReader = new InputStreamReader(url.openStream());
-    return getEntryToStatusMap(statusListReader);
+    return getEntryToStatusMap(new InputStreamReader(url.openStream(), UTF_8));
   }
 
   public static HashMap<String, CertificateRevocationStatus> loadAllEntriesFromFile(String filePath)
-          throws IOException {
-    FileReader reader = new FileReader(filePath);
-    return getEntryToStatusMap(reader);
+      throws IOException {
+    return getEntryToStatusMap(Files.newBufferedReader(Path.of(filePath)));
   }
 
   private static HashMap<String, CertificateRevocationStatus> getEntryToStatusMap(
-          Reader statusListReader) {
+      Reader statusListReader) {
     JsonObject entries =
             JsonParser.parseReader(statusListReader).getAsJsonObject().getAsJsonObject("entries");
 
@@ -86,8 +86,7 @@ public class CertificateRevocationStatus {
 
   public static CertificateRevocationStatus loadStatusFromFile(String serialNumber, String filePath)
       throws IOException {
-    FileReader reader = new FileReader(filePath);
-    return decodeStatus(serialNumber, reader);
+    return decodeStatus(serialNumber, Files.newBufferedReader(Path.of(filePath)));
   }
 
 
@@ -118,7 +117,7 @@ public class CertificateRevocationStatus {
     if (serialNumber == null) {
       throw new IllegalArgumentException("serialNumber cannot be null");
     }
-    serialNumber = serialNumber.toLowerCase();
+    serialNumber = Ascii.toLowerCase(serialNumber);
 
     JsonObject entries = JsonParser.parseReader(statusListReader)
         .getAsJsonObject()

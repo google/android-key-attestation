@@ -44,6 +44,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 import org.bouncycastle.util.encoders.Base64;
 
 /**
@@ -227,7 +228,7 @@ public class KeyAttestationExample {
               "Certificate revocation status is " + certStatus.status.name());
         }
       } catch (IOException e) {
-        throw new IOException("Unable to fetch certificate status. Check connectivity.");
+        throw new IOException("Unable to fetch certificate status. Check connectivity.", e);
       }
     }
 
@@ -254,11 +255,10 @@ public class KeyAttestationExample {
 
   private static ImmutableList<X509Certificate> loadCertificates(String certFilesDir)
       throws CertificateException, IOException {
-    ImmutableList<Path> records =
-        Files.walk(Paths.get(certFilesDir))
-            .filter(Files::isRegularFile)
-            .sorted()
-            .collect(toImmutableList());
+    ImmutableList<Path> records;
+    try (Stream<Path> stream = Files.walk(Paths.get(certFilesDir))) {
+      records = stream.filter(Files::isRegularFile).sorted().collect(toImmutableList());
+    }
     ImmutableList.Builder<X509Certificate> certs = new ImmutableList.Builder<>();
     CertificateFactory factory = CertificateFactory.getInstance("X.509");
     for (int i = 0; i < records.size(); ++i) {
