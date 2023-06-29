@@ -171,12 +171,12 @@ public class AuthorizationListTest {
   }
 
   private static final String EXTENTION_DATA_WITH_ID_CREDENTIAL_KEY =
-          "MIH0oQgxBgIBAgIBA6IDAgEBowQCAggApQUxAwIBBKYIMQYCAQMCAQW/" +
-          "gUgFAgMBAAG/g3cCBQC/hT4DAgEAv4VATDBKBCAAAAAAAAAAAAAAAAAA" +
-          "AAAAAAAAAAAAAAAAAAAAAAAAAAEBAAoBAgQgEvR7Lf1t9nD6P2qyUmgi" +
-          "Q0mG+RixYnglj2TaAMZmHn2/hUEFAgMBrbC/hUIFAgMDFRi/hUYIBAZn" +
-          "b29nbGW/hUcHBAVzYXJnb7+FSAcEBXNhcmdvv4VMCAQGR29vZ2xlv4VN" +
-          "CgQIUGl4ZWwgM2G/hU4GAgQBND1lv4VPBgIEATQ9Zb+FUQIFAA==";
+      "MIH0oQgxBgIBAgIBA6IDAgEBowQCAggApQUxAwIBBKYIMQYCAQMCAQW/"
+          + "gUgFAgMBAAG/g3cCBQC/hT4DAgEAv4VATDBKBCAAAAAAAAAAAAAAAAAA"
+          + "AAAAAAAAAAAAAAAAAAAAAAAAAAEBAAoBAgQgEvR7Lf1t9nD6P2qyUmgi"
+          + "Q0mG+RixYnglj2TaAMZmHn2/hUEFAgMBrbC/hUIFAgMDFRi/hUYIBAZn"
+          + "b29nbGW/hUcHBAVzYXJnb7+FSAcEBXNhcmdvv4VMCAQGR29vZ2xlv4VN"
+          + "CgQIUGl4ZWwgM2G/hU4GAgQBND1lv4VPBgIEATQ9Zb+FUQIFAA==";
 
   @Test
   public void testCanParseIdentityCredentialTag() throws IOException {
