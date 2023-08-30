@@ -42,6 +42,7 @@ import java.io.IOException;
 import java.time.Instant;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.util.encoders.Base64;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -104,6 +105,7 @@ public class AuthorizationListTest {
         AuthorizationList.createAuthorizationList(
             getEncodableAuthorizationList(SW_ENFORCED_EXTENSION_DATA), ATTESTATION_VERSION);
 
+    assertThat(authorizationList.getUnorderedTags()).isEmpty();
     assertThat(authorizationList.creationDateTime).hasValue(EXPECTED_SW_CREATION_DATETIME);
     assertThat(authorizationList.rootOfTrust).isEmpty();
     assertThat(authorizationList.attestationApplicationId).isPresent();
@@ -119,6 +121,7 @@ public class AuthorizationListTest {
         AuthorizationList.createAuthorizationList(
             getEncodableAuthorizationList(TEE_ENFORCED_EXTENSION_DATA), ATTESTATION_VERSION);
 
+    assertThat(authorizationList.getUnorderedTags()).isEmpty();
     assertThat(authorizationList.purpose).isEqualTo(EXPECTED_TEE_PURPOSE);
     assertThat(authorizationList.algorithm).hasValue(EXPECTED_TEE_ALGORITHM);
     assertThat(authorizationList.keySize).hasValue(EXPECTED_TEE_KEY_SIZE);
@@ -167,6 +170,7 @@ public class AuthorizationListTest {
             getEncodableAuthorizationList(EXTENTION_DATA_WITH_INDIVIDUAL_ATTESTATION),
             ATTESTATION_VERSION);
 
+    assertThat(authorizationList.getUnorderedTags()).isEmpty();
     assertThat(authorizationList.individualAttestation).isTrue();
   }
 
@@ -185,6 +189,7 @@ public class AuthorizationListTest {
                     getEncodableAuthorizationList(EXTENTION_DATA_WITH_ID_CREDENTIAL_KEY),
                     ATTESTATION_VERSION);
 
+    assertThat(authorizationList.getUnorderedTags()).isEmpty();
     assertThat(authorizationList.identityCredentialKey).isTrue();
   }
 
@@ -195,8 +200,27 @@ public class AuthorizationListTest {
             getEncodableAuthorizationList(EXTENTION_DATA_WITH_INDIVIDUAL_ATTESTATION),
             ATTESTATION_VERSION);
     ASN1Sequence seq = authorizationList.toAsn1Sequence();
+    assertThat(authorizationList.getUnorderedTags()).isEmpty();
     assertThat(seq.getEncoded("DER"))
         .isEqualTo(Base64.decode(EXTENTION_DATA_WITH_INDIVIDUAL_ATTESTATION));
+  }
+
+  @Test
+  public void testCreateWithUnorderedTagsAndParse() throws IOException {
+    // Create a encodable auth list from valid attestation extension data.
+    ASN1Encodable[] encodableAuthList =
+        getEncodableAuthorizationList(EXTENTION_DATA_WITH_INDIVIDUAL_ATTESTATION);
+
+    // Introduce the error - alter the order of auth objects in auth list.
+    ASN1Encodable entry = encodableAuthList[13];
+    ASN1TaggedObject taggedEntry = ASN1TaggedObject.getInstance(entry);
+    encodableAuthList[13] = encodableAuthList[12];
+    encodableAuthList[12] = entry;
+    AuthorizationList authorizationList =
+        AuthorizationList.createAuthorizationList(encodableAuthList, ATTESTATION_VERSION);
+    // Make sure there is unordered tag present.
+    assertThat(authorizationList.getUnorderedTags()).hasSize(1);
+    assertThat(authorizationList.getUnorderedTags()).contains(taggedEntry.getTagNo());
   }
 
   @Test
