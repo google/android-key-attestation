@@ -105,7 +105,7 @@ public class AuthorizationListTest {
         AuthorizationList.createAuthorizationList(
             getEncodableAuthorizationList(SW_ENFORCED_EXTENSION_DATA), ATTESTATION_VERSION);
 
-    assertThat(authorizationList.getUnorderedTags()).isEmpty();
+    assertThat(authorizationList.unorderedTags).isEmpty();
     assertThat(authorizationList.creationDateTime).hasValue(EXPECTED_SW_CREATION_DATETIME);
     assertThat(authorizationList.rootOfTrust).isEmpty();
     assertThat(authorizationList.attestationApplicationId).isPresent();
@@ -121,7 +121,7 @@ public class AuthorizationListTest {
         AuthorizationList.createAuthorizationList(
             getEncodableAuthorizationList(TEE_ENFORCED_EXTENSION_DATA), ATTESTATION_VERSION);
 
-    assertThat(authorizationList.getUnorderedTags()).isEmpty();
+    assertThat(authorizationList.unorderedTags).isEmpty();
     assertThat(authorizationList.purpose).isEqualTo(EXPECTED_TEE_PURPOSE);
     assertThat(authorizationList.algorithm).hasValue(EXPECTED_TEE_ALGORITHM);
     assertThat(authorizationList.keySize).hasValue(EXPECTED_TEE_KEY_SIZE);
@@ -170,7 +170,7 @@ public class AuthorizationListTest {
             getEncodableAuthorizationList(EXTENTION_DATA_WITH_INDIVIDUAL_ATTESTATION),
             ATTESTATION_VERSION);
 
-    assertThat(authorizationList.getUnorderedTags()).isEmpty();
+    assertThat(authorizationList.unorderedTags).isEmpty();
     assertThat(authorizationList.individualAttestation).isTrue();
   }
 
@@ -185,11 +185,11 @@ public class AuthorizationListTest {
   @Test
   public void testCanParseIdentityCredentialTag() throws IOException {
     AuthorizationList authorizationList =
-            AuthorizationList.createAuthorizationList(
-                    getEncodableAuthorizationList(EXTENTION_DATA_WITH_ID_CREDENTIAL_KEY),
-                    ATTESTATION_VERSION);
+        AuthorizationList.createAuthorizationList(
+            getEncodableAuthorizationList(EXTENTION_DATA_WITH_ID_CREDENTIAL_KEY),
+            ATTESTATION_VERSION);
 
-    assertThat(authorizationList.getUnorderedTags()).isEmpty();
+    assertThat(authorizationList.unorderedTags).isEmpty();
     assertThat(authorizationList.identityCredentialKey).isTrue();
   }
 
@@ -200,7 +200,7 @@ public class AuthorizationListTest {
             getEncodableAuthorizationList(EXTENTION_DATA_WITH_INDIVIDUAL_ATTESTATION),
             ATTESTATION_VERSION);
     ASN1Sequence seq = authorizationList.toAsn1Sequence();
-    assertThat(authorizationList.getUnorderedTags()).isEmpty();
+    assertThat(authorizationList.unorderedTags).isEmpty();
     assertThat(seq.getEncoded("DER"))
         .isEqualTo(Base64.decode(EXTENTION_DATA_WITH_INDIVIDUAL_ATTESTATION));
   }
@@ -219,8 +219,7 @@ public class AuthorizationListTest {
     AuthorizationList authorizationList =
         AuthorizationList.createAuthorizationList(encodableAuthList, ATTESTATION_VERSION);
     // Make sure there is unordered tag present.
-    assertThat(authorizationList.getUnorderedTags()).hasSize(1);
-    assertThat(authorizationList.getUnorderedTags()).contains(taggedEntry.getTagNo());
+    assertThat(authorizationList.unorderedTags).containsExactly(taggedEntry.getTagNo());
   }
 
   @Test
