@@ -372,9 +372,10 @@ public class AuthorizationList {
   public final Optional<Integer> bootPatchLevel;
   public final boolean individualAttestation;
   public final boolean identityCredentialKey;
+  public final ImmutableList<Integer> unorderedTags;
 
   private AuthorizationList(ASN1Encodable[] authorizationList, int attestationVersion) {
-    parsedAuthorizationMap = getAuthorizationMap(authorizationList);
+    ParsedAuthorizationMap parsedAuthorizationMap = getAuthorizationMap(authorizationList);
 
     this.purpose =
         parsedAuthorizationMap.findIntegerSetAuthorizationListEntry(KM_TAG_PURPOSE).stream()
@@ -493,6 +494,7 @@ public class AuthorizationList {
         parsedAuthorizationMap.findBooleanAuthorizationListEntry(KM_TAG_DEVICE_UNIQUE_ATTESTATION);
     this.identityCredentialKey =
         parsedAuthorizationMap.findBooleanAuthorizationListEntry(KM_TAG_IDENTITY_CREDENTIAL_KEY);
+    this.unorderedTags = parsedAuthorizationMap.getUnorderedTags();
   }
 
   private AuthorizationList(Builder builder) {
@@ -537,6 +539,7 @@ public class AuthorizationList {
     this.bootPatchLevel = Optional.ofNullable(builder.bootPatchLevel);
     this.individualAttestation = builder.individualAttestation;
     this.identityCredentialKey = builder.identityCredentialKey;
+    this.unorderedTags = builder.unorderedTags;
   }
 
   static AuthorizationList createAuthorizationList(
@@ -814,6 +817,7 @@ public class AuthorizationList {
     Integer bootPatchLevel;
     boolean individualAttestation;
     boolean identityCredentialKey;
+    ImmutableList<Integer> unorderedTags;
 
     @CanIgnoreReturnValue
     public Builder setPurpose(Set<OperationPurpose> purpose) {
@@ -1064,13 +1068,6 @@ public class AuthorizationList {
     public AuthorizationList build() {
       return new AuthorizationList(this);
     }
-  }
-
-  /** Holds authorizations map and unordered tags in authorization list present in attest record. */
-  private ParsedAuthorizationMap parsedAuthorizationMap;
-
-  public ImmutableList<Integer> getUnorderedTags() {
-    return parsedAuthorizationMap.getUnorderedTags();
   }
 
   /**
