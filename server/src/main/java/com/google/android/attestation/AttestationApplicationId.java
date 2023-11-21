@@ -19,14 +19,17 @@ import static com.google.android.attestation.Constants.ATTESTATION_APPLICATION_I
 import static com.google.android.attestation.Constants.ATTESTATION_APPLICATION_ID_SIGNATURE_DIGESTS_INDEX;
 import static com.google.android.attestation.Constants.ATTESTATION_PACKAGE_INFO_PACKAGE_NAME_INDEX;
 import static com.google.android.attestation.Constants.ATTESTATION_PACKAGE_INFO_VERSION_INDEX;
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.Streams.stream;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import java.util.ArrayList;
+import com.google.common.collect.ImmutableList;
+import com.google.errorprone.annotations.Immutable;
+import com.google.protobuf.ByteString;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
@@ -43,9 +46,10 @@ import org.jspecify.nullness.Nullable;
  *
  * <p>The Attestation Application ID data from KeyMint will not exceed 1K bytes.
  */
+@Immutable
 public class AttestationApplicationId {
-  public final List<AttestationPackageInfo> packageInfos;
-  public final List<byte[]> signatureDigests;
+  public final ImmutableList<AttestationPackageInfo> packageInfos;
+  public final ImmutableList<ByteString> signatureDigests;
 
   private AttestationApplicationId(byte[] attestationApplicationId) {
     ASN1Sequence attestationApplicationIdSequence =
@@ -54,25 +58,28 @@ public class AttestationApplicationId {
         (ASN1Set)
             attestationApplicationIdSequence.getObjectAt(
                 ATTESTATION_APPLICATION_ID_PACKAGE_INFOS_INDEX);
-    packageInfos = new ArrayList<>();
-    for (ASN1Encodable packageInfo : attestationPackageInfos) {
-      packageInfos.add(new AttestationPackageInfo((ASN1Sequence) packageInfo));
-    }
+    packageInfos =
+        stream(attestationPackageInfos.iterator())
+            .map(ASN1Sequence.class::cast)
+            .map(AttestationPackageInfo::new)
+            .collect(toImmutableList());
 
     ASN1Set digests =
         (ASN1Set)
             attestationApplicationIdSequence.getObjectAt(
                 ATTESTATION_APPLICATION_ID_SIGNATURE_DIGESTS_INDEX);
-    signatureDigests = new ArrayList<>();
-    for (ASN1Encodable digest : digests) {
-      signatureDigests.add(((ASN1OctetString) digest).getOctets());
-    }
+    signatureDigests =
+        stream(digests.iterator())
+            .map(ASN1OctetString.class::cast)
+            .map(ASN1OctetString::getOctets)
+            .map(ByteString::copyFrom)
+            .collect(toImmutableList());
   }
 
   public AttestationApplicationId(
-      List<AttestationPackageInfo> packageInfos, List<byte[]> signatureDigests) {
-    this.packageInfos = packageInfos;
-    this.signatureDigests = signatureDigests;
+      List<AttestationPackageInfo> packageInfos, List<ByteString> signatureDigests) {
+    this.packageInfos = ImmutableList.copyOf(packageInfos);
+    this.signatureDigests = ImmutableList.copyOf(signatureDigests);
   }
 
   static AttestationApplicationId createAttestationApplicationId(byte[] attestationApplicationId) {
@@ -81,15 +88,17 @@ public class AttestationApplicationId {
 
   ASN1Sequence toAsn1Sequence() {
     ASN1Encodable[] applicationIdAsn1Array = new ASN1Encodable[2];
-    ASN1EncodableVector tmpPackageInfos = new ASN1EncodableVector();
-    packageInfos.forEach(packageInfo -> tmpPackageInfos.add(packageInfo.toAsn1Sequence()));
     applicationIdAsn1Array[ATTESTATION_APPLICATION_ID_PACKAGE_INFOS_INDEX] =
-        new DERSet(tmpPackageInfos);
-
-    ASN1EncodableVector tmpSignatureDigests = new ASN1EncodableVector();
-    signatureDigests.forEach(digest -> tmpSignatureDigests.add(new DEROctetString(digest)));
+        new DERSet(
+            packageInfos.stream()
+                .map(AttestationPackageInfo::toAsn1Sequence)
+                .toArray(ASN1Sequence[]::new));
     applicationIdAsn1Array[ATTESTATION_APPLICATION_ID_SIGNATURE_DIGESTS_INDEX] =
-        new DERSet(tmpSignatureDigests);
+        new DERSet(
+            signatureDigests.stream()
+                .map(ByteString::toByteArray)
+                .map(DEROctetString::new)
+                .toArray(DEROctetString[]::new));
 
     return new DERSequence(applicationIdAsn1Array);
   }
@@ -110,6 +119,7 @@ public class AttestationApplicationId {
   }
 
   /** Provides package's name and version number. */
+  @Immutable
   public static class AttestationPackageInfo {
     public final String packageName;
     public final long version;

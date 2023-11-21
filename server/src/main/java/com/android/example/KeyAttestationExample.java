@@ -19,7 +19,6 @@ import static com.google.android.attestation.Constants.GOOGLE_ROOT_CA_PUB_KEY;
 import static com.google.android.attestation.ParsedAttestationRecord.createParsedAttestationRecord;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.android.attestation.AttestationApplicationId;
 import com.google.android.attestation.AttestationApplicationId.AttestationPackageInfo;
@@ -28,6 +27,7 @@ import com.google.android.attestation.CertificateRevocationStatus;
 import com.google.android.attestation.ParsedAttestationRecord;
 import com.google.android.attestation.RootOfTrust;
 import com.google.common.collect.ImmutableList;
+import com.google.protobuf.ByteString;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -98,9 +98,9 @@ public class KeyAttestationExample {
         "Keymaster Security Level: " + parsedAttestationRecord.keymasterSecurityLevel.name());
 
     System.out.println(
-        "Attestation Challenge: "
-            + new String(parsedAttestationRecord.attestationChallenge, UTF_8));
-    System.out.println("Unique ID: " + Arrays.toString(parsedAttestationRecord.uniqueId));
+        "Attestation Challenge: " + parsedAttestationRecord.attestationChallenge.toStringUtf8());
+    System.out.println(
+        "Unique ID: " + Arrays.toString(parsedAttestationRecord.uniqueId.toByteArray()));
 
     System.out.println("Software Enforced Authorization List:");
     AuthorizationList softwareEnforced = parsedAttestationRecord.softwareEnforced;
@@ -174,13 +174,17 @@ public class KeyAttestationExample {
 
   private static void print(RootOfTrust rootOfTrust, String indent) {
     System.out.println(
-        indent + "Verified Boot Key: " + Base64.toBase64String(rootOfTrust.verifiedBootKey));
+        indent
+            + "Verified Boot Key: "
+            + Base64.toBase64String(rootOfTrust.verifiedBootKey.toByteArray()));
     System.out.println(indent + "Device Locked: " + rootOfTrust.deviceLocked);
     System.out.println(indent + "Verified Boot State: " + rootOfTrust.verifiedBootState.name());
     rootOfTrust.verifiedBootHash.ifPresent(
         verifiedBootHash ->
             System.out.println(
-                indent + "Verified Boot Hash: " + Base64.toBase64String(verifiedBootHash)));
+                indent
+                    + "Verified Boot Hash: "
+                    + Base64.toBase64String(verifiedBootHash.toByteArray())));
   }
 
   private static void print(AttestationApplicationId attestationApplicationId, String indent) {
@@ -189,8 +193,8 @@ public class KeyAttestationExample {
         System.out.println(indent + "\t" + info.packageName + ", " + info.version);
       }
       System.out.println(indent + "Signature Digests:");
-    for (byte[] digest : attestationApplicationId.signatureDigests) {
-      System.out.println(indent + "\t" + Base64.toBase64String(digest));
+    for (ByteString digest : attestationApplicationId.signatureDigests) {
+      System.out.println(indent + "\t" + Base64.toBase64String(digest.toByteArray()));
     }
   }
 
