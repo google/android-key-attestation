@@ -30,6 +30,7 @@ maven_install(
         "com.google.code.gson:gson:2.10.1",
         "com.google.errorprone:error_prone_annotations:2.3.1",
         "com.google.guava:guava:32.0.1-jre",
+        "com.google.protobuf:protobuf-javalite:3.25.1",
         "com.squareup.okhttp3:okhttp:4.10.0",
         "org.bouncycastle:bcpkix-jdk18on:1.73",
         "org.bouncycastle:bcprov-jdk18on:1.73",

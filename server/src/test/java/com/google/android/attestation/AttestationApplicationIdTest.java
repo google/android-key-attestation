@@ -21,6 +21,7 @@ import static org.junit.Assert.assertThrows;
 
 import com.google.android.attestation.AttestationApplicationId.AttestationPackageInfo;
 import com.google.common.collect.ImmutableList;
+import com.google.protobuf.ByteString;
 import org.bouncycastle.util.encoders.Base64;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -57,8 +58,9 @@ public class AttestationApplicationIdTest {
           new AttestationPackageInfo("com.google.SSRestartDetector", 29L),
           new AttestationPackageInfo("com.google.android.hiddenmenu", 1L),
           new AttestationPackageInfo("com.android.providers.settings", 29L));
-  private static final ImmutableList<byte[]> EXPECTED_SIGNATURE_DIGESTS =
-      ImmutableList.of(Base64.decode("MBqjywgRNFAcRfFCKrxmwkIk/V3tX9yPF+aXF2/YZqo=\n"));
+  private static final ImmutableList<ByteString> EXPECTED_SIGNATURE_DIGESTS =
+      ImmutableList.of(
+          ByteString.copyFrom(Base64.decode("MBqjywgRNFAcRfFCKrxmwkIk/V3tX9yPF+aXF2/YZqo=\n")));
 
   private static final AttestationApplicationId EXPECTED_ATTESTATION_APPLICATION_ID =
       new AttestationApplicationId(EXPECTED_PACKAGE_INFOS, EXPECTED_SIGNATURE_DIGESTS);

@@ -21,6 +21,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import com.google.android.attestation.AuthorizationList.UserAuthType;
 import com.google.android.attestation.ParsedAttestationRecord.SecurityLevel;
 import com.google.common.collect.ImmutableSet;
+import com.google.protobuf.ByteString;
 import com.google.testing.junit.testparameterinjector.TestParameterInjector;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -103,8 +104,8 @@ public class ParsedAttestationRecordTest {
   private static final int EXPECTED_KEYMASTER_VERSION = 4;
   private static final SecurityLevel EXPECTED_KEYMASTER_SECURITY_LEVEL =
       SecurityLevel.TRUSTED_ENVIRONMENT;
-  private static final byte[] EXPECTED_ATTESTATION_CHALLENGE = "abc".getBytes(UTF_8);
-  private static final byte[] EXPECTED_UNIQUE_ID = "".getBytes(UTF_8);
+  private static final ByteString EXPECTED_ATTESTATION_CHALLENGE = ByteString.copyFromUtf8("abc");
+  private static final ByteString EXPECTED_UNIQUE_ID = ByteString.copyFromUtf8("");
 
   private static X509Certificate getAttestationRecord(String certStr) throws CertificateException {
     CertificateFactory factory = CertificateFactory.getInstance("X509");
@@ -140,15 +141,15 @@ public class ParsedAttestationRecordTest {
     PublicKey attestedKey = generator.generateKeyPair().getPublic();
     AuthorizationList.Builder teeEnforcedBuilder = AuthorizationList.builder();
     teeEnforcedBuilder.userAuthType = ImmutableSet.of(UserAuthType.FINGERPRINT);
-    teeEnforcedBuilder.attestationIdBrand = "free food".getBytes(UTF_8);
+    teeEnforcedBuilder.attestationIdBrand = ByteString.copyFromUtf8("free food");
     ParsedAttestationRecord expected =
         ParsedAttestationRecord.create(
             /* attestationVersion= */ 2,
             /* attestationSecurityLevel= */ SecurityLevel.TRUSTED_ENVIRONMENT,
             /* keymasterVersion= */ 4,
             /* keymasterSecurityLevel= */ SecurityLevel.SOFTWARE,
-            /* attestationChallenge= */ "abc".getBytes(UTF_8),
-            /* uniqueId= */ "foodplease".getBytes(UTF_8),
+            /* attestationChallenge= */ ByteString.copyFromUtf8("abc"),
+            /* uniqueId= */ ByteString.copyFromUtf8("foodplease"),
             /* softwareEnforced= */ AuthorizationList.builder().build(),
             teeEnforcedBuilder.build(),
             attestedKey);
