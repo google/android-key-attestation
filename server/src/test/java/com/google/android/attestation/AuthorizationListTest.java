@@ -41,6 +41,9 @@ import com.google.testing.junit.testparameterinjector.TestParameter;
 import com.google.testing.junit.testparameterinjector.TestParameterInjector;
 import java.io.IOException;
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1TaggedObject;
@@ -98,7 +101,7 @@ public class AuthorizationListTest {
   private static ASN1Encodable[] getEncodableAuthorizationList(String extensionData)
       throws IOException {
     byte[] extensionDataBytes = Base64.decode(extensionData);
-    return ((ASN1Sequence) ASN1Sequence.fromByteArray(extensionDataBytes)).toArray();
+    return ASN1Sequence.getInstance(extensionDataBytes).toArray();
   }
 
   @Test
@@ -208,7 +211,7 @@ public class AuthorizationListTest {
   }
 
   @Test
-  public void testCreateWithUnorderedTagsAndParse() throws IOException {
+  public void testCreateWithUnorderedTagAndParse() throws IOException {
     // Create a encodable auth list from valid attestation extension data.
     ASN1Encodable[] encodableAuthList =
         getEncodableAuthorizationList(EXTENTION_DATA_WITH_INDIVIDUAL_ATTESTATION);
@@ -222,6 +225,19 @@ public class AuthorizationListTest {
         AuthorizationList.createAuthorizationList(encodableAuthList, ATTESTATION_VERSION);
     // Make sure there is unordered tag present.
     assertThat(authorizationList.unorderedTags).containsExactly(taggedEntry.getTagNo());
+  }
+
+  @Test
+  public void testCreateWithUnorderedTagsAndParse() throws IOException {
+    List<ASN1Encodable> encodableAuthList =
+        Arrays.asList(getEncodableAuthorizationList(EXTENTION_DATA_WITH_INDIVIDUAL_ATTESTATION));
+    ASN1TaggedObject taggedEntry = ASN1TaggedObject.getInstance(encodableAuthList.get(0));
+    Collections.swap(encodableAuthList, 3, 5);
+    Collections.swap(encodableAuthList, 12, 13);
+    AuthorizationList authorizationList =
+        AuthorizationList.createAuthorizationList(
+            encodableAuthList.stream().toArray(ASN1Encodable[]::new), ATTESTATION_VERSION);
+    assertThat(authorizationList.unorderedTags).containsExactly(6, 200, 712);
   }
 
   @Test
