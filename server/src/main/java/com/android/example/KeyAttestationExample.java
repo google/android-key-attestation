@@ -90,96 +90,102 @@ public class KeyAttestationExample {
 
     ParsedAttestationRecord parsedAttestationRecord = createParsedAttestationRecord(certs);
 
-    System.out.println("Attestation version: " + parsedAttestationRecord.attestationVersion);
+    System.out.println("Attestation version: " + parsedAttestationRecord.attestationVersion());
     System.out.println(
-        "Attestation Security Level: " + parsedAttestationRecord.attestationSecurityLevel.name());
-    System.out.println("Keymaster Version: " + parsedAttestationRecord.keymasterVersion);
+        "Attestation Security Level: " + parsedAttestationRecord.attestationSecurityLevel().name());
+    System.out.println("Keymaster Version: " + parsedAttestationRecord.keymasterVersion());
     System.out.println(
-        "Keymaster Security Level: " + parsedAttestationRecord.keymasterSecurityLevel.name());
+        "Keymaster Security Level: " + parsedAttestationRecord.keymasterSecurityLevel().name());
 
     System.out.println(
-        "Attestation Challenge: " + parsedAttestationRecord.attestationChallenge.toStringUtf8());
+        "Attestation Challenge: " + parsedAttestationRecord.attestationChallenge().toStringUtf8());
     System.out.println(
-        "Unique ID: " + Arrays.toString(parsedAttestationRecord.uniqueId.toByteArray()));
+        "Unique ID: " + Arrays.toString(parsedAttestationRecord.uniqueId().toByteArray()));
 
     System.out.println("Software Enforced Authorization List:");
-    AuthorizationList softwareEnforced = parsedAttestationRecord.softwareEnforced;
+    AuthorizationList softwareEnforced = parsedAttestationRecord.softwareEnforced();
     printAuthorizationList(softwareEnforced, "\t");
 
     System.out.println("TEE Enforced Authorization List:");
-    AuthorizationList teeEnforced = parsedAttestationRecord.teeEnforced;
+    AuthorizationList teeEnforced = parsedAttestationRecord.teeEnforced();
     printAuthorizationList(teeEnforced, "\t");
   }
 
   private static void printAuthorizationList(AuthorizationList authorizationList, String indent) {
     // Detailed explanation of the keys and their values can be found here:
     // https://source.android.com/security/keystore/tags
-    print(authorizationList.purpose, indent + "Purpose(s)");
-    print(authorizationList.algorithm, indent + "Algorithm");
-    print(authorizationList.keySize, indent + "Key Size");
-    print(authorizationList.digest, indent + "Digest");
-    print(authorizationList.padding, indent + "Padding");
-    print(authorizationList.ecCurve, indent + "EC Curve");
-    print(authorizationList.rsaPublicExponent, indent + "RSA Public Exponent");
-    System.out.println(indent + "Rollback Resistance: " + authorizationList.rollbackResistance);
-    print(authorizationList.activeDateTime, indent + "Active DateTime");
-    print(authorizationList.originationExpireDateTime, indent + "Origination Expire DateTime");
-    print(authorizationList.usageExpireDateTime, indent + "Usage Expire DateTime");
-    System.out.println(indent + "No Auth Required: " + authorizationList.noAuthRequired);
-    print(authorizationList.userAuthType, indent + "User Auth Type");
-    print(authorizationList.authTimeout, indent + "Auth Timeout");
-    System.out.println(indent + "Allow While On Body: " + authorizationList.allowWhileOnBody);
+    print(authorizationList.purpose(), indent + "Purpose(s)");
+    print(authorizationList.algorithm(), indent + "Algorithm");
+    print(authorizationList.keySize(), indent + "Key Size");
+    print(authorizationList.digest(), indent + "Digest");
+    print(authorizationList.padding(), indent + "Padding");
+    print(authorizationList.ecCurve(), indent + "EC Curve");
+    print(authorizationList.rsaPublicExponent(), indent + "RSA Public Exponent");
+    System.out.println(indent + "Rollback Resistance: " + authorizationList.rollbackResistance());
+    print(authorizationList.activeDateTime(), indent + "Active DateTime");
+    print(authorizationList.originationExpireDateTime(), indent + "Origination Expire DateTime");
+    print(authorizationList.usageExpireDateTime(), indent + "Usage Expire DateTime");
+    System.out.println(indent + "No Auth Required: " + authorizationList.noAuthRequired());
+    print(authorizationList.userAuthType(), indent + "User Auth Type");
+    print(authorizationList.authTimeout(), indent + "Auth Timeout");
+    System.out.println(indent + "Allow While On Body: " + authorizationList.allowWhileOnBody());
     System.out.println(
         indent
             + "Trusted User Presence Required: "
-            + authorizationList.trustedUserPresenceRequired);
+            + authorizationList.trustedUserPresenceRequired());
     System.out.println(
-        indent + "Trusted Confirmation Required: " + authorizationList.trustedConfirmationRequired);
+        indent
+            + "Trusted Confirmation Required: "
+            + authorizationList.trustedConfirmationRequired());
     System.out.println(
-        indent + "Unlocked Device Required: " + authorizationList.unlockedDeviceRequired);
-    System.out.println(indent + "All Applications: " + authorizationList.allApplications);
-    print(authorizationList.applicationId, indent + "Application ID");
-    print(authorizationList.creationDateTime, indent + "Creation DateTime");
-    print(authorizationList.origin, indent + "Origin");
-    System.out.println(indent + "Rollback Resistant: " + authorizationList.rollbackResistant);
-    authorizationList.rootOfTrust.ifPresent(
-        rootOfTrust -> {
-          System.out.println(indent + "Root Of Trust:");
-          print(rootOfTrust, indent + "\t");
-        });
-    print(authorizationList.osVersion, indent + "OS Version");
-    print(authorizationList.osPatchLevel, indent + "OS Patch Level");
-    authorizationList.attestationApplicationId.ifPresent(
-        attestationApplicationId -> {
-          System.out.println(indent + "Attestation Application ID:");
-          print(attestationApplicationId, indent + "\t");
-        });
+        indent + "Unlocked Device Required: " + authorizationList.unlockedDeviceRequired());
+    System.out.println(indent + "All Applications: " + authorizationList.allApplications());
+    print(authorizationList.applicationId(), indent + "Application ID");
+    print(authorizationList.creationDateTime(), indent + "Creation DateTime");
+    print(authorizationList.origin(), indent + "Origin");
+    System.out.println(indent + "Rollback Resistant: " + authorizationList.rollbackResistant());
+    authorizationList
+        .rootOfTrust()
+        .ifPresent(
+            rootOfTrust -> {
+              System.out.println(indent + "Root Of Trust:");
+              print(rootOfTrust, indent + "\t");
+            });
+    print(authorizationList.osVersion(), indent + "OS Version");
+    print(authorizationList.osPatchLevel(), indent + "OS Patch Level");
+    authorizationList
+        .attestationApplicationId()
+        .ifPresent(
+            attestationApplicationId -> {
+              System.out.println(indent + "Attestation Application ID:");
+              print(attestationApplicationId, indent + "\t");
+            });
     print(
-        authorizationList.attestationApplicationIdBytes,
+        authorizationList.attestationApplicationIdBytes(),
         indent + "Attestation Application ID Bytes");
-    print(authorizationList.attestationIdBrand, indent + "Attestation ID Brand");
-    print(authorizationList.attestationIdDevice, indent + "Attestation ID Device");
-    print(authorizationList.attestationIdProduct, indent + "Attestation ID Product");
-    print(authorizationList.attestationIdSerial, indent + "Attestation ID Serial");
-    print(authorizationList.attestationIdImei, indent + "Attestation ID IMEI");
-    print(authorizationList.attestationIdSecondImei, indent + "Attestation ID SECOND IMEI");
-    print(authorizationList.attestationIdMeid, indent + "Attestation ID MEID");
-    print(authorizationList.attestationIdManufacturer, indent + "Attestation ID Manufacturer");
-    print(authorizationList.attestationIdModel, indent + "Attestation ID Model");
-    print(authorizationList.vendorPatchLevel, indent + "Vendor Patch Level");
-    print(authorizationList.bootPatchLevel, indent + "Boot Patch Level");
+    print(authorizationList.attestationIdBrand(), indent + "Attestation ID Brand");
+    print(authorizationList.attestationIdDevice(), indent + "Attestation ID Device");
+    print(authorizationList.attestationIdProduct(), indent + "Attestation ID Product");
+    print(authorizationList.attestationIdSerial(), indent + "Attestation ID Serial");
+    print(authorizationList.attestationIdImei(), indent + "Attestation ID IMEI");
+    print(authorizationList.attestationIdSecondImei(), indent + "Attestation ID SECOND IMEI");
+    print(authorizationList.attestationIdMeid(), indent + "Attestation ID MEID");
+    print(authorizationList.attestationIdManufacturer(), indent + "Attestation ID Manufacturer");
+    print(authorizationList.attestationIdModel(), indent + "Attestation ID Model");
+    print(authorizationList.vendorPatchLevel(), indent + "Vendor Patch Level");
+    print(authorizationList.bootPatchLevel(), indent + "Boot Patch Level");
     System.out.println(
-        indent + "Identity Credential Key: " + authorizationList.identityCredentialKey);
+        indent + "Identity Credential Key: " + authorizationList.identityCredentialKey());
   }
 
   private static void print(RootOfTrust rootOfTrust, String indent) {
     System.out.println(
         indent
             + "Verified Boot Key: "
-            + Base64.getEncoder().encodeToString(rootOfTrust.verifiedBootKey.toByteArray()));
-    System.out.println(indent + "Device Locked: " + rootOfTrust.deviceLocked);
-    System.out.println(indent + "Verified Boot State: " + rootOfTrust.verifiedBootState.name());
-    rootOfTrust.verifiedBootHash.ifPresent(
+            + Base64.getEncoder().encodeToString(rootOfTrust.verifiedBootKey().toByteArray()));
+    System.out.println(indent + "Device Locked: " + rootOfTrust.deviceLocked());
+    System.out.println(indent + "Verified Boot State: " + rootOfTrust.verifiedBootState().name());
+    rootOfTrust.verifiedBootHash().ifPresent(
         verifiedBootHash ->
             System.out.println(
                 indent
@@ -189,11 +195,11 @@ public class KeyAttestationExample {
 
   private static void print(AttestationApplicationId attestationApplicationId, String indent) {
       System.out.println(indent + "Package Infos (<package name>, <version>): ");
-    for (AttestationPackageInfo info : attestationApplicationId.packageInfos) {
-        System.out.println(indent + "\t" + info.packageName + ", " + info.version);
+    for (AttestationPackageInfo info : attestationApplicationId.packageInfos()) {
+      System.out.println(indent + "\t" + info.packageName() + ", " + info.version());
       }
       System.out.println(indent + "Signature Digests:");
-    for (ByteString digest : attestationApplicationId.signatureDigests) {
+      for (ByteString digest : attestationApplicationId.signatureDigests()) {
       System.out.println(indent + "\t" + Base64.getEncoder().encodeToString(digest.toByteArray()));
     }
   }

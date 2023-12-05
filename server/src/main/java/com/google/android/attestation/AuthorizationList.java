@@ -65,11 +65,11 @@ import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.Streams.stream;
 import static java.util.Arrays.stream;
 
+import com.google.auto.value.AutoValue;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.Immutable;
 import com.google.protobuf.ByteString;
 import java.time.Duration;
@@ -99,9 +99,9 @@ import org.bouncycastle.asn1.DERTaggedObject;
  * hardware abstraction layer (HAL). You compare these values to the device's current state or to a
  * set of expected values to verify that a key pair is still valid for use in your app.
  */
-@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+@AutoValue
 @Immutable
-public class AuthorizationList {
+public abstract class AuthorizationList {
   /** Specifies the types of user authenticators that may be used to authorize this key. */
   public enum UserAuthType {
     USER_AUTH_TYPE_NONE,
@@ -334,220 +334,223 @@ public class AuthorizationList {
           7,
           OperationPurpose.ATTEST_KEY);
 
-  public final ImmutableSet<OperationPurpose> purpose;
-  public final Optional<Algorithm> algorithm;
-  public final Optional<Integer> keySize;
-  public final ImmutableSet<DigestMode> digest;
-  public final ImmutableSet<PaddingMode> padding;
-  public final Optional<EcCurve> ecCurve;
-  public final Optional<Long> rsaPublicExponent;
-  public final boolean rollbackResistance;
-  public final Optional<Instant> activeDateTime;
-  public final Optional<Instant> originationExpireDateTime;
-  public final Optional<Instant> usageExpireDateTime;
-  public final boolean noAuthRequired;
-  public final ImmutableSet<UserAuthType> userAuthType;
-  public final Optional<Duration> authTimeout;
-  public final boolean allowWhileOnBody;
-  public final boolean trustedUserPresenceRequired;
-  public final boolean trustedConfirmationRequired;
-  public final boolean unlockedDeviceRequired;
-  public final boolean allApplications;
-  public final Optional<ByteString> applicationId;
-  public final Optional<Instant> creationDateTime;
-  public final Optional<KeyOrigin> origin;
-  public final boolean rollbackResistant;
-  public final Optional<RootOfTrust> rootOfTrust;
-  public final Optional<Integer> osVersion;
-  public final Optional<Integer> osPatchLevel;
-  public final Optional<AttestationApplicationId> attestationApplicationId;
-  public final Optional<ByteString> attestationApplicationIdBytes;
-  public final Optional<ByteString> attestationIdBrand;
-  public final Optional<ByteString> attestationIdDevice;
-  public final Optional<ByteString> attestationIdProduct;
-  public final Optional<ByteString> attestationIdSerial;
-  public final Optional<ByteString> attestationIdImei;
-  public final Optional<ByteString> attestationIdSecondImei;
-  public final Optional<ByteString> attestationIdMeid;
-  public final Optional<ByteString> attestationIdManufacturer;
-  public final Optional<ByteString> attestationIdModel;
-  public final Optional<Integer> vendorPatchLevel;
-  public final Optional<Integer> bootPatchLevel;
-  public final boolean individualAttestation;
-  public final boolean identityCredentialKey;
-  public final ImmutableList<Integer> unorderedTags;
+  public abstract ImmutableSet<OperationPurpose> purpose();
 
-  private AuthorizationList(ASN1Encodable[] authorizationList, int attestationVersion) {
-    ParsedAuthorizationMap parsedAuthorizationMap = getAuthorizationMap(authorizationList);
+  public abstract Optional<Algorithm> algorithm();
 
-    this.purpose =
-        parsedAuthorizationMap.findIntegerSetAuthorizationListEntry(KM_TAG_PURPOSE).stream()
-            .flatMap(key -> Stream.ofNullable(ASN1_TO_OPERATION_PURPOSE.get(key)))
-            .collect(toImmutableSet());
-    this.algorithm =
-        parsedAuthorizationMap
-            .findOptionalIntegerAuthorizationListEntry(KM_TAG_ALGORITHM)
-            .map(ASN1_TO_ALGORITHM::get);
-    this.keySize =
-        parsedAuthorizationMap.findOptionalIntegerAuthorizationListEntry(KM_TAG_KEY_SIZE);
-    this.digest =
-        parsedAuthorizationMap.findIntegerSetAuthorizationListEntry(KM_TAG_DIGEST).stream()
-            .flatMap(key -> Stream.ofNullable(ASN1_TO_DIGEST_MODE.get(key)))
-            .collect(toImmutableSet());
-    this.padding =
-        parsedAuthorizationMap.findIntegerSetAuthorizationListEntry(KM_TAG_PADDING).stream()
-            .flatMap(key -> Stream.ofNullable(ASN1_TO_PADDING_MODE.get(key)))
-            .collect(toImmutableSet());
-    this.ecCurve =
-        parsedAuthorizationMap
-            .findOptionalIntegerAuthorizationListEntry(KM_TAG_EC_CURVE)
-            .map(ASN1_TO_EC_CURVE::get);
-    this.rsaPublicExponent =
-        parsedAuthorizationMap.findOptionalLongAuthorizationListEntry(KM_TAG_RSA_PUBLIC_EXPONENT);
-    this.rollbackResistance =
-        parsedAuthorizationMap.findBooleanAuthorizationListEntry(KM_TAG_ROLLBACK_RESISTANCE);
-    this.activeDateTime =
-        parsedAuthorizationMap.findOptionalInstantMillisAuthorizationListEntry(
-            KM_TAG_ACTIVE_DATE_TIME);
-    this.originationExpireDateTime =
-        parsedAuthorizationMap.findOptionalInstantMillisAuthorizationListEntry(
-            KM_TAG_ORIGINATION_EXPIRE_DATE_TIME);
-    this.usageExpireDateTime =
-        parsedAuthorizationMap.findOptionalInstantMillisAuthorizationListEntry(
-            KM_TAG_USAGE_EXPIRE_DATE_TIME);
-    this.noAuthRequired =
-        parsedAuthorizationMap.findBooleanAuthorizationListEntry(KM_TAG_NO_AUTH_REQUIRED);
-    this.userAuthType = parsedAuthorizationMap.findUserAuthType(KM_TAG_USER_AUTH_TYPE);
-    this.authTimeout =
-        parsedAuthorizationMap.findOptionalDurationSecondsAuthorizationListEntry(
-            KM_TAG_AUTH_TIMEOUT);
-    this.allowWhileOnBody =
-        parsedAuthorizationMap.findBooleanAuthorizationListEntry(KM_TAG_ALLOW_WHILE_ON_BODY);
-    this.trustedUserPresenceRequired =
-        parsedAuthorizationMap.findBooleanAuthorizationListEntry(
-            KM_TAG_TRUSTED_USER_PRESENCE_REQUIRED);
-    this.trustedConfirmationRequired =
-        parsedAuthorizationMap.findBooleanAuthorizationListEntry(
-            KM_TAG_TRUSTED_CONFIRMATION_REQUIRED);
-    this.unlockedDeviceRequired =
-        parsedAuthorizationMap.findBooleanAuthorizationListEntry(KM_TAG_UNLOCKED_DEVICE_REQUIRED);
-    this.allApplications =
-        parsedAuthorizationMap.findBooleanAuthorizationListEntry(KM_TAG_ALL_APPLICATIONS);
-    this.applicationId =
-        parsedAuthorizationMap.findOptionalByteArrayAuthorizationListEntry(KM_TAG_APPLICATION_ID);
-    this.creationDateTime =
-        parsedAuthorizationMap.findOptionalInstantMillisAuthorizationListEntry(
-            KM_TAG_CREATION_DATE_TIME);
-    this.origin =
-        parsedAuthorizationMap
-            .findOptionalIntegerAuthorizationListEntry(KM_TAG_ORIGIN)
-            .map(ASN1_TO_KEY_ORIGIN::get);
-    this.rollbackResistant =
-        parsedAuthorizationMap.findBooleanAuthorizationListEntry(KM_TAG_ROLLBACK_RESISTANT);
-    this.rootOfTrust =
-        parsedAuthorizationMap
-            .findAuthorizationListEntry(KM_TAG_ROOT_OF_TRUST)
-            .map(ASN1Sequence.class::cast)
-            .map(rootOfTrust -> RootOfTrust.createRootOfTrust(rootOfTrust, attestationVersion));
-    this.osVersion =
-        parsedAuthorizationMap.findOptionalIntegerAuthorizationListEntry(KM_TAG_OS_VERSION);
-    this.osPatchLevel =
-        parsedAuthorizationMap.findOptionalIntegerAuthorizationListEntry(KM_TAG_OS_PATCH_LEVEL);
-    this.attestationApplicationId =
-        parsedAuthorizationMap
-            .findAuthorizationListEntry(KM_TAG_ATTESTATION_APPLICATION_ID)
-            .map(ASN1OctetString.class::cast)
-            .map(ASN1OctetString::getOctets)
-            .map(AttestationApplicationId::createAttestationApplicationId);
-    this.attestationApplicationIdBytes =
-        parsedAuthorizationMap.findOptionalByteArrayAuthorizationListEntry(
-            KM_TAG_ATTESTATION_APPLICATION_ID);
-    this.attestationIdBrand =
-        parsedAuthorizationMap.findOptionalByteArrayAuthorizationListEntry(
-            KM_TAG_ATTESTATION_ID_BRAND);
-    this.attestationIdDevice =
-        parsedAuthorizationMap.findOptionalByteArrayAuthorizationListEntry(
-            KM_TAG_ATTESTATION_ID_DEVICE);
-    this.attestationIdProduct =
-        parsedAuthorizationMap.findOptionalByteArrayAuthorizationListEntry(
-            KM_TAG_ATTESTATION_ID_PRODUCT);
-    this.attestationIdSerial =
-        parsedAuthorizationMap.findOptionalByteArrayAuthorizationListEntry(
-            KM_TAG_ATTESTATION_ID_SERIAL);
-    this.attestationIdImei =
-        parsedAuthorizationMap.findOptionalByteArrayAuthorizationListEntry(
-            KM_TAG_ATTESTATION_ID_IMEI);
-    this.attestationIdSecondImei =
-        parsedAuthorizationMap.findOptionalByteArrayAuthorizationListEntry(
-            KM_TAG_ATTESTATION_ID_SECOND_IMEI);
-    this.attestationIdMeid =
-        parsedAuthorizationMap.findOptionalByteArrayAuthorizationListEntry(
-            KM_TAG_ATTESTATION_ID_MEID);
-    this.attestationIdManufacturer =
-        parsedAuthorizationMap.findOptionalByteArrayAuthorizationListEntry(
-            KM_TAG_ATTESTATION_ID_MANUFACTURER);
-    this.attestationIdModel =
-        parsedAuthorizationMap.findOptionalByteArrayAuthorizationListEntry(
-            KM_TAG_ATTESTATION_ID_MODEL);
-    this.vendorPatchLevel =
-        parsedAuthorizationMap.findOptionalIntegerAuthorizationListEntry(KM_TAG_VENDOR_PATCH_LEVEL);
-    this.bootPatchLevel =
-        parsedAuthorizationMap.findOptionalIntegerAuthorizationListEntry(KM_TAG_BOOT_PATCH_LEVEL);
-    this.individualAttestation =
-        parsedAuthorizationMap.findBooleanAuthorizationListEntry(KM_TAG_DEVICE_UNIQUE_ATTESTATION);
-    this.identityCredentialKey =
-        parsedAuthorizationMap.findBooleanAuthorizationListEntry(KM_TAG_IDENTITY_CREDENTIAL_KEY);
-    this.unorderedTags = parsedAuthorizationMap.getUnorderedTags();
-  }
+  public abstract Optional<Integer> keySize();
 
-  private AuthorizationList(Builder builder) {
-    this.purpose = builder.purpose;
-    this.algorithm = Optional.ofNullable(builder.algorithm);
-    this.keySize = Optional.ofNullable(builder.keySize);
-    this.digest = builder.digest;
-    this.padding = builder.padding;
-    this.ecCurve = Optional.ofNullable(builder.ecCurve);
-    this.rsaPublicExponent = Optional.ofNullable(builder.rsaPublicExponent);
-    this.rollbackResistance = builder.rollbackResistance;
-    this.activeDateTime = Optional.ofNullable(builder.activeDateTime);
-    this.originationExpireDateTime = Optional.ofNullable(builder.originationExpireDateTime);
-    this.usageExpireDateTime = Optional.ofNullable(builder.usageExpireDateTime);
-    this.noAuthRequired = builder.noAuthRequired;
-    this.userAuthType = builder.userAuthType;
-    this.authTimeout = Optional.ofNullable(builder.authTimeout);
-    this.allowWhileOnBody = builder.allowWhileOnBody;
-    this.trustedUserPresenceRequired = builder.trustedUserPresenceRequired;
-    this.trustedConfirmationRequired = builder.trustedConfirmationRequired;
-    this.unlockedDeviceRequired = builder.unlockedDeviceRequired;
-    this.allApplications = builder.allApplications;
-    this.applicationId = Optional.ofNullable(builder.applicationId);
-    this.creationDateTime = Optional.ofNullable(builder.creationDateTime);
-    this.origin = Optional.ofNullable(builder.origin);
-    this.rollbackResistant = builder.rollbackResistant;
-    this.rootOfTrust = Optional.ofNullable(builder.rootOfTrust);
-    this.osVersion = Optional.ofNullable(builder.osVersion);
-    this.osPatchLevel = Optional.ofNullable(builder.osPatchLevel);
-    this.attestationApplicationId = Optional.ofNullable(builder.attestationApplicationId);
-    this.attestationApplicationIdBytes = Optional.ofNullable(builder.attestationApplicationIdBytes);
-    this.attestationIdBrand = Optional.ofNullable(builder.attestationIdBrand);
-    this.attestationIdDevice = Optional.ofNullable(builder.attestationIdDevice);
-    this.attestationIdProduct = Optional.ofNullable(builder.attestationIdProduct);
-    this.attestationIdSerial = Optional.ofNullable(builder.attestationIdSerial);
-    this.attestationIdImei = Optional.ofNullable(builder.attestationIdImei);
-    this.attestationIdSecondImei = Optional.ofNullable(builder.attestationIdSecondImei);
-    this.attestationIdMeid = Optional.ofNullable(builder.attestationIdMeid);
-    this.attestationIdManufacturer = Optional.ofNullable(builder.attestationIdManufacturer);
-    this.attestationIdModel = Optional.ofNullable(builder.attestationIdModel);
-    this.vendorPatchLevel = Optional.ofNullable(builder.vendorPatchLevel);
-    this.bootPatchLevel = Optional.ofNullable(builder.bootPatchLevel);
-    this.individualAttestation = builder.individualAttestation;
-    this.identityCredentialKey = builder.identityCredentialKey;
-    this.unorderedTags = builder.unorderedTags;
-  }
+  public abstract ImmutableSet<DigestMode> digest();
+
+  public abstract ImmutableSet<PaddingMode> padding();
+
+  public abstract Optional<EcCurve> ecCurve();
+
+  public abstract Optional<Long> rsaPublicExponent();
+
+  public abstract boolean rollbackResistance();
+
+  public abstract Optional<Instant> activeDateTime();
+
+  public abstract Optional<Instant> originationExpireDateTime();
+
+  public abstract Optional<Instant> usageExpireDateTime();
+
+  public abstract boolean noAuthRequired();
+
+  public abstract ImmutableSet<UserAuthType> userAuthType();
+
+  public abstract Optional<Duration> authTimeout();
+
+  public abstract boolean allowWhileOnBody();
+
+  public abstract boolean trustedUserPresenceRequired();
+
+  public abstract boolean trustedConfirmationRequired();
+
+  public abstract boolean unlockedDeviceRequired();
+
+  public abstract boolean allApplications();
+
+  public abstract Optional<ByteString> applicationId();
+
+  public abstract Optional<Instant> creationDateTime();
+
+  public abstract Optional<KeyOrigin> origin();
+
+  public abstract boolean rollbackResistant();
+
+  public abstract Optional<RootOfTrust> rootOfTrust();
+
+  public abstract Optional<Integer> osVersion();
+
+  public abstract Optional<Integer> osPatchLevel();
+
+  public abstract Optional<AttestationApplicationId> attestationApplicationId();
+
+  public abstract Optional<ByteString> attestationApplicationIdBytes();
+
+  public abstract Optional<ByteString> attestationIdBrand();
+
+  public abstract Optional<ByteString> attestationIdDevice();
+
+  public abstract Optional<ByteString> attestationIdProduct();
+
+  public abstract Optional<ByteString> attestationIdSerial();
+
+  public abstract Optional<ByteString> attestationIdImei();
+
+  public abstract Optional<ByteString> attestationIdSecondImei();
+
+  public abstract Optional<ByteString> attestationIdMeid();
+
+  public abstract Optional<ByteString> attestationIdManufacturer();
+
+  public abstract Optional<ByteString> attestationIdModel();
+
+  public abstract Optional<Integer> vendorPatchLevel();
+
+  public abstract Optional<Integer> bootPatchLevel();
+
+  public abstract boolean individualAttestation();
+
+  public abstract boolean identityCredentialKey();
+
+  public abstract ImmutableList<Integer> unorderedTags();
 
   static AuthorizationList createAuthorizationList(
       ASN1Encodable[] authorizationList, int attestationVersion) {
-    return new AuthorizationList(authorizationList, attestationVersion);
+    Builder builder = AuthorizationList.builder();
+    ParsedAuthorizationMap parsedAuthorizationMap = getAuthorizationMap(authorizationList);
+
+    builder.setPurpose(
+        parsedAuthorizationMap.findIntegerSetAuthorizationListEntry(KM_TAG_PURPOSE).stream()
+            .flatMap(key -> Stream.ofNullable(ASN1_TO_OPERATION_PURPOSE.get(key)))
+            .collect(toImmutableSet()));
+    parsedAuthorizationMap
+        .findOptionalIntegerAuthorizationListEntry(KM_TAG_ALGORITHM)
+        .map(ASN1_TO_ALGORITHM::get)
+        .ifPresent(builder::setAlgorithm);
+
+    parsedAuthorizationMap
+        .findOptionalIntegerAuthorizationListEntry(KM_TAG_KEY_SIZE)
+        .ifPresent(builder::setKeySize);
+    builder.setDigest(
+        parsedAuthorizationMap.findIntegerSetAuthorizationListEntry(KM_TAG_DIGEST).stream()
+            .flatMap(key -> Stream.ofNullable(ASN1_TO_DIGEST_MODE.get(key)))
+            .collect(toImmutableSet()));
+    builder.setPadding(
+        parsedAuthorizationMap.findIntegerSetAuthorizationListEntry(KM_TAG_PADDING).stream()
+            .flatMap(key -> Stream.ofNullable(ASN1_TO_PADDING_MODE.get(key)))
+            .collect(toImmutableSet()));
+    parsedAuthorizationMap
+        .findOptionalIntegerAuthorizationListEntry(KM_TAG_EC_CURVE)
+        .map(ASN1_TO_EC_CURVE::get)
+        .ifPresent(builder::setEcCurve);
+    parsedAuthorizationMap
+        .findOptionalLongAuthorizationListEntry(KM_TAG_RSA_PUBLIC_EXPONENT)
+        .ifPresent(builder::setRsaPublicExponent);
+    builder.setRollbackResistance(
+        parsedAuthorizationMap.findBooleanAuthorizationListEntry(KM_TAG_ROLLBACK_RESISTANCE));
+    parsedAuthorizationMap
+        .findOptionalInstantMillisAuthorizationListEntry(KM_TAG_ACTIVE_DATE_TIME)
+        .ifPresent(builder::setActiveDateTime);
+    parsedAuthorizationMap
+        .findOptionalInstantMillisAuthorizationListEntry(KM_TAG_ORIGINATION_EXPIRE_DATE_TIME)
+        .ifPresent(builder::setOriginationExpireDateTime);
+    parsedAuthorizationMap
+        .findOptionalInstantMillisAuthorizationListEntry(KM_TAG_USAGE_EXPIRE_DATE_TIME)
+        .ifPresent(builder::setUsageExpireDateTime);
+    builder.setNoAuthRequired(
+        parsedAuthorizationMap.findBooleanAuthorizationListEntry(KM_TAG_NO_AUTH_REQUIRED));
+    builder.setUserAuthType(parsedAuthorizationMap.findUserAuthType(KM_TAG_USER_AUTH_TYPE));
+    parsedAuthorizationMap
+        .findOptionalDurationSecondsAuthorizationListEntry(KM_TAG_AUTH_TIMEOUT)
+        .ifPresent(builder::setAuthTimeout);
+    builder.setAllowWhileOnBody(
+        parsedAuthorizationMap.findBooleanAuthorizationListEntry(KM_TAG_ALLOW_WHILE_ON_BODY));
+    builder.setTrustedUserPresenceRequired(
+        parsedAuthorizationMap.findBooleanAuthorizationListEntry(
+            KM_TAG_TRUSTED_USER_PRESENCE_REQUIRED));
+    builder.setTrustedConfirmationRequired(
+        parsedAuthorizationMap.findBooleanAuthorizationListEntry(
+            KM_TAG_TRUSTED_CONFIRMATION_REQUIRED));
+    builder.setUnlockedDeviceRequired(
+        parsedAuthorizationMap.findBooleanAuthorizationListEntry(KM_TAG_UNLOCKED_DEVICE_REQUIRED));
+    builder.setAllApplications(
+        parsedAuthorizationMap.findBooleanAuthorizationListEntry(KM_TAG_ALL_APPLICATIONS));
+    parsedAuthorizationMap
+        .findOptionalByteArrayAuthorizationListEntry(KM_TAG_APPLICATION_ID)
+        .ifPresent(builder::setApplicationId);
+    parsedAuthorizationMap
+        .findOptionalInstantMillisAuthorizationListEntry(KM_TAG_CREATION_DATE_TIME)
+        .ifPresent(builder::setCreationDateTime);
+    parsedAuthorizationMap
+        .findOptionalIntegerAuthorizationListEntry(KM_TAG_ORIGIN)
+        .map(ASN1_TO_KEY_ORIGIN::get)
+        .ifPresent(builder::setOrigin);
+    builder.setRollbackResistant(
+        parsedAuthorizationMap.findBooleanAuthorizationListEntry(KM_TAG_ROLLBACK_RESISTANT));
+    parsedAuthorizationMap
+        .findAuthorizationListEntry(KM_TAG_ROOT_OF_TRUST)
+        .map(ASN1Sequence.class::cast)
+        .map(rootOfTrust -> RootOfTrust.createRootOfTrust(rootOfTrust, attestationVersion))
+        .ifPresent(builder::setRootOfTrust);
+    parsedAuthorizationMap
+        .findOptionalIntegerAuthorizationListEntry(KM_TAG_OS_VERSION)
+        .ifPresent(builder::setOsVersion);
+    parsedAuthorizationMap
+        .findOptionalIntegerAuthorizationListEntry(KM_TAG_OS_PATCH_LEVEL)
+        .ifPresent(builder::setOsPatchLevel);
+    parsedAuthorizationMap
+        .findAuthorizationListEntry(KM_TAG_ATTESTATION_APPLICATION_ID)
+        .map(ASN1OctetString.class::cast)
+        .map(ASN1OctetString::getOctets)
+        .map(AttestationApplicationId::createAttestationApplicationId)
+        .ifPresent(builder::setAttestationApplicationId);
+    parsedAuthorizationMap
+        .findOptionalByteArrayAuthorizationListEntry(KM_TAG_ATTESTATION_APPLICATION_ID)
+        .ifPresent(builder::setAttestationApplicationIdBytes);
+    parsedAuthorizationMap
+        .findOptionalByteArrayAuthorizationListEntry(KM_TAG_ATTESTATION_ID_BRAND)
+        .ifPresent(builder::setAttestationIdBrand);
+    parsedAuthorizationMap
+        .findOptionalByteArrayAuthorizationListEntry(KM_TAG_ATTESTATION_ID_DEVICE)
+        .ifPresent(builder::setAttestationIdDevice);
+    parsedAuthorizationMap
+        .findOptionalByteArrayAuthorizationListEntry(KM_TAG_ATTESTATION_ID_PRODUCT)
+        .ifPresent(builder::setAttestationIdProduct);
+    parsedAuthorizationMap
+        .findOptionalByteArrayAuthorizationListEntry(KM_TAG_ATTESTATION_ID_SERIAL)
+        .ifPresent(builder::setAttestationIdSerial);
+    parsedAuthorizationMap
+        .findOptionalByteArrayAuthorizationListEntry(KM_TAG_ATTESTATION_ID_IMEI)
+        .ifPresent(builder::setAttestationIdImei);
+    parsedAuthorizationMap
+        .findOptionalByteArrayAuthorizationListEntry(KM_TAG_ATTESTATION_ID_SECOND_IMEI)
+        .ifPresent(builder::setAttestationIdSecondImei);
+    parsedAuthorizationMap
+        .findOptionalByteArrayAuthorizationListEntry(KM_TAG_ATTESTATION_ID_MEID)
+        .ifPresent(builder::setAttestationIdMeid);
+    parsedAuthorizationMap
+        .findOptionalByteArrayAuthorizationListEntry(KM_TAG_ATTESTATION_ID_MANUFACTURER)
+        .ifPresent(builder::setAttestationIdManufacturer);
+    parsedAuthorizationMap
+        .findOptionalByteArrayAuthorizationListEntry(KM_TAG_ATTESTATION_ID_MODEL)
+        .ifPresent(builder::setAttestationIdModel);
+    parsedAuthorizationMap
+        .findOptionalIntegerAuthorizationListEntry(KM_TAG_VENDOR_PATCH_LEVEL)
+        .ifPresent(builder::setVendorPatchLevel);
+    parsedAuthorizationMap
+        .findOptionalIntegerAuthorizationListEntry(KM_TAG_BOOT_PATCH_LEVEL)
+        .ifPresent(builder::setBootPatchLevel);
+    builder.setIndividualAttestation(
+        parsedAuthorizationMap.findBooleanAuthorizationListEntry(KM_TAG_DEVICE_UNIQUE_ATTESTATION));
+    builder.setIdentityCredentialKey(
+        parsedAuthorizationMap.findBooleanAuthorizationListEntry(KM_TAG_IDENTITY_CREDENTIAL_KEY));
+    builder.setUnorderedTags(parsedAuthorizationMap.getUnorderedTags());
+
+    return builder.build();
   }
 
   private static ParsedAuthorizationMap getAuthorizationMap(ASN1Encodable[] authorizationList) {
@@ -635,63 +638,65 @@ public class AuthorizationList {
     ASN1EncodableVector vector = new ASN1EncodableVector();
     addOptionalIntegerSet(
         KM_TAG_PURPOSE,
-        this.purpose.stream()
+        this.purpose().stream()
             .flatMap(key -> Stream.ofNullable(OPERATION_PURPOSE_TO_ASN1.get(key)))
             .collect(toImmutableSet()),
         vector);
-    addOptionalInteger(KM_TAG_ALGORITHM, this.algorithm.map(ALGORITHM_TO_ASN1::get), vector);
-    addOptionalInteger(KM_TAG_KEY_SIZE, this.keySize, vector);
+    addOptionalInteger(KM_TAG_ALGORITHM, this.algorithm().map(ALGORITHM_TO_ASN1::get), vector);
+    addOptionalInteger(KM_TAG_KEY_SIZE, this.keySize(), vector);
     addOptionalIntegerSet(
         KM_TAG_DIGEST,
-        this.digest.stream()
+        this.digest().stream()
             .flatMap(key -> Stream.ofNullable(DIGEST_MODE_TO_ASN1.get(key)))
             .collect(toImmutableSet()),
         vector);
     addOptionalIntegerSet(
         KM_TAG_PADDING,
-        this.padding.stream()
+        this.padding().stream()
             .flatMap(key -> Stream.ofNullable(PADDING_MODE_TO_ASN1.get(key)))
             .collect(toImmutableSet()),
         vector);
-    addOptionalInteger(KM_TAG_EC_CURVE, this.ecCurve.map(EC_CURVE_TO_ASN1::get), vector);
-    addOptionalLong(KM_TAG_RSA_PUBLIC_EXPONENT, this.rsaPublicExponent, vector);
-    addBoolean(KM_TAG_ROLLBACK_RESISTANCE, this.rollbackResistance, vector);
-    addOptionalInstant(KM_TAG_ACTIVE_DATE_TIME, this.activeDateTime, vector);
-    addOptionalInstant(KM_TAG_ORIGINATION_EXPIRE_DATE_TIME, this.originationExpireDateTime, vector);
-    addOptionalInstant(KM_TAG_USAGE_EXPIRE_DATE_TIME, this.usageExpireDateTime, vector);
-    addBoolean(KM_TAG_NO_AUTH_REQUIRED, this.noAuthRequired, vector);
-    addOptionalUserAuthType(KM_TAG_USER_AUTH_TYPE, this.userAuthType, vector);
-    addOptionalDuration(KM_TAG_AUTH_TIMEOUT, this.authTimeout, vector);
-    addBoolean(KM_TAG_ALLOW_WHILE_ON_BODY, this.allowWhileOnBody, vector);
-    addBoolean(KM_TAG_TRUSTED_USER_PRESENCE_REQUIRED, this.trustedUserPresenceRequired, vector);
-    addBoolean(KM_TAG_TRUSTED_CONFIRMATION_REQUIRED, this.trustedConfirmationRequired, vector);
-    addBoolean(KM_TAG_UNLOCKED_DEVICE_REQUIRED, this.unlockedDeviceRequired, vector);
-    addBoolean(KM_TAG_ALL_APPLICATIONS, this.allApplications, vector);
-    addOptionalOctetString(KM_TAG_APPLICATION_ID, this.applicationId, vector);
-    addOptionalInstant(KM_TAG_CREATION_DATE_TIME, this.creationDateTime, vector);
-    addOptionalInteger(KM_TAG_ORIGIN, this.origin.map(KEY_ORIGIN_TO_ASN1::get), vector);
-    addBoolean(KM_TAG_ROLLBACK_RESISTANT, this.rollbackResistant, vector);
-    addOptionalRootOfTrust(KM_TAG_ROOT_OF_TRUST, this.rootOfTrust, vector);
-    addOptionalInteger(KM_TAG_OS_VERSION, this.osVersion, vector);
-    addOptionalInteger(KM_TAG_OS_PATCH_LEVEL, this.osPatchLevel, vector);
+    addOptionalInteger(KM_TAG_EC_CURVE, this.ecCurve().map(EC_CURVE_TO_ASN1::get), vector);
+    addOptionalLong(KM_TAG_RSA_PUBLIC_EXPONENT, this.rsaPublicExponent(), vector);
+    addBoolean(KM_TAG_ROLLBACK_RESISTANCE, this.rollbackResistance(), vector);
+    addOptionalInstant(KM_TAG_ACTIVE_DATE_TIME, this.activeDateTime(), vector);
+    addOptionalInstant(
+        KM_TAG_ORIGINATION_EXPIRE_DATE_TIME, this.originationExpireDateTime(), vector);
+    addOptionalInstant(KM_TAG_USAGE_EXPIRE_DATE_TIME, this.usageExpireDateTime(), vector);
+    addBoolean(KM_TAG_NO_AUTH_REQUIRED, this.noAuthRequired(), vector);
+    addOptionalUserAuthType(KM_TAG_USER_AUTH_TYPE, this.userAuthType(), vector);
+    addOptionalDuration(KM_TAG_AUTH_TIMEOUT, this.authTimeout(), vector);
+    addBoolean(KM_TAG_ALLOW_WHILE_ON_BODY, this.allowWhileOnBody(), vector);
+    addBoolean(KM_TAG_TRUSTED_USER_PRESENCE_REQUIRED, this.trustedUserPresenceRequired(), vector);
+    addBoolean(KM_TAG_TRUSTED_CONFIRMATION_REQUIRED, this.trustedConfirmationRequired(), vector);
+    addBoolean(KM_TAG_UNLOCKED_DEVICE_REQUIRED, this.unlockedDeviceRequired(), vector);
+    addBoolean(KM_TAG_ALL_APPLICATIONS, this.allApplications(), vector);
+    addOptionalOctetString(KM_TAG_APPLICATION_ID, this.applicationId(), vector);
+    addOptionalInstant(KM_TAG_CREATION_DATE_TIME, this.creationDateTime(), vector);
+    addOptionalInteger(KM_TAG_ORIGIN, this.origin().map(KEY_ORIGIN_TO_ASN1::get), vector);
+    addBoolean(KM_TAG_ROLLBACK_RESISTANT, this.rollbackResistant(), vector);
+    addOptionalRootOfTrust(KM_TAG_ROOT_OF_TRUST, this.rootOfTrust(), vector);
+    addOptionalInteger(KM_TAG_OS_VERSION, this.osVersion(), vector);
+    addOptionalInteger(KM_TAG_OS_PATCH_LEVEL, this.osPatchLevel(), vector);
     addOptionalAttestationApplicationId(
         KM_TAG_ATTESTATION_APPLICATION_ID,
-        this.attestationApplicationId,
-        this.attestationApplicationIdBytes,
+        this.attestationApplicationId(),
+        this.attestationApplicationIdBytes(),
         vector);
-    addOptionalOctetString(KM_TAG_ATTESTATION_ID_BRAND, this.attestationIdBrand, vector);
-    addOptionalOctetString(KM_TAG_ATTESTATION_ID_DEVICE, this.attestationIdDevice, vector);
-    addOptionalOctetString(KM_TAG_ATTESTATION_ID_PRODUCT, this.attestationIdProduct, vector);
-    addOptionalOctetString(KM_TAG_ATTESTATION_ID_SERIAL, this.attestationIdSerial, vector);
-    addOptionalOctetString(KM_TAG_ATTESTATION_ID_IMEI, this.attestationIdImei, vector);
-    addOptionalOctetString(KM_TAG_ATTESTATION_ID_SECOND_IMEI, this.attestationIdSecondImei, vector);
-    addOptionalOctetString(KM_TAG_ATTESTATION_ID_MEID, this.attestationIdMeid, vector);
+    addOptionalOctetString(KM_TAG_ATTESTATION_ID_BRAND, this.attestationIdBrand(), vector);
+    addOptionalOctetString(KM_TAG_ATTESTATION_ID_DEVICE, this.attestationIdDevice(), vector);
+    addOptionalOctetString(KM_TAG_ATTESTATION_ID_PRODUCT, this.attestationIdProduct(), vector);
+    addOptionalOctetString(KM_TAG_ATTESTATION_ID_SERIAL, this.attestationIdSerial(), vector);
+    addOptionalOctetString(KM_TAG_ATTESTATION_ID_IMEI, this.attestationIdImei(), vector);
     addOptionalOctetString(
-        KM_TAG_ATTESTATION_ID_MANUFACTURER, this.attestationIdManufacturer, vector);
-    addOptionalOctetString(KM_TAG_ATTESTATION_ID_MODEL, this.attestationIdModel, vector);
-    addOptionalInteger(KM_TAG_VENDOR_PATCH_LEVEL, this.vendorPatchLevel, vector);
-    addOptionalInteger(KM_TAG_BOOT_PATCH_LEVEL, this.bootPatchLevel, vector);
-    addBoolean(KM_TAG_DEVICE_UNIQUE_ATTESTATION, this.individualAttestation, vector);
+        KM_TAG_ATTESTATION_ID_SECOND_IMEI, this.attestationIdSecondImei(), vector);
+    addOptionalOctetString(KM_TAG_ATTESTATION_ID_MEID, this.attestationIdMeid(), vector);
+    addOptionalOctetString(
+        KM_TAG_ATTESTATION_ID_MANUFACTURER, this.attestationIdManufacturer(), vector);
+    addOptionalOctetString(KM_TAG_ATTESTATION_ID_MODEL, this.attestationIdModel(), vector);
+    addOptionalInteger(KM_TAG_VENDOR_PATCH_LEVEL, this.vendorPatchLevel(), vector);
+    addOptionalInteger(KM_TAG_BOOT_PATCH_LEVEL, this.bootPatchLevel(), vector);
+    addBoolean(KM_TAG_DEVICE_UNIQUE_ATTESTATION, this.individualAttestation(), vector);
     return new DERSequence(vector);
   }
 
@@ -777,307 +782,117 @@ public class AuthorizationList {
   }
 
   public static Builder builder() {
-    return new Builder();
+    return new AutoValue_AuthorizationList.Builder()
+        .setPurpose(ImmutableSet.of())
+        .setDigest(ImmutableSet.of())
+        .setPadding(ImmutableSet.of())
+        .setRollbackResistance(false)
+        .setNoAuthRequired(false)
+        .setUserAuthType(ImmutableSet.of())
+        .setAllowWhileOnBody(false)
+        .setTrustedUserPresenceRequired(false)
+        .setTrustedConfirmationRequired(false)
+        .setUnlockedDeviceRequired(false)
+        .setAllApplications(false)
+        .setRollbackResistant(false)
+        .setIndividualAttestation(false)
+        .setIdentityCredentialKey(false)
+        .setUnorderedTags(ImmutableList.of());
   }
 
   /**
    * Builder for an AuthorizationList. Any field not set will be made an Optional.empty or set with
    * the default value.
    */
-  public static final class Builder {
+  @AutoValue.Builder
+  public abstract static class Builder {
+    public abstract Builder setPurpose(Set<OperationPurpose> purpose);
 
-    ImmutableSet<OperationPurpose> purpose = ImmutableSet.of();
-    Algorithm algorithm;
-    Integer keySize;
-    ImmutableSet<DigestMode> digest = ImmutableSet.of();
-    ImmutableSet<PaddingMode> padding = ImmutableSet.of();
-    EcCurve ecCurve;
-    Long rsaPublicExponent;
-    boolean rollbackResistance;
-    Instant activeDateTime;
-    Instant originationExpireDateTime;
-    Instant usageExpireDateTime;
-    boolean noAuthRequired;
-    ImmutableSet<UserAuthType> userAuthType = ImmutableSet.of();
-    Duration authTimeout;
-    boolean allowWhileOnBody;
-    boolean trustedUserPresenceRequired;
-    boolean trustedConfirmationRequired;
-    boolean unlockedDeviceRequired;
-    boolean allApplications;
-    ByteString applicationId;
-    Instant creationDateTime;
-    KeyOrigin origin;
-    boolean rollbackResistant;
-    RootOfTrust rootOfTrust;
-    Integer osVersion;
-    Integer osPatchLevel;
-    AttestationApplicationId attestationApplicationId;
-    ByteString attestationApplicationIdBytes;
-    ByteString attestationIdBrand;
-    ByteString attestationIdDevice;
-    ByteString attestationIdProduct;
-    ByteString attestationIdSerial;
-    ByteString attestationIdImei;
-    ByteString attestationIdSecondImei;
-    ByteString attestationIdMeid;
-    ByteString attestationIdManufacturer;
-    ByteString attestationIdModel;
-    Integer vendorPatchLevel;
-    Integer bootPatchLevel;
-    boolean individualAttestation;
-    boolean identityCredentialKey;
-    ImmutableList<Integer> unorderedTags;
+    public abstract Builder setAlgorithm(Algorithm algorithm);
 
-    @CanIgnoreReturnValue
-    public Builder setPurpose(Set<OperationPurpose> purpose) {
-      this.purpose = ImmutableSet.copyOf(purpose);
-      return this;
-    }
+    public abstract Builder setKeySize(Integer keySize);
 
-    @CanIgnoreReturnValue
-    public Builder setAlgorithm(Algorithm algorithm) {
-      this.algorithm = algorithm;
-      return this;
-    }
+    public abstract Builder setDigest(Set<DigestMode> digest);
 
-    @CanIgnoreReturnValue
-    public Builder setKeySize(Integer keySize) {
-      this.keySize = keySize;
-      return this;
-    }
+    public abstract Builder setPadding(Set<PaddingMode> padding);
 
-    @CanIgnoreReturnValue
-    public Builder setDigest(Set<DigestMode> digest) {
-      this.digest = ImmutableSet.copyOf(digest);
-      return this;
-    }
+    public abstract Builder setEcCurve(EcCurve ecCurve);
 
-    @CanIgnoreReturnValue
-    public Builder setPadding(Set<PaddingMode> padding) {
-      this.padding = ImmutableSet.copyOf(padding);
-      return this;
-    }
+    public abstract Builder setRsaPublicExponent(Long rsaPublicExponent);
 
-    @CanIgnoreReturnValue
-    public Builder setEcCurve(EcCurve ecCurve) {
-      this.ecCurve = ecCurve;
-      return this;
-    }
+    public abstract Builder setRollbackResistance(boolean rollbackResistance);
 
-    @CanIgnoreReturnValue
-    public Builder setRsaPublicExponent(Long rsaPublicExponent) {
-      this.rsaPublicExponent = rsaPublicExponent;
-      return this;
-    }
+    public abstract Builder setActiveDateTime(Instant activeDateTime);
 
-    @CanIgnoreReturnValue
-    public Builder setRollbackResistance(boolean rollbackResistance) {
-      this.rollbackResistance = rollbackResistance;
-      return this;
-    }
+    public abstract Builder setOriginationExpireDateTime(Instant originationExpireDateTime);
 
-    @CanIgnoreReturnValue
-    public Builder setActiveDateTime(Instant activeDateTime) {
-      this.activeDateTime = activeDateTime;
-      return this;
-    }
+    public abstract Builder setUsageExpireDateTime(Instant usageExpireDateTime);
 
-    @CanIgnoreReturnValue
-    public Builder setOriginationExpireDateTime(Instant originationExpireDateTime) {
-      this.originationExpireDateTime = originationExpireDateTime;
-      return this;
-    }
+    public abstract Builder setNoAuthRequired(boolean noAuthRequired);
 
-    @CanIgnoreReturnValue
-    public Builder setUsageExpireDateTime(Instant usageExpireDateTime) {
-      this.usageExpireDateTime = usageExpireDateTime;
-      return this;
-    }
+    public abstract Builder setUserAuthType(Set<UserAuthType> userAuthType);
 
-    @CanIgnoreReturnValue
-    public Builder setNoAuthRequired(boolean noAuthRequired) {
-      this.noAuthRequired = noAuthRequired;
-      return this;
-    }
+    public abstract Builder setAuthTimeout(Duration authTimeout);
 
-    @CanIgnoreReturnValue
-    public Builder setUserAuthType(Set<UserAuthType> userAuthType) {
-      this.userAuthType = ImmutableSet.copyOf(userAuthType);
-      return this;
-    }
+    public abstract Builder setAllowWhileOnBody(boolean allowWhileOnBody);
 
-    @CanIgnoreReturnValue
-    public Builder setAuthTimeout(Duration authTimeout) {
-      this.authTimeout = authTimeout;
-      return this;
-    }
+    public abstract Builder setTrustedUserPresenceRequired(boolean trustedUserPresenceRequired);
 
-    @CanIgnoreReturnValue
-    public Builder setAllowWhileOnBody(boolean allowWhileOnBody) {
-      this.allowWhileOnBody = allowWhileOnBody;
-      return this;
-    }
+    public abstract Builder setTrustedConfirmationRequired(boolean trustedConfirmationRequired);
 
-    @CanIgnoreReturnValue
-    public Builder setTrustedUserPresenceRequired(boolean trustedUserPresenceRequired) {
-      this.trustedUserPresenceRequired = trustedUserPresenceRequired;
-      return this;
-    }
+    public abstract Builder setUnlockedDeviceRequired(boolean unlockedDeviceRequired);
 
-    @CanIgnoreReturnValue
-    public Builder setTrustedConfirmationRequired(boolean trustedConfirmationRequired) {
-      this.trustedConfirmationRequired = trustedConfirmationRequired;
-      return this;
-    }
+    public abstract Builder setAllApplications(boolean allApplications);
 
-    @CanIgnoreReturnValue
-    public Builder setUnlockedDeviceRequired(boolean unlockedDeviceRequired) {
-      this.unlockedDeviceRequired = unlockedDeviceRequired;
-      return this;
-    }
+    public abstract Builder setApplicationId(ByteString applicationId);
 
-    @CanIgnoreReturnValue
-    public Builder setAllApplications(boolean allApplications) {
-      this.allApplications = allApplications;
-      return this;
-    }
+    public abstract Builder setCreationDateTime(Instant creationDateTime);
 
-    @CanIgnoreReturnValue
-    public Builder setApplicationId(ByteString applicationId) {
-      this.applicationId = applicationId;
-      return this;
-    }
+    public abstract Builder setOrigin(KeyOrigin origin);
 
-    @CanIgnoreReturnValue
-    public Builder setCreationDateTime(Instant creationDateTime) {
-      this.creationDateTime = creationDateTime;
-      return this;
-    }
+    public abstract Builder setRollbackResistant(boolean rollbackResistant);
 
-    @CanIgnoreReturnValue
-    public Builder setOrigin(KeyOrigin origin) {
-      this.origin = origin;
-      return this;
-    }
+    public abstract Builder setRootOfTrust(RootOfTrust rootOfTrust);
 
-    @CanIgnoreReturnValue
-    public Builder setRollbackResistant(boolean rollbackResistant) {
-      this.rollbackResistant = rollbackResistant;
-      return this;
-    }
+    public abstract Builder setOsVersion(Integer osVersion);
 
-    @CanIgnoreReturnValue
-    public Builder setRootOfTrust(RootOfTrust rootOfTrust) {
-      this.rootOfTrust = rootOfTrust;
-      return this;
-    }
+    public abstract Builder setOsPatchLevel(Integer osPatchLevel);
 
-    @CanIgnoreReturnValue
-    public Builder setOsVersion(Integer osVersion) {
-      this.osVersion = osVersion;
-      return this;
-    }
+    public abstract Builder setAttestationApplicationId(
+        AttestationApplicationId attestationApplicationId);
 
-    @CanIgnoreReturnValue
-    public Builder setOsPatchLevel(Integer osPatchLevel) {
-      this.osPatchLevel = osPatchLevel;
-      return this;
-    }
+    public abstract Builder setAttestationApplicationIdBytes(
+        ByteString attestationApplicationIdBytes);
 
-    @CanIgnoreReturnValue
-    public Builder setAttestationApplicationId(AttestationApplicationId attestationApplicationId) {
-      this.attestationApplicationId = attestationApplicationId;
-      return this;
-    }
+    public abstract Builder setAttestationIdBrand(ByteString attestationIdBrand);
 
-    @CanIgnoreReturnValue
-    public Builder setAttestationApplicationIdBytes(ByteString attestationApplicationIdBytes) {
-      this.attestationApplicationIdBytes = attestationApplicationIdBytes;
-      return this;
-    }
+    public abstract Builder setAttestationIdDevice(ByteString attestationIdDevice);
 
-    @CanIgnoreReturnValue
-    public Builder setAttestationIdBrand(ByteString attestationIdBrand) {
-      this.attestationIdBrand = attestationIdBrand;
-      return this;
-    }
+    public abstract Builder setAttestationIdProduct(ByteString attestationIdProduct);
 
-    @CanIgnoreReturnValue
-    public Builder setAttestationIdDevice(ByteString attestationIdDevice) {
-      this.attestationIdDevice = attestationIdDevice;
-      return this;
-    }
+    public abstract Builder setAttestationIdSerial(ByteString attestationIdSerial);
 
-    @CanIgnoreReturnValue
-    public Builder setAttestationIdProduct(ByteString attestationIdProduct) {
-      this.attestationIdProduct = attestationIdProduct;
-      return this;
-    }
+    public abstract Builder setAttestationIdImei(ByteString attestationIdImei);
 
-    @CanIgnoreReturnValue
-    public Builder setAttestationIdSerial(ByteString attestationIdSerial) {
-      this.attestationIdSerial = attestationIdSerial;
-      return this;
-    }
+    public abstract Builder setAttestationIdSecondImei(ByteString attestationIdSecondImei);
 
-    @CanIgnoreReturnValue
-    public Builder setAttestationIdImei(ByteString attestationIdImei) {
-      this.attestationIdImei = attestationIdImei;
-      return this;
-    }
+    public abstract Builder setAttestationIdMeid(ByteString attestationIdMeid);
 
-    @CanIgnoreReturnValue
-    public Builder setAttestationIdSecondImei(ByteString attestationIdSecondImei) {
-      this.attestationIdSecondImei = attestationIdSecondImei;
-      return this;
-    }
+    public abstract Builder setAttestationIdManufacturer(ByteString attestationIdManufacturer);
 
-    @CanIgnoreReturnValue
-    public Builder setAttestationIdMeid(ByteString attestationIdMeid) {
-      this.attestationIdMeid = attestationIdMeid;
-      return this;
-    }
+    public abstract Builder setAttestationIdModel(ByteString attestationIdModel);
 
-    @CanIgnoreReturnValue
-    public Builder setAttestationIdManufacturer(ByteString attestationIdManufacturer) {
-      this.attestationIdManufacturer = attestationIdManufacturer;
-      return this;
-    }
+    public abstract Builder setVendorPatchLevel(Integer vendorPatchLevel);
 
-    @CanIgnoreReturnValue
-    public Builder setAttestationIdModel(ByteString attestationIdModel) {
-      this.attestationIdModel = attestationIdModel;
-      return this;
-    }
+    public abstract Builder setBootPatchLevel(Integer bootPatchLevel);
 
-    @CanIgnoreReturnValue
-    public Builder setVendorPatchLevel(Integer vendorPatchLevel) {
-      this.vendorPatchLevel = vendorPatchLevel;
-      return this;
-    }
+    public abstract Builder setIndividualAttestation(boolean individualAttestation);
 
-    @CanIgnoreReturnValue
-    public Builder setBootPatchLevel(Integer bootPatchLevel) {
-      this.bootPatchLevel = bootPatchLevel;
-      return this;
-    }
+    public abstract Builder setIdentityCredentialKey(boolean identityCredentialKey);
 
-    @CanIgnoreReturnValue
-    public Builder setIndividualAttestation(boolean individualAttestation) {
-      this.individualAttestation = individualAttestation;
-      return this;
-    }
+    public abstract Builder setUnorderedTags(ImmutableList<Integer> unorderedTags);
 
-    @CanIgnoreReturnValue
-    public Builder setIdentityCredentialKey(boolean identityCredentialKey) {
-      this.identityCredentialKey = identityCredentialKey;
-      return this;
-    }
-
-    public AuthorizationList build() {
-      return new AuthorizationList(this);
-    }
+    public abstract AuthorizationList build();
   }
 
   /**
