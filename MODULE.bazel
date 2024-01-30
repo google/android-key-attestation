@@ -1,6 +1,20 @@
-###############################################################################
-# Bazel now uses Bzlmod by default to manage external dependencies.
-# Please consider migrating your external dependencies from WORKSPACE to MODULE.bazel.
-#
-# For more details, please check https://github.com/bazelbuild/bazel/issues/18958
-###############################################################################
+bazel_dep(name = "rules_jvm_external", version = "6.0")
+maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
+maven.install(
+    artifacts = [
+        "com.google.code.gson:gson:2.10.1",
+        "com.google.errorprone:error_prone_annotations:2.3.1",
+        "com.google.guava:guava:32.0.1-jre",
+        "com.google.protobuf:protobuf-javalite:3.25.1",
+        "com.squareup.okhttp3:okhttp:4.10.0",
+        "org.bouncycastle:bcpkix-jdk18on:1.73",
+        "org.bouncycastle:bcprov-jdk18on:1.73",
+        "org.jspecify:jspecify:0.2.0",
+        "com.google.testparameterinjector:test-parameter-injector:1.11",
+        "com.google.truth:truth:1.0",
+        "com.google.truth.extensions:truth-java8-extension:1.0",
+        "junit:junit:4.12",
+    ],
+    lock_file = "//:maven_install.json",
+)
+use_repo(maven, "maven", "unpinned_maven")
