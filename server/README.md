@@ -34,21 +34,18 @@ Pre-requisites
 --------------
 
 - Up-to-date Java JDK
-- [Bouncy Castle Cryptography Java APIs][5] (included as dependency in gradle build configuration).
+- [Bouncy Castle Cryptography Java APIs][5]
 
 [5]: https://www.bouncycastle.org/java.html
 
 Getting Started
 ---------------
 
-This sample uses the Gradle build system. To build this project, use the
-`gradlew build` command or use "Import Project" in IntelliJ or Android Studio.
- 
-Run the main method in `KeyAttestationExample` directly or use the
-`gradlew run --args="<cert-directory>"` task to execute this sample. The `cert-directory` must
+This sample uses the Bazel build system. Run the main method in `KeyAttestationExample` directly or use the
+`bazel run //server/src/main/java/com/android/example:KeyAttestationExample -- <cert-directory>` task to execute this sample. The `cert-directory` must
 contain the certificate chain, one certificate per file in either DER or PEM encoding and the files
 are read in alphabetical order. For example the provided
-`/examples/pem/algorithm_EC_SecurityLevel_StrongBox/` can be used.
+`server/examples/pem/algorithm_EC_SecurityLevel_StrongBox/` can be used.
 
 Support
 -------
