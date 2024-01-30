@@ -22,8 +22,8 @@ import static org.junit.Assert.assertThrows;
 import com.google.android.attestation.RootOfTrust.VerifiedBootState;
 import com.google.protobuf.ByteString;
 import java.io.IOException;
+import java.util.Base64;
 import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.util.encoders.Base64;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -35,19 +35,19 @@ public class RootOfTrustTest {
   // Generated from certificate with EC Algorithm and StrongBox Security Level
   private static final String ROOT_OF_TRUST =
       "MEoEIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQEACgECBCByjbEnTx8c8Vcd5DgLBIpVSsSjgOdvU1UI"
-          + "NSkISpN4AQ==\n";
+          + "NSkISpN4AQ==";
   private static final int ATTESTATION_VERSION = 3;
 
   private static final ByteString EXPECTED_VERIFIED_BOOT_KEY =
-      ByteString.copyFrom(Base64.decode("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="));
+      ByteString.copyFrom(Base64.getDecoder().decode("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="));
   private static final boolean EXPECTED_DEVICE_LOCKED = false;
   private static final VerifiedBootState EXPECTED_VERIFIED_BOOT_STATE =
       VerifiedBootState.UNVERIFIED;
   private static final ByteString EXPECTED_VERIFIED_BOOT_HASH =
-      ByteString.copyFrom(Base64.decode("co2xJ08fHPFXHeQ4CwSKVUrEo4Dnb1NVCDUpCEqTeAE="));
+      ByteString.copyFrom(Base64.getDecoder().decode("co2xJ08fHPFXHeQ4CwSKVUrEo4Dnb1NVCDUpCEqTeAE="));
 
   private static ASN1Sequence getRootOfTrustSequence(String rootOfTrustB64) throws IOException {
-    byte[] rootOfTrustBytes = Base64.decode(rootOfTrustB64);
+    byte[] rootOfTrustBytes = Base64.getDecoder().decode(rootOfTrustB64);
     return (ASN1Sequence) ASN1Sequence.fromByteArray(rootOfTrustBytes);
   }
 

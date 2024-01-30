@@ -22,10 +22,11 @@ import static org.junit.Assert.assertThrows;
 import com.google.android.attestation.AttestationApplicationId.AttestationPackageInfo;
 import com.google.common.collect.ImmutableList;
 import com.google.protobuf.ByteString;
-import org.bouncycastle.util.encoders.Base64;
+import java.util.Base64;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
 
 /** Test for {@link AttestationApplicationId}. */
 @RunWith(JUnit4.class)
@@ -33,7 +34,7 @@ public class AttestationApplicationIdTest {
 
   // Generated from certificate with RSA Algorithm and StrongBox Security Level
   private static final byte[] ATTESTATION_APPLICATION_ID =
-      Base64.decode(
+          Base64.getDecoder().decode(
           "MIIBszGCAYswDAQHYW5kcm9pZAIBHTAZBBRjb20uYW5kcm9pZC5rZXljaGFpbgIBHTAZBBRjb20uYW5kcm9p"
               + "ZC5zZXR0aW5ncwIBHTAZBBRjb20ucXRpLmRpYWdzZXJ2aWNlcwIBHTAaBBVjb20uYW5kcm9pZC5keW"
               + "5zeXN0ZW0CAR0wHQQYY29tLmFuZHJvaWQuaW5wdXRkZXZpY2VzAgEdMB8EGmNvbS5hbmRyb2lkLmxv"
@@ -60,7 +61,7 @@ public class AttestationApplicationIdTest {
           new AttestationPackageInfo("com.android.providers.settings", 29L));
   private static final ImmutableList<ByteString> EXPECTED_SIGNATURE_DIGESTS =
       ImmutableList.of(
-          ByteString.copyFrom(Base64.decode("MBqjywgRNFAcRfFCKrxmwkIk/V3tX9yPF+aXF2/YZqo=\n")));
+                  ByteString.copyFrom(Base64.getDecoder().decode("MBqjywgRNFAcRfFCKrxmwkIk/V3tX9yPF+aXF2/YZqo=")));
 
   private static final AttestationApplicationId EXPECTED_ATTESTATION_APPLICATION_ID =
       new AttestationApplicationId(EXPECTED_PACKAGE_INFOS, EXPECTED_SIGNATURE_DIGESTS);
