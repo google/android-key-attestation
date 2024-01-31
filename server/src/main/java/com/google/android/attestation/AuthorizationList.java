@@ -63,6 +63,7 @@ import static com.google.android.attestation.Constants.UINT32_MAX;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.Streams.stream;
+import static java.util.Arrays.stream;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
@@ -74,7 +75,6 @@ import com.google.protobuf.ByteString;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -557,7 +557,7 @@ public class AuthorizationList {
     //
     // https://guava.dev/releases/23.0/api/docs/com/google/common/collect/ImmutableCollection.html
     ImmutableMap<Integer, ASN1Object> authorizationMap =
-        Arrays.stream(authorizationList)
+        stream(authorizationList)
             .map(ASN1TaggedObject::getInstance)
             .collect(
                 toImmutableMap(
