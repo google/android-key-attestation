@@ -6,6 +6,5 @@ java_binary(
         "//server/src/main/java/com/google/android/attestation",
         "@maven//:com_google_guava_guava",
         "@maven//:com_google_protobuf_protobuf_javalite",
-        "@maven//:org_bouncycastle_bcprov_jdk18on",
     ],
 )

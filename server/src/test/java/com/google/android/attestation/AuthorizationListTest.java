@@ -42,12 +42,12 @@ import com.google.testing.junit.testparameterinjector.TestParameterInjector;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.util.encoders.Base64;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -75,7 +75,7 @@ public class AuthorizationListTest {
   private static final Instant EXPECTED_SW_CREATION_DATETIME = Instant.ofEpochMilli(1563202592972L);
   private static final ByteString EXPECTED_SW_ATTESTATION_APPLICATION_ID_BYTES =
       ByteString.copyFrom(
-          Base64.decode(
+          Base64.getDecoder().decode(
               "MIIBszGCAYswDAQHYW5kcm9pZAIBHTAZBBRjb20uYW5kcm9pZC5rZXljaGFpbgIBHTAZBBRjb20uYW5kcm9pZC5z"
                   + "ZXR0aW5ncwIBHTAZBBRjb20ucXRpLmRpYWdzZXJ2aWNlcwIBHTAaBBVjb20uYW5kcm9pZC5keW5zeXN0ZW"
                   + "0CAR0wHQQYY29tLmFuZHJvaWQuaW5wdXRkZXZpY2VzAgEdMB8EGmNvbS5hbmRyb2lkLmxvY2FsdHJhbnNw"
@@ -100,7 +100,7 @@ public class AuthorizationListTest {
 
   private static ASN1Encodable[] getEncodableAuthorizationList(String extensionData)
       throws IOException {
-    byte[] extensionDataBytes = Base64.decode(extensionData);
+    byte[] extensionDataBytes = Base64.getDecoder().decode(extensionData);
     return ASN1Sequence.getInstance(extensionDataBytes).toArray();
   }
 
@@ -207,7 +207,7 @@ public class AuthorizationListTest {
     ASN1Sequence seq = authorizationList.toAsn1Sequence();
     assertThat(authorizationList.unorderedTags).isEmpty();
     assertThat(seq.getEncoded("DER"))
-        .isEqualTo(Base64.decode(EXTENTION_DATA_WITH_INDIVIDUAL_ATTESTATION));
+        .isEqualTo(Base64.getDecoder().decode(EXTENTION_DATA_WITH_INDIVIDUAL_ATTESTATION));
   }
 
   @Test

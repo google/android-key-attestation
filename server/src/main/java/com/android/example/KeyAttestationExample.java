@@ -41,11 +41,11 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
-import org.bouncycastle.util.encoders.Base64;
 
 /**
  * This is an illustration of how you can use the Bouncy Castle ASN.1 parser to extract information
@@ -176,7 +176,7 @@ public class KeyAttestationExample {
     System.out.println(
         indent
             + "Verified Boot Key: "
-            + Base64.toBase64String(rootOfTrust.verifiedBootKey.toByteArray()));
+            + Base64.getEncoder().encodeToString(rootOfTrust.verifiedBootKey.toByteArray()));
     System.out.println(indent + "Device Locked: " + rootOfTrust.deviceLocked);
     System.out.println(indent + "Verified Boot State: " + rootOfTrust.verifiedBootState.name());
     rootOfTrust.verifiedBootHash.ifPresent(
@@ -184,7 +184,7 @@ public class KeyAttestationExample {
             System.out.println(
                 indent
                     + "Verified Boot Hash: "
-                    + Base64.toBase64String(verifiedBootHash.toByteArray())));
+                + Base64.getEncoder().encodeToString(verifiedBootHash.toByteArray())));
   }
 
   private static void print(AttestationApplicationId attestationApplicationId, String indent) {
@@ -194,14 +194,14 @@ public class KeyAttestationExample {
       }
       System.out.println(indent + "Signature Digests:");
     for (ByteString digest : attestationApplicationId.signatureDigests) {
-      System.out.println(indent + "\t" + Base64.toBase64String(digest.toByteArray()));
+      System.out.println(indent + "\t" + Base64.getEncoder().encodeToString(digest.toByteArray()));
     }
   }
 
   private static <T> void print(Optional<T> optional, String caption) {
     if (optional.isPresent()) {
       if (optional.get() instanceof byte[]) {
-        System.out.println(caption + ": " + Base64.toBase64String((byte[]) optional.get()));
+        System.out.println(caption + ": " + Base64.getEncoder().encodeToString((byte[]) optional.get()));
       } else {
         System.out.println(caption + ": " + optional.get());
       }
@@ -240,7 +240,7 @@ public class KeyAttestationExample {
     // backed key attestation, Android 7.0 (API level 24) or higher, and
     // Google Play services, the root certificate should be signed with the
     // Google attestation root key.
-    byte[] googleRootCaPubKey = Base64.decode(GOOGLE_ROOT_CA_PUB_KEY);
+    byte[] googleRootCaPubKey = Base64.getDecoder().decode(GOOGLE_ROOT_CA_PUB_KEY);
     if (Arrays.equals(
         googleRootCaPubKey,
         certs.get(certs.size() - 1).getPublicKey().getEncoded())) {
