@@ -27,7 +27,6 @@ import static com.google.android.attestation.AuthorizationList.UserAuthType.USER
 import static com.google.android.attestation.AuthorizationList.userAuthTypeToEnum;
 import static com.google.android.attestation.Constants.UINT32_MAX;
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth8.assertThat;
 import static org.junit.Assert.fail;
 
 import com.google.android.attestation.AuthorizationList.Algorithm;
@@ -231,7 +230,6 @@ public class AuthorizationListTest {
   public void testCreateWithUnorderedTagsAndParse() throws IOException {
     List<ASN1Encodable> encodableAuthList =
         Arrays.asList(getEncodableAuthorizationList(EXTENTION_DATA_WITH_INDIVIDUAL_ATTESTATION));
-    ASN1TaggedObject taggedEntry = ASN1TaggedObject.getInstance(encodableAuthList.get(0));
     Collections.swap(encodableAuthList, 3, 5);
     Collections.swap(encodableAuthList, 12, 13);
     AuthorizationList authorizationList =
