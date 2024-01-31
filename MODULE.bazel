@@ -2,6 +2,7 @@ bazel_dep(name = "rules_jvm_external", version = "6.0")
 maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
 maven.install(
     artifacts = [
+        "com.google.auto.value:auto-value:1.10.4",
         "com.google.code.gson:gson:2.10.1",
         "com.google.errorprone:error_prone_annotations:2.24.1",
         "com.google.guava:guava:33.0.0-jre",
@@ -9,7 +10,6 @@ maven.install(
         "com.squareup.okhttp3:okhttp:4.12.0",
         "org.bouncycastle:bcpkix-jdk18on:1.77",
         "org.bouncycastle:bcprov-jdk18on:1.77",
-        "org.jspecify:jspecify:0.3.0",
         "com.google.testparameterinjector:test-parameter-injector:1.15",
         "com.google.truth:truth:1.3.0",
         "com.google.truth.extensions:truth-java8-extension:1.3.0",

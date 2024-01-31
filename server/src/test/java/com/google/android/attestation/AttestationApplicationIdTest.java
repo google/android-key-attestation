@@ -46,25 +46,25 @@ public class AttestationApplicationIdTest {
 
   private static final ImmutableList<AttestationPackageInfo> EXPECTED_PACKAGE_INFOS =
       ImmutableList.of(
-          new AttestationPackageInfo("android", 29L),
-          new AttestationPackageInfo("com.android.keychain", 29L),
-          new AttestationPackageInfo("com.android.settings", 29L),
-          new AttestationPackageInfo("com.qti.diagservices", 29L),
-          new AttestationPackageInfo("com.android.dynsystem", 29L),
-          new AttestationPackageInfo("com.android.inputdevices", 29L),
-          new AttestationPackageInfo("com.android.localtransport", 29L),
-          new AttestationPackageInfo("com.android.location.fused", 29L),
-          new AttestationPackageInfo("com.android.server.telecom", 29L),
-          new AttestationPackageInfo("com.android.wallpaperbackup", 29L),
-          new AttestationPackageInfo("com.google.SSRestartDetector", 29L),
-          new AttestationPackageInfo("com.google.android.hiddenmenu", 1L),
-          new AttestationPackageInfo("com.android.providers.settings", 29L));
+          AttestationPackageInfo.create("android", 29L),
+          AttestationPackageInfo.create("com.android.keychain", 29L),
+          AttestationPackageInfo.create("com.android.settings", 29L),
+          AttestationPackageInfo.create("com.qti.diagservices", 29L),
+          AttestationPackageInfo.create("com.android.dynsystem", 29L),
+          AttestationPackageInfo.create("com.android.inputdevices", 29L),
+          AttestationPackageInfo.create("com.android.localtransport", 29L),
+          AttestationPackageInfo.create("com.android.location.fused", 29L),
+          AttestationPackageInfo.create("com.android.server.telecom", 29L),
+          AttestationPackageInfo.create("com.android.wallpaperbackup", 29L),
+          AttestationPackageInfo.create("com.google.SSRestartDetector", 29L),
+          AttestationPackageInfo.create("com.google.android.hiddenmenu", 1L),
+          AttestationPackageInfo.create("com.android.providers.settings", 29L));
   private static final ImmutableList<ByteString> EXPECTED_SIGNATURE_DIGESTS =
       ImmutableList.of(
                   ByteString.copyFrom(Base64.getDecoder().decode("MBqjywgRNFAcRfFCKrxmwkIk/V3tX9yPF+aXF2/YZqo=")));
 
   private static final AttestationApplicationId EXPECTED_ATTESTATION_APPLICATION_ID =
-      new AttestationApplicationId(EXPECTED_PACKAGE_INFOS, EXPECTED_SIGNATURE_DIGESTS);
+      AttestationApplicationId.create(EXPECTED_PACKAGE_INFOS, EXPECTED_SIGNATURE_DIGESTS);
 
   @Test
   public void testCreateAttestationApplicationId() {
@@ -90,7 +90,7 @@ public class AttestationApplicationIdTest {
     AttestationApplicationId attestationApplicationId =
         AttestationApplicationId.createAttestationApplicationId(ATTESTATION_APPLICATION_ID);
     AttestationApplicationId emptyAttestationApplicationId =
-        new AttestationApplicationId(ImmutableList.of(), ImmutableList.of());
+        AttestationApplicationId.create(ImmutableList.of(), ImmutableList.of());
 
     assertThat(attestationApplicationId.equals(EXPECTED_ATTESTATION_APPLICATION_ID)).isTrue();
     assertThat(EXPECTED_ATTESTATION_APPLICATION_ID.equals(attestationApplicationId)).isTrue();

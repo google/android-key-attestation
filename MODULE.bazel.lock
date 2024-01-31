@@ -1,6 +1,6 @@
 {
   "lockFileVersion": 3,
-  "moduleFileHash": "84213a19384ee2d1605bc19a918f99e0f727ad9df777f5bfc8da31080d9f8431",
+  "moduleFileHash": "2e25a9ada2230f99b28730fbe0960b6c7dac8d92da5b397edfd1c08004b0ecc8",
   "flags": {
     "cmdRegistries": [
       "https://bcr.bazel.build/"
@@ -43,6 +43,7 @@
               "tagName": "install",
               "attributeValues": {
                 "artifacts": [
+                  "com.google.auto.value:auto-value:1.10.4",
                   "com.google.code.gson:gson:2.10.1",
                   "com.google.errorprone:error_prone_annotations:2.24.1",
                   "com.google.guava:guava:33.0.0-jre",
@@ -50,7 +51,6 @@
                   "com.squareup.okhttp3:okhttp:4.12.0",
                   "org.bouncycastle:bcpkix-jdk18on:1.77",
                   "org.bouncycastle:bcprov-jdk18on:1.77",
-                  "org.jspecify:jspecify:0.3.0",
                   "com.google.testparameterinjector:test-parameter-injector:1.15",
                   "com.google.truth:truth:1.3.0",
                   "com.google.truth.extensions:truth-java8-extension:1.3.0",
@@ -2053,7 +2053,7 @@
       "general": {
         "bzlTransitiveDigest": "vOkppYc6wE/3x4HnEmuAd/USfcKbaNTBbUEl7bKmhsY=",
         "accumulatedFileDigests": {
-          "@@//:maven_install.json": "ebbe3708516974a594f9142921590b1eb0b34ca27f489d62d4020ebb35bb208c",
+          "@@//:maven_install.json": "360ed95c4a9f637fe547a2bcd33c9265c4b9d79d53b5c0c5f1bb531a356f6b36",
           "@@rules_jvm_external~6.0//:rules_jvm_external_deps_install.json": "cafb5d2d8119391eb2b322ce3840d3352ea82d496bdb8cbd4b6779ec4d044dda"
         },
         "envVariables": {},
@@ -2615,6 +2615,7 @@
                 "{ \"repo_url\": \"https://repo1.maven.org/maven2\" }"
               ],
               "artifacts": [
+                "{ \"group\": \"com.google.auto.value\", \"artifact\": \"auto-value\", \"version\": \"1.10.4\" }",
                 "{ \"group\": \"com.google.code.gson\", \"artifact\": \"gson\", \"version\": \"2.10.1\" }",
                 "{ \"group\": \"com.google.errorprone\", \"artifact\": \"error_prone_annotations\", \"version\": \"2.24.1\" }",
                 "{ \"group\": \"com.google.guava\", \"artifact\": \"guava\", \"version\": \"33.0.0-jre\" }",
@@ -2622,7 +2623,6 @@
                 "{ \"group\": \"com.squareup.okhttp3\", \"artifact\": \"okhttp\", \"version\": \"4.12.0\" }",
                 "{ \"group\": \"org.bouncycastle\", \"artifact\": \"bcpkix-jdk18on\", \"version\": \"1.77\" }",
                 "{ \"group\": \"org.bouncycastle\", \"artifact\": \"bcprov-jdk18on\", \"version\": \"1.77\" }",
-                "{ \"group\": \"org.jspecify\", \"artifact\": \"jspecify\", \"version\": \"0.3.0\" }",
                 "{ \"group\": \"com.google.testparameterinjector\", \"artifact\": \"test-parameter-injector\", \"version\": \"1.15\" }",
                 "{ \"group\": \"com.google.truth\", \"artifact\": \"truth\", \"version\": \"1.3.0\" }",
                 "{ \"group\": \"com.google.truth.extensions\", \"artifact\": \"truth-java8-extension\", \"version\": \"1.3.0\" }",
@@ -3172,18 +3172,6 @@
               "downloaded_file_path": "v1/org/conscrypt/conscrypt-openjdk-uber/2.5.2/conscrypt-openjdk-uber-2.5.2.jar"
             }
           },
-          "org_jspecify_jspecify_0_3_0": {
-            "bzlFile": "@@bazel_tools//tools/build_defs/repo:http.bzl",
-            "ruleClassName": "http_file",
-            "attributes": {
-              "name": "rules_jvm_external~6.0~maven~org_jspecify_jspecify_0_3_0",
-              "sha256": "e1c7e1832b6095fcfcbe57485700c7330d53d4e57e2c5bbf9c71819b02e978be",
-              "urls": [
-                "https://repo1.maven.org/maven2/org/jspecify/jspecify/0.3.0/jspecify-0.3.0.jar"
-              ],
-              "downloaded_file_path": "v1/org/jspecify/jspecify/0.3.0/jspecify-0.3.0.jar"
-            }
-          },
           "com_google_auto_value_auto_value_annotations_1_10_2": {
             "bzlFile": "@@bazel_tools//tools/build_defs/repo:http.bzl",
             "ruleClassName": "http_file",
@@ -3376,6 +3364,7 @@
                 "{ \"repo_url\": \"https://repo1.maven.org/maven2\" }"
               ],
               "artifacts": [
+                "{ \"group\": \"com.google.auto.value\", \"artifact\": \"auto-value\", \"version\": \"1.10.4\" }",
                 "{ \"group\": \"com.google.code.gson\", \"artifact\": \"gson\", \"version\": \"2.10.1\" }",
                 "{ \"group\": \"com.google.errorprone\", \"artifact\": \"error_prone_annotations\", \"version\": \"2.24.1\" }",
                 "{ \"group\": \"com.google.guava\", \"artifact\": \"guava\", \"version\": \"33.0.0-jre\" }",
@@ -3383,7 +3372,6 @@
                 "{ \"group\": \"com.squareup.okhttp3\", \"artifact\": \"okhttp\", \"version\": \"4.12.0\" }",
                 "{ \"group\": \"org.bouncycastle\", \"artifact\": \"bcpkix-jdk18on\", \"version\": \"1.77\" }",
                 "{ \"group\": \"org.bouncycastle\", \"artifact\": \"bcprov-jdk18on\", \"version\": \"1.77\" }",
-                "{ \"group\": \"org.jspecify\", \"artifact\": \"jspecify\", \"version\": \"0.3.0\" }",
                 "{ \"group\": \"com.google.testparameterinjector\", \"artifact\": \"test-parameter-injector\", \"version\": \"1.15\" }",
                 "{ \"group\": \"com.google.truth\", \"artifact\": \"truth\", \"version\": \"1.3.0\" }",
                 "{ \"group\": \"com.google.truth.extensions\", \"artifact\": \"truth-java8-extension\", \"version\": \"1.3.0\" }",
@@ -3645,6 +3633,18 @@
                 "https://repo1.maven.org/maven2/io/netty/netty-transport-classes-epoll/4.1.94.Final/netty-transport-classes-epoll-4.1.94.Final.jar"
               ],
               "downloaded_file_path": "v1/io/netty/netty-transport-classes-epoll/4.1.94.Final/netty-transport-classes-epoll-4.1.94.Final.jar"
+            }
+          },
+          "com_google_auto_value_auto_value_1_10_4": {
+            "bzlFile": "@@bazel_tools//tools/build_defs/repo:http.bzl",
+            "ruleClassName": "http_file",
+            "attributes": {
+              "name": "rules_jvm_external~6.0~maven~com_google_auto_value_auto_value_1_10_4",
+              "sha256": "f3c438d1f82904bbcb452084d488b660f3c7488e9274c3a58f049e121632d434",
+              "urls": [
+                "https://repo1.maven.org/maven2/com/google/auto/value/auto-value/1.10.4/auto-value-1.10.4.jar"
+              ],
+              "downloaded_file_path": "v1/com/google/auto/value/auto-value/1.10.4/auto-value-1.10.4.jar"
             }
           },
           "io_grpc_grpc_alts_1_56_1": {

@@ -109,14 +109,14 @@ public class AuthorizationListTest {
         AuthorizationList.createAuthorizationList(
             getEncodableAuthorizationList(SW_ENFORCED_EXTENSION_DATA), ATTESTATION_VERSION);
 
-    assertThat(authorizationList.unorderedTags).isEmpty();
-    assertThat(authorizationList.creationDateTime).hasValue(EXPECTED_SW_CREATION_DATETIME);
-    assertThat(authorizationList.rootOfTrust).isEmpty();
-    assertThat(authorizationList.attestationApplicationId).isPresent();
-    assertThat(authorizationList.attestationApplicationIdBytes)
+    assertThat(authorizationList.unorderedTags()).isEmpty();
+    assertThat(authorizationList.creationDateTime()).hasValue(EXPECTED_SW_CREATION_DATETIME);
+    assertThat(authorizationList.rootOfTrust()).isEmpty();
+    assertThat(authorizationList.attestationApplicationId()).isPresent();
+    assertThat(authorizationList.attestationApplicationIdBytes())
         .hasValue(EXPECTED_SW_ATTESTATION_APPLICATION_ID_BYTES);
-    assertThat(authorizationList.individualAttestation).isFalse();
-    assertThat(authorizationList.identityCredentialKey).isFalse();
+    assertThat(authorizationList.individualAttestation()).isFalse();
+    assertThat(authorizationList.identityCredentialKey()).isFalse();
   }
 
   @Test
@@ -125,22 +125,22 @@ public class AuthorizationListTest {
         AuthorizationList.createAuthorizationList(
             getEncodableAuthorizationList(TEE_ENFORCED_EXTENSION_DATA), ATTESTATION_VERSION);
 
-    assertThat(authorizationList.unorderedTags).isEmpty();
-    assertThat(authorizationList.purpose).isEqualTo(EXPECTED_TEE_PURPOSE);
-    assertThat(authorizationList.algorithm).hasValue(EXPECTED_TEE_ALGORITHM);
-    assertThat(authorizationList.keySize).hasValue(EXPECTED_TEE_KEY_SIZE);
-    assertThat(authorizationList.digest).isEqualTo(EXPECTED_TEE_DIGEST);
-    assertThat(authorizationList.padding).isEqualTo(EXPECTED_TEE_PADDING);
-    assertThat(authorizationList.rsaPublicExponent).hasValue(EXPECTED_TEE_RSA_PUBLIC_COMPONENT);
-    assertThat(authorizationList.noAuthRequired).isTrue();
-    assertThat(authorizationList.origin).hasValue(EXPECTED_TEE_ORIGIN);
-    assertThat(authorizationList.rootOfTrust).isPresent();
-    assertThat(authorizationList.osVersion).hasValue(EXPECTED_TEE_OS_VERSION);
-    assertThat(authorizationList.osPatchLevel).hasValue(EXPECTED_TEE_OS_PATCH_LEVEL);
-    assertThat(authorizationList.vendorPatchLevel).hasValue(EXPECTED_TEE_VENDOR_PATCH_LEVEL);
-    assertThat(authorizationList.bootPatchLevel).hasValue(EXPECTED_TEE_BOOT_PATCH_LEVEL);
-    assertThat(authorizationList.individualAttestation).isFalse();
-    assertThat(authorizationList.identityCredentialKey).isFalse();
+    assertThat(authorizationList.unorderedTags()).isEmpty();
+    assertThat(authorizationList.purpose()).isEqualTo(EXPECTED_TEE_PURPOSE);
+    assertThat(authorizationList.algorithm()).hasValue(EXPECTED_TEE_ALGORITHM);
+    assertThat(authorizationList.keySize()).hasValue(EXPECTED_TEE_KEY_SIZE);
+    assertThat(authorizationList.digest()).isEqualTo(EXPECTED_TEE_DIGEST);
+    assertThat(authorizationList.padding()).isEqualTo(EXPECTED_TEE_PADDING);
+    assertThat(authorizationList.rsaPublicExponent()).hasValue(EXPECTED_TEE_RSA_PUBLIC_COMPONENT);
+    assertThat(authorizationList.noAuthRequired()).isTrue();
+    assertThat(authorizationList.origin()).hasValue(EXPECTED_TEE_ORIGIN);
+    assertThat(authorizationList.rootOfTrust()).isPresent();
+    assertThat(authorizationList.osVersion()).hasValue(EXPECTED_TEE_OS_VERSION);
+    assertThat(authorizationList.osPatchLevel()).hasValue(EXPECTED_TEE_OS_PATCH_LEVEL);
+    assertThat(authorizationList.vendorPatchLevel()).hasValue(EXPECTED_TEE_VENDOR_PATCH_LEVEL);
+    assertThat(authorizationList.bootPatchLevel()).hasValue(EXPECTED_TEE_BOOT_PATCH_LEVEL);
+    assertThat(authorizationList.individualAttestation()).isFalse();
+    assertThat(authorizationList.identityCredentialKey()).isFalse();
   }
 
   @Test
@@ -174,8 +174,8 @@ public class AuthorizationListTest {
             getEncodableAuthorizationList(EXTENTION_DATA_WITH_INDIVIDUAL_ATTESTATION),
             ATTESTATION_VERSION);
 
-    assertThat(authorizationList.unorderedTags).isEmpty();
-    assertThat(authorizationList.individualAttestation).isTrue();
+    assertThat(authorizationList.unorderedTags()).isEmpty();
+    assertThat(authorizationList.individualAttestation()).isTrue();
   }
 
   private static final String EXTENTION_DATA_WITH_ID_CREDENTIAL_KEY =
@@ -193,8 +193,8 @@ public class AuthorizationListTest {
             getEncodableAuthorizationList(EXTENTION_DATA_WITH_ID_CREDENTIAL_KEY),
             ATTESTATION_VERSION);
 
-    assertThat(authorizationList.unorderedTags).isEmpty();
-    assertThat(authorizationList.identityCredentialKey).isTrue();
+    assertThat(authorizationList.unorderedTags()).isEmpty();
+    assertThat(authorizationList.identityCredentialKey()).isTrue();
   }
 
   @Test
@@ -204,7 +204,7 @@ public class AuthorizationListTest {
             getEncodableAuthorizationList(EXTENTION_DATA_WITH_INDIVIDUAL_ATTESTATION),
             ATTESTATION_VERSION);
     ASN1Sequence seq = authorizationList.toAsn1Sequence();
-    assertThat(authorizationList.unorderedTags).isEmpty();
+    assertThat(authorizationList.unorderedTags()).isEmpty();
     assertThat(seq.getEncoded("DER"))
         .isEqualTo(Base64.getDecoder().decode(EXTENTION_DATA_WITH_INDIVIDUAL_ATTESTATION));
   }
@@ -223,7 +223,7 @@ public class AuthorizationListTest {
     AuthorizationList authorizationList =
         AuthorizationList.createAuthorizationList(encodableAuthList, ATTESTATION_VERSION);
     // Make sure there is unordered tag present.
-    assertThat(authorizationList.unorderedTags).containsExactly(taggedEntry.getTagNo());
+    assertThat(authorizationList.unorderedTags()).containsExactly(taggedEntry.getTagNo());
   }
 
   @Test
@@ -235,7 +235,7 @@ public class AuthorizationListTest {
     AuthorizationList authorizationList =
         AuthorizationList.createAuthorizationList(
             encodableAuthList.stream().toArray(ASN1Encodable[]::new), ATTESTATION_VERSION);
-    assertThat(authorizationList.unorderedTags).containsExactly(6, 200, 712);
+    assertThat(authorizationList.unorderedTags()).containsExactly(6, 200, 712);
   }
 
   @Test

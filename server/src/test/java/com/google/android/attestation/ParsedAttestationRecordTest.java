@@ -122,16 +122,16 @@ public class ParsedAttestationRecordTest {
     ParsedAttestationRecord attestationRecord =
         ParsedAttestationRecord.createParsedAttestationRecord(Arrays.asList(x509Certificate2, x509Certificate));
 
-    assertThat(attestationRecord.attestationVersion).isEqualTo(EXPECTED_ATTESTATION_VERSION);
-    assertThat(attestationRecord.attestationSecurityLevel)
+    assertThat(attestationRecord.attestationVersion()).isEqualTo(EXPECTED_ATTESTATION_VERSION);
+    assertThat(attestationRecord.attestationSecurityLevel())
         .isEqualTo(EXPECTED_ATTESTATION_SECURITY_LEVEL);
-    assertThat(attestationRecord.keymasterVersion).isEqualTo(EXPECTED_KEYMASTER_VERSION);
-    assertThat(attestationRecord.keymasterSecurityLevel)
+    assertThat(attestationRecord.keymasterVersion()).isEqualTo(EXPECTED_KEYMASTER_VERSION);
+    assertThat(attestationRecord.keymasterSecurityLevel())
         .isEqualTo(EXPECTED_KEYMASTER_SECURITY_LEVEL);
-    assertThat(attestationRecord.attestationChallenge).isEqualTo(EXPECTED_ATTESTATION_CHALLENGE);
-    assertThat(attestationRecord.uniqueId).isEqualTo(EXPECTED_UNIQUE_ID);
-    assertThat(attestationRecord.softwareEnforced).isNotNull();
-    assertThat(attestationRecord.teeEnforced).isNotNull();
+    assertThat(attestationRecord.attestationChallenge()).isEqualTo(EXPECTED_ATTESTATION_CHALLENGE);
+    assertThat(attestationRecord.uniqueId()).isEqualTo(EXPECTED_UNIQUE_ID);
+    assertThat(attestationRecord.softwareEnforced()).isNotNull();
+    assertThat(attestationRecord.teeEnforced()).isNotNull();
   }
 
   @Test
@@ -140,8 +140,8 @@ public class ParsedAttestationRecordTest {
     generator.initialize(384);
     PublicKey attestedKey = generator.generateKeyPair().getPublic();
     AuthorizationList.Builder teeEnforcedBuilder = AuthorizationList.builder();
-    teeEnforcedBuilder.userAuthType = ImmutableSet.of(UserAuthType.FINGERPRINT);
-    teeEnforcedBuilder.attestationIdBrand = ByteString.copyFromUtf8("free food");
+    teeEnforcedBuilder.setUserAuthType(ImmutableSet.of(UserAuthType.FINGERPRINT));
+    teeEnforcedBuilder.setAttestationIdBrand(ByteString.copyFromUtf8("free food"));
     ParsedAttestationRecord expected =
         ParsedAttestationRecord.create(
             /* attestationVersion= */ 2,
@@ -155,15 +155,16 @@ public class ParsedAttestationRecordTest {
             attestedKey);
     ASN1Sequence seq = expected.toAsn1Sequence();
     ParsedAttestationRecord actual = ParsedAttestationRecord.create(seq, attestedKey);
-    assertThat(actual.attestationVersion).isEqualTo(expected.attestationVersion);
-    assertThat(actual.attestationSecurityLevel).isEqualTo(expected.attestationSecurityLevel);
-    assertThat(actual.keymasterVersion).isEqualTo(expected.keymasterVersion);
-    assertThat(actual.keymasterSecurityLevel).isEqualTo(expected.keymasterSecurityLevel);
-    assertThat(actual.attestationChallenge).isEqualTo(expected.attestationChallenge);
-    assertThat(actual.uniqueId).isEqualTo(expected.uniqueId);
-    assertThat(actual.teeEnforced.userAuthType).isEqualTo(expected.teeEnforced.userAuthType);
-    assertThat(actual.teeEnforced.attestationIdBrand)
-        .isEqualTo(expected.teeEnforced.attestationIdBrand);
-    assertThat(actual.attestedKey).isEqualTo(expected.attestedKey);
+    assertThat(actual.attestationVersion()).isEqualTo(expected.attestationVersion());
+    assertThat(actual.attestationSecurityLevel()).isEqualTo(expected.attestationSecurityLevel());
+    assertThat(actual.keymasterVersion()).isEqualTo(expected.keymasterVersion());
+    assertThat(actual.keymasterSecurityLevel()).isEqualTo(expected.keymasterSecurityLevel());
+    assertThat(actual.attestationChallenge()).isEqualTo(expected.attestationChallenge());
+    assertThat(actual.uniqueId()).isEqualTo(expected.uniqueId());
+    assertThat(actual.teeEnforced().userAuthType())
+        .isEqualTo(expected.teeEnforced().userAuthType());
+    assertThat(actual.teeEnforced().attestationIdBrand())
+        .isEqualTo(expected.teeEnforced().attestationIdBrand());
+    assertThat(actual.attestedKey()).isEqualTo(expected.attestedKey());
   }
 }
