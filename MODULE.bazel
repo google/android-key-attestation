@@ -11,7 +11,7 @@ maven.install(
         "org.bouncycastle:bcpkix-jdk18on:1.77",
         "org.bouncycastle:bcprov-jdk18on:1.77",
         "com.google.testparameterinjector:test-parameter-injector:1.15",
-        "com.google.truth:truth:1.3.0",
+        "com.google.truth:truth:1.4.0",
         "com.google.truth.extensions:truth-java8-extension:1.3.0",
         "junit:junit:4.13.2",
     ],

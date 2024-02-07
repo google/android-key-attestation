@@ -25,6 +25,7 @@ import static com.google.android.attestation.Constants.ROOT_OF_TRUST_VERIFIED_BO
 import static com.google.android.attestation.Constants.ROOT_OF_TRUST_VERIFIED_BOOT_STATE_INDEX;
 
 import com.google.auto.value.AutoValue;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.Immutable;
 import com.google.protobuf.ByteString;
 import java.util.Optional;
@@ -49,35 +50,54 @@ public abstract class RootOfTrust {
 
   public abstract Optional<ByteString> verifiedBootHash();
 
-  static RootOfTrust createRootOfTrust(ASN1Sequence rootOfTrust, int attestationVersion) {
-    ByteString verifiedBootKey =
-        ByteString.copyFrom(
-            ((ASN1OctetString) rootOfTrust.getObjectAt(ROOT_OF_TRUST_VERIFIED_BOOT_KEY_INDEX))
-                .getOctets());
-    boolean deviceLocked =
-        ASN1Parsing.getBooleanFromAsn1(rootOfTrust.getObjectAt(ROOT_OF_TRUST_DEVICE_LOCKED_INDEX));
-    VerifiedBootState verifiedBootState =
-        verifiedBootStateToEnum(
-            ASN1Parsing.getIntegerFromAsn1(
-                rootOfTrust.getObjectAt(ROOT_OF_TRUST_VERIFIED_BOOT_STATE_INDEX)));
-    Optional<ByteString> verifiedBootHash =
-        attestationVersion >= 3
-            ? Optional.of(
-                ByteString.copyFrom(
-                    ASN1OctetString.getInstance(
-                            rootOfTrust.getObjectAt(ROOT_OF_TRUST_VERIFIED_BOOT_HASH_INDEX))
-                        .getOctets()))
-            : Optional.empty();
-    return RootOfTrust.create(verifiedBootKey, deviceLocked, verifiedBootState, verifiedBootHash);
+  public static Builder builder() {
+    return new AutoValue_RootOfTrust.Builder();
   }
 
-  public static RootOfTrust create(
-      ByteString verifiedBootKey,
-      boolean deviceLocked,
-      VerifiedBootState verifiedBootState,
-      Optional<ByteString> verifiedBootHash) {
-    return new AutoValue_RootOfTrust(
-        verifiedBootKey, deviceLocked, verifiedBootState, verifiedBootHash);
+  /** Builder for {@link RootOfTrust}. */
+  @AutoValue.Builder
+  public abstract static class Builder {
+    public abstract Builder setVerifiedBootKey(ByteString value);
+
+    @CanIgnoreReturnValue
+    public final Builder setVerifiedBootKey(byte[] value) {
+      this.setVerifiedBootKey(ByteString.copyFrom(value));
+      return this;
+    }
+
+    public abstract Builder setDeviceLocked(boolean value);
+
+    public abstract Builder setVerifiedBootState(VerifiedBootState value);
+
+    public abstract Builder setVerifiedBootHash(ByteString value);
+
+    @CanIgnoreReturnValue
+    public final Builder setVerifiedBootHash(byte[] value) {
+      setVerifiedBootHash(ByteString.copyFrom(value));
+      return this;
+    }
+
+    public abstract RootOfTrust build();
+  }
+
+  static RootOfTrust createRootOfTrust(ASN1Sequence rootOfTrust, int attestationVersion) {
+    Builder builder = RootOfTrust.builder();
+    builder.setVerifiedBootKey(
+        ASN1OctetString.getInstance(rootOfTrust.getObjectAt(ROOT_OF_TRUST_VERIFIED_BOOT_KEY_INDEX))
+            .getOctets());
+    builder.setDeviceLocked(
+        ASN1Parsing.getBooleanFromAsn1(rootOfTrust.getObjectAt(ROOT_OF_TRUST_DEVICE_LOCKED_INDEX)));
+    builder.setVerifiedBootState(
+        verifiedBootStateToEnum(
+            ASN1Parsing.getIntegerFromAsn1(
+                rootOfTrust.getObjectAt(ROOT_OF_TRUST_VERIFIED_BOOT_STATE_INDEX))));
+    if (attestationVersion >= 3) {
+      builder.setVerifiedBootHash(
+          ASN1OctetString.getInstance(
+                  rootOfTrust.getObjectAt(ROOT_OF_TRUST_VERIFIED_BOOT_HASH_INDEX))
+              .getOctets());
+    }
+    return builder.build();
   }
 
   private static VerifiedBootState verifiedBootStateToEnum(int securityLevel) {

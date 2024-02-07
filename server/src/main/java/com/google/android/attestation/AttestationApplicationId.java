@@ -19,12 +19,12 @@ import static com.google.android.attestation.Constants.ATTESTATION_APPLICATION_I
 import static com.google.android.attestation.Constants.ATTESTATION_APPLICATION_ID_SIGNATURE_DIGESTS_INDEX;
 import static com.google.android.attestation.Constants.ATTESTATION_PACKAGE_INFO_PACKAGE_NAME_INDEX;
 import static com.google.android.attestation.Constants.ATTESTATION_PACKAGE_INFO_VERSION_INDEX;
-import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.Streams.stream;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.Immutable;
 import com.google.protobuf.ByteString;
 import java.util.List;
@@ -51,36 +51,65 @@ public abstract class AttestationApplicationId {
 
   public abstract ImmutableList<ByteString> signatureDigests();
 
-  public static AttestationApplicationId create(
-      List<AttestationPackageInfo> packageInfos, List<ByteString> signatureDigests) {
-    return new AutoValue_AttestationApplicationId(
-        ImmutableList.copyOf(packageInfos), ImmutableList.copyOf(signatureDigests));
+  public static Builder builder() {
+    return new AutoValue_AttestationApplicationId.Builder();
+  }
+
+  /** Builder for {@link AttestationApplicationId}. */
+  @AutoValue.Builder
+  public abstract static class Builder {
+    public abstract Builder setPackageInfos(List<AttestationPackageInfo> value);
+
+    abstract ImmutableList.Builder<AttestationPackageInfo> packageInfosBuilder();
+
+    @CanIgnoreReturnValue
+    public final Builder addPackageInfo(AttestationPackageInfo value) {
+      packageInfosBuilder().add(value);
+      return this;
+    }
+
+    public abstract Builder setSignatureDigests(List<ByteString> value);
+
+    abstract ImmutableList.Builder<ByteString> signatureDigestsBuilder();
+
+    @CanIgnoreReturnValue
+    public final Builder addSignatureDigest(ByteString value) {
+      signatureDigestsBuilder().add(value);
+      return this;
+    }
+
+    @CanIgnoreReturnValue
+    public final Builder addSignatureDigest(byte[] value) {
+      addSignatureDigest(ByteString.copyFrom(value));
+      return this;
+    }
+
+    public abstract AttestationApplicationId build();
   }
 
   static AttestationApplicationId createAttestationApplicationId(byte[] attestationApplicationId) {
+    AttestationApplicationId.Builder builder = AttestationApplicationId.builder();
     ASN1Sequence attestationApplicationIdSequence =
         ASN1Sequence.getInstance(attestationApplicationId);
     ASN1Set attestationPackageInfos =
         (ASN1Set)
             attestationApplicationIdSequence.getObjectAt(
                 ATTESTATION_APPLICATION_ID_PACKAGE_INFOS_INDEX);
-    ImmutableList<AttestationPackageInfo> packageInfos =
-        stream(attestationPackageInfos.iterator())
-            .map(ASN1Sequence.class::cast)
-            .map(AttestationPackageInfo::create)
-            .collect(toImmutableList());
+    stream(attestationPackageInfos.iterator())
+        .map(ASN1Sequence.class::cast)
+        .map(AttestationPackageInfo::create)
+        .forEach(builder::addPackageInfo);
 
     ASN1Set digests =
         (ASN1Set)
             attestationApplicationIdSequence.getObjectAt(
                 ATTESTATION_APPLICATION_ID_SIGNATURE_DIGESTS_INDEX);
-    ImmutableList<ByteString> signatureDigests =
-        stream(digests.iterator())
-            .map(ASN1OctetString.class::cast)
-            .map(ASN1OctetString::getOctets)
-            .map(ByteString::copyFrom)
-            .collect(toImmutableList());
-    return AttestationApplicationId.create(packageInfos, signatureDigests);
+    stream(digests.iterator())
+        .map(ASN1OctetString.class::cast)
+        .map(ASN1OctetString::getOctets)
+        .map(ByteString::copyFrom)
+        .forEach(builder::addSignatureDigest);
+    return builder.build();
   }
 
   ASN1Sequence toAsn1Sequence() {
@@ -108,6 +137,20 @@ public abstract class AttestationApplicationId {
 
     public abstract long version();
 
+    public static Builder builder() {
+      return new AutoValue_AttestationApplicationId_AttestationPackageInfo.Builder();
+    }
+
+    /** Builder for {@link AttestationPackageInfo}. */
+    @AutoValue.Builder
+    public abstract static class Builder {
+      public abstract Builder setPackageName(String packageName);
+
+      public abstract Builder setVersion(long version);
+
+      public abstract AttestationPackageInfo build();
+    }
+
     private static AttestationPackageInfo create(ASN1Sequence packageInfo) {
       String packageName =
           new String(
@@ -119,11 +162,10 @@ public abstract class AttestationApplicationId {
           ((ASN1Integer) packageInfo.getObjectAt(ATTESTATION_PACKAGE_INFO_VERSION_INDEX))
               .getValue()
               .longValue();
-      return AttestationPackageInfo.create(packageName, version);
-    }
-
-    public static AttestationPackageInfo create(String packageName, long version) {
-      return new AutoValue_AttestationApplicationId_AttestationPackageInfo(packageName, version);
+      return AttestationPackageInfo.builder()
+          .setPackageName(packageName)
+          .setVersion(version)
+          .build();
     }
 
     ASN1Sequence toAsn1Sequence() {

@@ -20,13 +20,10 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertThrows;
 
 import com.google.android.attestation.AttestationApplicationId.AttestationPackageInfo;
-import com.google.common.collect.ImmutableList;
-import com.google.protobuf.ByteString;
 import java.util.Base64;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-
 
 /** Test for {@link AttestationApplicationId}. */
 @RunWith(JUnit4.class)
@@ -44,27 +41,73 @@ public class AttestationApplicationIdTest {
               + "RkZW5tZW51AgEBMCMEHmNvbS5hbmRyb2lkLnByb3ZpZGVycy5zZXR0aW5ncwIBHTEiBCAwGqPLCBE0"
               + "UBxF8UIqvGbCQiT9Xe1f3I8X5pcXb9hmqg==");
 
-  private static final ImmutableList<AttestationPackageInfo> EXPECTED_PACKAGE_INFOS =
-      ImmutableList.of(
-          AttestationPackageInfo.create("android", 29L),
-          AttestationPackageInfo.create("com.android.keychain", 29L),
-          AttestationPackageInfo.create("com.android.settings", 29L),
-          AttestationPackageInfo.create("com.qti.diagservices", 29L),
-          AttestationPackageInfo.create("com.android.dynsystem", 29L),
-          AttestationPackageInfo.create("com.android.inputdevices", 29L),
-          AttestationPackageInfo.create("com.android.localtransport", 29L),
-          AttestationPackageInfo.create("com.android.location.fused", 29L),
-          AttestationPackageInfo.create("com.android.server.telecom", 29L),
-          AttestationPackageInfo.create("com.android.wallpaperbackup", 29L),
-          AttestationPackageInfo.create("com.google.SSRestartDetector", 29L),
-          AttestationPackageInfo.create("com.google.android.hiddenmenu", 1L),
-          AttestationPackageInfo.create("com.android.providers.settings", 29L));
-  private static final ImmutableList<ByteString> EXPECTED_SIGNATURE_DIGESTS =
-      ImmutableList.of(
-                  ByteString.copyFrom(Base64.getDecoder().decode("MBqjywgRNFAcRfFCKrxmwkIk/V3tX9yPF+aXF2/YZqo=")));
-
   private static final AttestationApplicationId EXPECTED_ATTESTATION_APPLICATION_ID =
-      AttestationApplicationId.create(EXPECTED_PACKAGE_INFOS, EXPECTED_SIGNATURE_DIGESTS);
+      AttestationApplicationId.builder()
+          .addPackageInfo(
+              AttestationPackageInfo.builder().setPackageName("android").setVersion(29L).build())
+          .addPackageInfo(
+              AttestationPackageInfo.builder()
+                  .setPackageName("com.android.keychain")
+                  .setVersion(29L)
+                  .build())
+          .addPackageInfo(
+              AttestationPackageInfo.builder()
+                  .setPackageName("com.android.settings")
+                  .setVersion(29L)
+                  .build())
+          .addPackageInfo(
+              AttestationPackageInfo.builder()
+                  .setPackageName("com.qti.diagservices")
+                  .setVersion(29L)
+                  .build())
+          .addPackageInfo(
+              AttestationPackageInfo.builder()
+                  .setPackageName("com.android.dynsystem")
+                  .setVersion(29L)
+                  .build())
+          .addPackageInfo(
+              AttestationPackageInfo.builder()
+                  .setPackageName("com.android.inputdevices")
+                  .setVersion(29L)
+                  .build())
+          .addPackageInfo(
+              AttestationPackageInfo.builder()
+                  .setPackageName("com.android.localtransport")
+                  .setVersion(29L)
+                  .build())
+          .addPackageInfo(
+              AttestationPackageInfo.builder()
+                  .setPackageName("com.android.location.fused")
+                  .setVersion(29L)
+                  .build())
+          .addPackageInfo(
+              AttestationPackageInfo.builder()
+                  .setPackageName("com.android.server.telecom")
+                  .setVersion(29L)
+                  .build())
+          .addPackageInfo(
+              AttestationPackageInfo.builder()
+                  .setPackageName("com.android.wallpaperbackup")
+                  .setVersion(29L)
+                  .build())
+          .addPackageInfo(
+              AttestationPackageInfo.builder()
+                  .setPackageName("com.google.SSRestartDetector")
+                  .setVersion(29L)
+                  .build())
+          .addPackageInfo(
+              AttestationPackageInfo.builder()
+                  .setPackageName("com.google.android.hiddenmenu")
+                  .setVersion(1L)
+                  .build())
+          .addPackageInfo(
+              AttestationPackageInfo.builder()
+                  .setPackageName("com.android.providers.settings")
+                  .setVersion(29L)
+                  .build())
+          .addSignatureDigest(
+              Base64.getDecoder().decode("MBqjywgRNFAcRfFCKrxmwkIk/V3tX9yPF+aXF2/YZqo="))
+          .build();
 
   @Test
   public void testCreateAttestationApplicationId() {
@@ -83,29 +126,5 @@ public class AttestationApplicationIdTest {
         () ->
             AttestationApplicationId.createAttestationApplicationId(
                 "Invalid DEROctet String".getBytes(UTF_8)));
-  }
-
-  @Test
-  public void testEquals() {
-    AttestationApplicationId attestationApplicationId =
-        AttestationApplicationId.createAttestationApplicationId(ATTESTATION_APPLICATION_ID);
-    AttestationApplicationId emptyAttestationApplicationId =
-        AttestationApplicationId.create(ImmutableList.of(), ImmutableList.of());
-
-    assertThat(attestationApplicationId.equals(EXPECTED_ATTESTATION_APPLICATION_ID)).isTrue();
-    assertThat(EXPECTED_ATTESTATION_APPLICATION_ID.equals(attestationApplicationId)).isTrue();
-
-    assertThat(attestationApplicationId.equals(emptyAttestationApplicationId)).isFalse();
-    assertThat(emptyAttestationApplicationId.equals(attestationApplicationId)).isFalse();
-  }
-
-  @Test
-  public void testEqualObjectsHaveEqualHashCodes() {
-    AttestationApplicationId attestationApplicationId =
-        AttestationApplicationId.createAttestationApplicationId(ATTESTATION_APPLICATION_ID);
-
-    assertThat(attestationApplicationId.equals(EXPECTED_ATTESTATION_APPLICATION_ID)).isTrue();
-    assertThat(attestationApplicationId.hashCode())
-        .isEqualTo(EXPECTED_ATTESTATION_APPLICATION_ID.hashCode());
   }
 }
