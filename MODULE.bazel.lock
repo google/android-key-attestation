@@ -1,6 +1,6 @@
 {
   "lockFileVersion": 3,
-  "moduleFileHash": "2e25a9ada2230f99b28730fbe0960b6c7dac8d92da5b397edfd1c08004b0ecc8",
+  "moduleFileHash": "8313b0118d15634c08b3a27cb5b22ddb6854efb764631c0cd9665e8fcbbab3b8",
   "flags": {
     "cmdRegistries": [
       "https://bcr.bazel.build/"
@@ -52,7 +52,7 @@
                   "org.bouncycastle:bcpkix-jdk18on:1.77",
                   "org.bouncycastle:bcprov-jdk18on:1.77",
                   "com.google.testparameterinjector:test-parameter-injector:1.15",
-                  "com.google.truth:truth:1.3.0",
+                  "com.google.truth:truth:1.4.0",
                   "com.google.truth.extensions:truth-java8-extension:1.3.0",
                   "junit:junit:4.13.2"
                 ],
@@ -2053,7 +2053,7 @@
       "general": {
         "bzlTransitiveDigest": "vOkppYc6wE/3x4HnEmuAd/USfcKbaNTBbUEl7bKmhsY=",
         "accumulatedFileDigests": {
-          "@@//:maven_install.json": "360ed95c4a9f637fe547a2bcd33c9265c4b9d79d53b5c0c5f1bb531a356f6b36",
+          "@@//:maven_install.json": "bba577a5eeafbd67959c00989f317e8abe6c20efe1d1da4156ff25528a911549",
           "@@rules_jvm_external~6.0//:rules_jvm_external_deps_install.json": "cafb5d2d8119391eb2b322ce3840d3352ea82d496bdb8cbd4b6779ec4d044dda"
         },
         "envVariables": {},
@@ -2224,6 +2224,18 @@
                 "https://repo1.maven.org/maven2/org/apache/maven/maven-artifact/3.9.4/maven-artifact-3.9.4.jar"
               ],
               "downloaded_file_path": "v1/org/apache/maven/maven-artifact/3.9.4/maven-artifact-3.9.4.jar"
+            }
+          },
+          "com_google_truth_truth_1_4_0": {
+            "bzlFile": "@@bazel_tools//tools/build_defs/repo:http.bzl",
+            "ruleClassName": "http_file",
+            "attributes": {
+              "name": "rules_jvm_external~6.0~maven~com_google_truth_truth_1_4_0",
+              "sha256": "235c28e96ee6701ab01cc852fb294cb0f34756f636a8154b9aef08fb1215bbc4",
+              "urls": [
+                "https://repo1.maven.org/maven2/com/google/truth/truth/1.4.0/truth-1.4.0.jar"
+              ],
+              "downloaded_file_path": "v1/com/google/truth/truth/1.4.0/truth-1.4.0.jar"
             }
           },
           "software_amazon_awssdk_metrics_spi_2_20_128": {
@@ -2624,7 +2636,7 @@
                 "{ \"group\": \"org.bouncycastle\", \"artifact\": \"bcpkix-jdk18on\", \"version\": \"1.77\" }",
                 "{ \"group\": \"org.bouncycastle\", \"artifact\": \"bcprov-jdk18on\", \"version\": \"1.77\" }",
                 "{ \"group\": \"com.google.testparameterinjector\", \"artifact\": \"test-parameter-injector\", \"version\": \"1.15\" }",
-                "{ \"group\": \"com.google.truth\", \"artifact\": \"truth\", \"version\": \"1.3.0\" }",
+                "{ \"group\": \"com.google.truth\", \"artifact\": \"truth\", \"version\": \"1.4.0\" }",
                 "{ \"group\": \"com.google.truth.extensions\", \"artifact\": \"truth-java8-extension\", \"version\": \"1.3.0\" }",
                 "{ \"group\": \"junit\", \"artifact\": \"junit\", \"version\": \"4.13.2\" }",
                 "{ \"group\": \"com.google.code.findbugs\", \"artifact\": \"jsr305\", \"version\": \"3.0.2\" }",
@@ -2762,18 +2774,6 @@
                 "https://repo1.maven.org/maven2/com/google/protobuf/protobuf-java-util/3.23.2/protobuf-java-util-3.23.2.jar"
               ],
               "downloaded_file_path": "v1/com/google/protobuf/protobuf-java-util/3.23.2/protobuf-java-util-3.23.2.jar"
-            }
-          },
-          "com_google_truth_truth_1_3_0": {
-            "bzlFile": "@@bazel_tools//tools/build_defs/repo:http.bzl",
-            "ruleClassName": "http_file",
-            "attributes": {
-              "name": "rules_jvm_external~6.0~maven~com_google_truth_truth_1_3_0",
-              "sha256": "5e74b4879d1f824978703d7afb99327a37ed75b4fd33198ac00dfe8104afbec9",
-              "urls": [
-                "https://repo1.maven.org/maven2/com/google/truth/truth/1.3.0/truth-1.3.0.jar"
-              ],
-              "downloaded_file_path": "v1/com/google/truth/truth/1.3.0/truth-1.3.0.jar"
             }
           },
           "net_bytebuddy_byte_buddy_1_12_7": {
@@ -3373,7 +3373,7 @@
                 "{ \"group\": \"org.bouncycastle\", \"artifact\": \"bcpkix-jdk18on\", \"version\": \"1.77\" }",
                 "{ \"group\": \"org.bouncycastle\", \"artifact\": \"bcprov-jdk18on\", \"version\": \"1.77\" }",
                 "{ \"group\": \"com.google.testparameterinjector\", \"artifact\": \"test-parameter-injector\", \"version\": \"1.15\" }",
-                "{ \"group\": \"com.google.truth\", \"artifact\": \"truth\", \"version\": \"1.3.0\" }",
+                "{ \"group\": \"com.google.truth\", \"artifact\": \"truth\", \"version\": \"1.4.0\" }",
                 "{ \"group\": \"com.google.truth.extensions\", \"artifact\": \"truth-java8-extension\", \"version\": \"1.3.0\" }",
                 "{ \"group\": \"junit\", \"artifact\": \"junit\", \"version\": \"4.13.2\" }",
                 "{ \"group\": \"com.google.code.findbugs\", \"artifact\": \"jsr305\", \"version\": \"3.0.2\" }",
