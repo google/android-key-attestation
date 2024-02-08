@@ -60,6 +60,7 @@ import static com.google.android.attestation.Constants.KM_TAG_USAGE_EXPIRE_DATE_
 import static com.google.android.attestation.Constants.KM_TAG_USER_AUTH_TYPE;
 import static com.google.android.attestation.Constants.KM_TAG_VENDOR_PATCH_LEVEL;
 import static com.google.android.attestation.Constants.UINT32_MAX;
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.Streams.stream;
@@ -74,6 +75,10 @@ import com.google.errorprone.annotations.Immutable;
 import com.google.protobuf.ByteString;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -384,7 +389,7 @@ public abstract class AuthorizationList {
 
   public abstract Optional<Integer> osVersion();
 
-  public abstract Optional<Integer> osPatchLevel();
+  public abstract Optional<YearMonth> osPatchLevel();
 
   public abstract Optional<AttestationApplicationId> attestationApplicationId();
 
@@ -408,9 +413,9 @@ public abstract class AuthorizationList {
 
   public abstract Optional<ByteString> attestationIdModel();
 
-  public abstract Optional<Integer> vendorPatchLevel();
+  public abstract Optional<LocalDate> vendorPatchLevel();
 
-  public abstract Optional<Integer> bootPatchLevel();
+  public abstract Optional<LocalDate> bootPatchLevel();
 
   public abstract boolean individualAttestation();
 
@@ -501,6 +506,8 @@ public abstract class AuthorizationList {
         .ifPresent(builder::setOsVersion);
     parsedAuthorizationMap
         .findOptionalIntegerAuthorizationListEntry(KM_TAG_OS_PATCH_LEVEL)
+        .map(String::valueOf)
+        .map(AuthorizationList::toYearMonth)
         .ifPresent(builder::setOsPatchLevel);
     parsedAuthorizationMap
         .findAuthorizationListEntry(KM_TAG_ATTESTATION_APPLICATION_ID)
@@ -540,9 +547,13 @@ public abstract class AuthorizationList {
         .ifPresent(builder::setAttestationIdModel);
     parsedAuthorizationMap
         .findOptionalIntegerAuthorizationListEntry(KM_TAG_VENDOR_PATCH_LEVEL)
+        .map(String::valueOf)
+        .map(AuthorizationList::toLocalDate)
         .ifPresent(builder::setVendorPatchLevel);
     parsedAuthorizationMap
         .findOptionalIntegerAuthorizationListEntry(KM_TAG_BOOT_PATCH_LEVEL)
+        .map(String::valueOf)
+        .map(AuthorizationList::toLocalDate)
         .ifPresent(builder::setBootPatchLevel);
     builder.setIndividualAttestation(
         parsedAuthorizationMap.findBooleanAuthorizationListEntry(KM_TAG_DEVICE_UNIQUE_ATTESTATION));
@@ -576,6 +587,39 @@ public abstract class AuthorizationList {
       previousTag = currentTag;
     }
     return new ParsedAuthorizationMap(authorizationMap, ImmutableList.copyOf(unorderedTags));
+  }
+
+  private static LocalDate toLocalDate(String value) {
+    checkArgument(value.length() == 6 || value.length() == 8);
+    if (value.length() == 6) {
+      // Workaround for dates incorrectly encoded as yyyyMM.
+      value = value.concat("01");
+    } else if (value.length() == 8 && value.substring(6, 8).equals("00")) {
+      // Workaround for dates incorrectly encoded with a day of '00'.
+      value = value.substring(0, 6).concat("01");
+    }
+    try {
+      return LocalDate.parse(value, DateTimeFormatter.ofPattern("yyyyMMdd"));
+    } catch (DateTimeParseException e) {
+      throw new IllegalArgumentException(e);
+    }
+  }
+
+  private static YearMonth toYearMonth(String value) {
+    checkArgument(value.length() == 6);
+    try {
+      return YearMonth.parse(value, DateTimeFormatter.ofPattern("yyyyMM"));
+    } catch (DateTimeParseException e) {
+      throw new IllegalArgumentException(e);
+    }
+  }
+
+  private static String toString(LocalDate date) {
+    return date.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+  }
+
+  private static String toString(YearMonth date) {
+    return date.format(DateTimeFormatter.ofPattern("yyyyMM"));
   }
 
   @VisibleForTesting
@@ -677,7 +721,10 @@ public abstract class AuthorizationList {
     addBoolean(KM_TAG_ROLLBACK_RESISTANT, this.rollbackResistant(), vector);
     addOptionalRootOfTrust(KM_TAG_ROOT_OF_TRUST, this.rootOfTrust(), vector);
     addOptionalInteger(KM_TAG_OS_VERSION, this.osVersion(), vector);
-    addOptionalInteger(KM_TAG_OS_PATCH_LEVEL, this.osPatchLevel(), vector);
+    addOptionalInteger(
+        KM_TAG_OS_PATCH_LEVEL,
+        this.osPatchLevel().map(AuthorizationList::toString).map(Integer::valueOf),
+        vector);
     addOptionalAttestationApplicationId(
         KM_TAG_ATTESTATION_APPLICATION_ID,
         this.attestationApplicationId(),
@@ -694,8 +741,14 @@ public abstract class AuthorizationList {
     addOptionalOctetString(
         KM_TAG_ATTESTATION_ID_MANUFACTURER, this.attestationIdManufacturer(), vector);
     addOptionalOctetString(KM_TAG_ATTESTATION_ID_MODEL, this.attestationIdModel(), vector);
-    addOptionalInteger(KM_TAG_VENDOR_PATCH_LEVEL, this.vendorPatchLevel(), vector);
-    addOptionalInteger(KM_TAG_BOOT_PATCH_LEVEL, this.bootPatchLevel(), vector);
+    addOptionalInteger(
+        KM_TAG_VENDOR_PATCH_LEVEL,
+        this.vendorPatchLevel().map(AuthorizationList::toString).map(Integer::valueOf),
+        vector);
+    addOptionalInteger(
+        KM_TAG_BOOT_PATCH_LEVEL,
+        this.bootPatchLevel().map(AuthorizationList::toString).map(Integer::valueOf),
+        vector);
     addBoolean(KM_TAG_DEVICE_UNIQUE_ATTESTATION, this.individualAttestation(), vector);
     return new DERSequence(vector);
   }
@@ -856,7 +909,7 @@ public abstract class AuthorizationList {
 
     public abstract Builder setOsVersion(Integer osVersion);
 
-    public abstract Builder setOsPatchLevel(Integer osPatchLevel);
+    public abstract Builder setOsPatchLevel(YearMonth osPatchLevel);
 
     public abstract Builder setAttestationApplicationId(
         AttestationApplicationId attestationApplicationId);
@@ -882,9 +935,9 @@ public abstract class AuthorizationList {
 
     public abstract Builder setAttestationIdModel(ByteString attestationIdModel);
 
-    public abstract Builder setVendorPatchLevel(Integer vendorPatchLevel);
+    public abstract Builder setVendorPatchLevel(LocalDate vendorPatchLevel);
 
-    public abstract Builder setBootPatchLevel(Integer bootPatchLevel);
+    public abstract Builder setBootPatchLevel(LocalDate bootPatchLevel);
 
     public abstract Builder setIndividualAttestation(boolean individualAttestation);
 

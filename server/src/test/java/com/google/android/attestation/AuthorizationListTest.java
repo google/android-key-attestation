@@ -40,6 +40,8 @@ import com.google.testing.junit.testparameterinjector.TestParameter;
 import com.google.testing.junit.testparameterinjector.TestParameterInjector;
 import java.io.IOException;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
@@ -93,9 +95,9 @@ public class AuthorizationListTest {
   private static final Long EXPECTED_TEE_RSA_PUBLIC_COMPONENT = 65537L;
   private static final KeyOrigin EXPECTED_TEE_ORIGIN = KeyOrigin.GENERATED;
   private static final Integer EXPECTED_TEE_OS_VERSION = 0;
-  private static final Integer EXPECTED_TEE_OS_PATCH_LEVEL = 201907;
-  private static final Integer EXPECTED_TEE_VENDOR_PATCH_LEVEL = 20190705;
-  private static final Integer EXPECTED_TEE_BOOT_PATCH_LEVEL = 20190700;
+  private static final YearMonth EXPECTED_TEE_OS_PATCH_LEVEL = YearMonth.of(2019, 7);
+  private static final LocalDate EXPECTED_TEE_VENDOR_PATCH_LEVEL = LocalDate.of(2019, 7, 5);
+  private static final LocalDate EXPECTED_TEE_BOOT_PATCH_LEVEL = LocalDate.of(2019, 7, 1);
 
   private static ASN1Encodable[] getEncodableAuthorizationList(String extensionData)
       throws IOException {
