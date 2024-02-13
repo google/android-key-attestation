@@ -29,6 +29,7 @@ import static com.google.android.attestation.Constants.TEE_ENFORCED_INDEX;
 import static com.google.android.attestation.Constants.UNIQUE_ID_INDEX;
 
 import com.google.auto.value.AutoValue;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.Immutable;
 import com.google.protobuf.ByteString;
 import java.io.IOException;
@@ -69,6 +70,48 @@ public abstract class ParsedAttestationRecord {
   @SuppressWarnings("Immutable")
   public abstract PublicKey attestedKey();
 
+  public static Builder builder() {
+    return new AutoValue_ParsedAttestationRecord.Builder()
+        .setAttestationChallenge(ByteString.EMPTY)
+        .setUniqueId(ByteString.EMPTY)
+        .setSoftwareEnforced(AuthorizationList.builder().build())
+        .setTeeEnforced(AuthorizationList.builder().build());
+  }
+
+  /** Builder for {@link ParsedAttestationRecord}. */
+  @AutoValue.Builder
+  public abstract static class Builder {
+    public abstract Builder setAttestationVersion(int value);
+
+    public abstract Builder setAttestationSecurityLevel(SecurityLevel value);
+
+    public abstract Builder setKeymasterVersion(int value);
+
+    public abstract Builder setKeymasterSecurityLevel(SecurityLevel value);
+
+    public abstract Builder setAttestationChallenge(ByteString value);
+
+    @CanIgnoreReturnValue
+    public final Builder setAttestationChallenge(byte[] value) {
+      return setAttestationChallenge(ByteString.copyFrom(value));
+    }
+
+    public abstract Builder setUniqueId(ByteString value);
+
+    @CanIgnoreReturnValue
+    public final Builder setUniqueId(byte[] value) {
+      return setUniqueId(ByteString.copyFrom(value));
+    }
+
+    public abstract Builder setSoftwareEnforced(AuthorizationList value);
+
+    public abstract Builder setTeeEnforced(AuthorizationList value);
+
+    public abstract Builder setAttestedKey(PublicKey value);
+
+    public abstract ParsedAttestationRecord build();
+  }
+
   public static ParsedAttestationRecord createParsedAttestationRecord(List<X509Certificate> certs)
       throws IOException {
 
@@ -91,66 +134,35 @@ public abstract class ParsedAttestationRecord {
   }
 
   public static ParsedAttestationRecord create(ASN1Sequence extensionData, PublicKey attestedKey) {
+    Builder builder = builder();
     int attestationVersion =
         ASN1Parsing.getIntegerFromAsn1(extensionData.getObjectAt(ATTESTATION_VERSION_INDEX));
-    SecurityLevel attestationSecurityLevel =
+    builder.setAttestationVersion(attestationVersion);
+    builder.setAttestationSecurityLevel(
         securityLevelToEnum(
             ASN1Parsing.getIntegerFromAsn1(
-                extensionData.getObjectAt(ATTESTATION_SECURITY_LEVEL_INDEX)));
-    int keymasterVersion =
-        ASN1Parsing.getIntegerFromAsn1(extensionData.getObjectAt(KEYMASTER_VERSION_INDEX));
-    SecurityLevel keymasterSecurityLevel =
+                extensionData.getObjectAt(ATTESTATION_SECURITY_LEVEL_INDEX))));
+    builder.setKeymasterVersion(
+        ASN1Parsing.getIntegerFromAsn1(extensionData.getObjectAt(KEYMASTER_VERSION_INDEX)));
+    builder.setKeymasterSecurityLevel(
         securityLevelToEnum(
             ASN1Parsing.getIntegerFromAsn1(
-                extensionData.getObjectAt(KEYMASTER_SECURITY_LEVEL_INDEX)));
-    ByteString attestationChallenge =
-        ByteString.copyFrom(
-            ASN1OctetString.getInstance(extensionData.getObjectAt(ATTESTATION_CHALLENGE_INDEX))
-                .getOctets());
-    ByteString uniqueId =
-        ByteString.copyFrom(
-            ASN1OctetString.getInstance(extensionData.getObjectAt(UNIQUE_ID_INDEX)).getOctets());
-    AuthorizationList softwareEnforced =
+                extensionData.getObjectAt(KEYMASTER_SECURITY_LEVEL_INDEX))));
+    builder.setAttestationChallenge(
+        ASN1OctetString.getInstance(extensionData.getObjectAt(ATTESTATION_CHALLENGE_INDEX))
+            .getOctets());
+    builder.setUniqueId(
+        ASN1OctetString.getInstance(extensionData.getObjectAt(UNIQUE_ID_INDEX)).getOctets());
+    builder.setSoftwareEnforced(
         AuthorizationList.createAuthorizationList(
             ASN1Sequence.getInstance(extensionData.getObjectAt(SW_ENFORCED_INDEX)).toArray(),
-            attestationVersion);
-    AuthorizationList teeEnforced =
+            attestationVersion));
+    builder.setTeeEnforced(
         AuthorizationList.createAuthorizationList(
             ASN1Sequence.getInstance(extensionData.getObjectAt(TEE_ENFORCED_INDEX)).toArray(),
-            attestationVersion);
-
-    return ParsedAttestationRecord.create(
-        attestationVersion,
-        attestationSecurityLevel,
-        keymasterVersion,
-        keymasterSecurityLevel,
-        attestationChallenge,
-        uniqueId,
-        softwareEnforced,
-        teeEnforced,
-        attestedKey);
-  }
-
-  public static ParsedAttestationRecord create(
-      int attestationVersion,
-      SecurityLevel attestationSecurityLevel,
-      int keymasterVersion,
-      SecurityLevel keymasterSecurityLevel,
-      ByteString attestationChallenge,
-      ByteString uniqueId,
-      AuthorizationList softwareEnforced,
-      AuthorizationList teeEnforced,
-      PublicKey attestedKey) {
-    return new AutoValue_ParsedAttestationRecord(
-        attestationVersion,
-        attestationSecurityLevel,
-        keymasterVersion,
-        keymasterSecurityLevel,
-        attestationChallenge,
-        uniqueId,
-        softwareEnforced,
-        teeEnforced,
-        attestedKey);
+            attestationVersion));
+    builder.setAttestedKey(attestedKey);
+    return builder.build();
   }
 
   private static SecurityLevel securityLevelToEnum(int securityLevel) {

@@ -51,7 +51,9 @@ public abstract class RootOfTrust {
   public abstract Optional<ByteString> verifiedBootHash();
 
   public static Builder builder() {
-    return new AutoValue_RootOfTrust.Builder();
+    return new AutoValue_RootOfTrust.Builder()
+        .setVerifiedBootKey(ByteString.EMPTY)
+        .setVerifiedBootHash(ByteString.EMPTY);
   }
 
   /** Builder for {@link RootOfTrust}. */
@@ -61,8 +63,7 @@ public abstract class RootOfTrust {
 
     @CanIgnoreReturnValue
     public final Builder setVerifiedBootKey(byte[] value) {
-      this.setVerifiedBootKey(ByteString.copyFrom(value));
-      return this;
+      return setVerifiedBootKey(ByteString.copyFrom(value));
     }
 
     public abstract Builder setDeviceLocked(boolean value);

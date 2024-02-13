@@ -23,11 +23,12 @@ import static com.google.common.collect.Streams.stream;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.Immutable;
 import com.google.protobuf.ByteString;
-import java.util.List;
+import java.io.IOException;
+import java.util.Set;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1OctetString;
@@ -47,9 +48,9 @@ import org.bouncycastle.asn1.DERSet;
 @AutoValue
 @Immutable
 public abstract class AttestationApplicationId {
-  public abstract ImmutableList<AttestationPackageInfo> packageInfos();
+  public abstract ImmutableSet<AttestationPackageInfo> packageInfos();
 
-  public abstract ImmutableList<ByteString> signatureDigests();
+  public abstract ImmutableSet<ByteString> signatureDigests();
 
   public static Builder builder() {
     return new AutoValue_AttestationApplicationId.Builder();
@@ -58,9 +59,9 @@ public abstract class AttestationApplicationId {
   /** Builder for {@link AttestationApplicationId}. */
   @AutoValue.Builder
   public abstract static class Builder {
-    public abstract Builder setPackageInfos(List<AttestationPackageInfo> value);
+    public abstract Builder setPackageInfos(Set<AttestationPackageInfo> value);
 
-    abstract ImmutableList.Builder<AttestationPackageInfo> packageInfosBuilder();
+    abstract ImmutableSet.Builder<AttestationPackageInfo> packageInfosBuilder();
 
     @CanIgnoreReturnValue
     public final Builder addPackageInfo(AttestationPackageInfo value) {
@@ -68,9 +69,9 @@ public abstract class AttestationApplicationId {
       return this;
     }
 
-    public abstract Builder setSignatureDigests(List<ByteString> value);
+    public abstract Builder setSignatureDigests(Set<ByteString> value);
 
-    abstract ImmutableList.Builder<ByteString> signatureDigestsBuilder();
+    abstract ImmutableSet.Builder<ByteString> signatureDigestsBuilder();
 
     @CanIgnoreReturnValue
     public final Builder addSignatureDigest(ByteString value) {
@@ -80,8 +81,7 @@ public abstract class AttestationApplicationId {
 
     @CanIgnoreReturnValue
     public final Builder addSignatureDigest(byte[] value) {
-      addSignatureDigest(ByteString.copyFrom(value));
-      return this;
+      return addSignatureDigest(ByteString.copyFrom(value));
     }
 
     public abstract AttestationApplicationId build();
@@ -112,7 +112,7 @@ public abstract class AttestationApplicationId {
     return builder.build();
   }
 
-  ASN1Sequence toAsn1Sequence() {
+  byte[] getEncoded() {
     ASN1Encodable[] applicationIdAsn1Array = new ASN1Encodable[2];
     applicationIdAsn1Array[ATTESTATION_APPLICATION_ID_PACKAGE_INFOS_INDEX] =
         new DERSet(
@@ -126,7 +126,11 @@ public abstract class AttestationApplicationId {
                 .map(DEROctetString::new)
                 .toArray(DEROctetString[]::new));
 
-    return new DERSequence(applicationIdAsn1Array);
+    try {
+      return new DERSequence(applicationIdAsn1Array).getEncoded();
+    } catch (IOException e) {
+      throw new IllegalArgumentException(e);
+    }
   }
 
   /** Provides package's name and version number. */

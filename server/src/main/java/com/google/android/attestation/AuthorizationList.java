@@ -71,6 +71,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.Immutable;
 import com.google.protobuf.ByteString;
 import java.time.Duration;
@@ -393,8 +394,6 @@ public abstract class AuthorizationList {
 
   public abstract Optional<AttestationApplicationId> attestationApplicationId();
 
-  public abstract Optional<ByteString> attestationApplicationIdBytes();
-
   public abstract Optional<ByteString> attestationIdBrand();
 
   public abstract Optional<ByteString> attestationIdDevice();
@@ -423,15 +422,199 @@ public abstract class AuthorizationList {
 
   public abstract ImmutableList<Integer> unorderedTags();
 
+  public static Builder builder() {
+    return new AutoValue_AuthorizationList.Builder()
+        .setRollbackResistance(false)
+        .setNoAuthRequired(false)
+        .setAllowWhileOnBody(false)
+        .setTrustedUserPresenceRequired(false)
+        .setTrustedConfirmationRequired(false)
+        .setUnlockedDeviceRequired(false)
+        .setAllApplications(false)
+        .setRollbackResistant(false)
+        .setIndividualAttestation(false)
+        .setIdentityCredentialKey(false);
+  }
+
+  /**
+   * Builder for an AuthorizationList. Any field not set will be made an Optional.empty or set with
+   * the default value.
+   */
+  @AutoValue.Builder
+  public abstract static class Builder {
+    abstract ImmutableSet.Builder<OperationPurpose> purposeBuilder();
+
+    @CanIgnoreReturnValue
+    public final Builder addPurpose(OperationPurpose value) {
+      purposeBuilder().add(value);
+      return this;
+    }
+
+    public abstract Builder setAlgorithm(Algorithm algorithm);
+
+    public abstract Builder setKeySize(Integer keySize);
+
+    abstract ImmutableSet.Builder<DigestMode> digestBuilder();
+
+    @CanIgnoreReturnValue
+    public final Builder addDigest(DigestMode value) {
+      digestBuilder().add(value);
+      return this;
+    }
+
+    abstract ImmutableSet.Builder<PaddingMode> paddingBuilder();
+
+    @CanIgnoreReturnValue
+    public final Builder addPadding(PaddingMode value) {
+      paddingBuilder().add(value);
+      return this;
+    }
+
+    public abstract Builder setEcCurve(EcCurve ecCurve);
+
+    public abstract Builder setRsaPublicExponent(Long rsaPublicExponent);
+
+    public abstract Builder setRollbackResistance(boolean rollbackResistance);
+
+    public abstract Builder setActiveDateTime(Instant activeDateTime);
+
+    public abstract Builder setOriginationExpireDateTime(Instant originationExpireDateTime);
+
+    public abstract Builder setUsageExpireDateTime(Instant usageExpireDateTime);
+
+    public abstract Builder setNoAuthRequired(boolean noAuthRequired);
+
+    abstract ImmutableSet.Builder<UserAuthType> userAuthTypeBuilder();
+
+    @CanIgnoreReturnValue
+    public final Builder addUserAuthType(UserAuthType value) {
+      userAuthTypeBuilder().add(value);
+      return this;
+    }
+
+    public abstract Builder setAuthTimeout(Duration authTimeout);
+
+    public abstract Builder setAllowWhileOnBody(boolean allowWhileOnBody);
+
+    public abstract Builder setTrustedUserPresenceRequired(boolean trustedUserPresenceRequired);
+
+    public abstract Builder setTrustedConfirmationRequired(boolean trustedConfirmationRequired);
+
+    public abstract Builder setUnlockedDeviceRequired(boolean unlockedDeviceRequired);
+
+    public abstract Builder setAllApplications(boolean allApplications);
+
+    public abstract Builder setApplicationId(ByteString applicationId);
+
+    @CanIgnoreReturnValue
+    public final Builder setApplicationId(String value) {
+      return setApplicationId(ByteString.copyFromUtf8(value));
+    }
+
+    public abstract Builder setCreationDateTime(Instant creationDateTime);
+
+    public abstract Builder setOrigin(KeyOrigin origin);
+
+    public abstract Builder setRollbackResistant(boolean rollbackResistant);
+
+    public abstract Builder setRootOfTrust(RootOfTrust rootOfTrust);
+
+    public abstract Builder setOsVersion(Integer osVersion);
+
+    public abstract Builder setOsPatchLevel(YearMonth osPatchLevel);
+
+    public abstract Builder setAttestationApplicationId(
+        AttestationApplicationId attestationApplicationId);
+
+    public abstract Builder setAttestationIdBrand(ByteString attestationIdBrand);
+
+    @CanIgnoreReturnValue
+    public final Builder setAttestationIdBrand(String value) {
+      return setAttestationIdBrand(ByteString.copyFromUtf8(value));
+    }
+
+    public abstract Builder setAttestationIdDevice(ByteString attestationIdDevice);
+
+    @CanIgnoreReturnValue
+    public final Builder setAttestationIdDevice(String value) {
+      return setAttestationIdDevice(ByteString.copyFromUtf8(value));
+    }
+
+    public abstract Builder setAttestationIdProduct(ByteString attestationIdProduct);
+
+    @CanIgnoreReturnValue
+    public final Builder setAttestationIdProduct(String value) {
+      return setAttestationIdProduct(ByteString.copyFromUtf8(value));
+    }
+
+    public abstract Builder setAttestationIdSerial(ByteString attestationIdSerial);
+
+    @CanIgnoreReturnValue
+    public final Builder setAttestationIdSerial(String value) {
+      return setAttestationIdSerial(ByteString.copyFromUtf8(value));
+    }
+
+    public abstract Builder setAttestationIdImei(ByteString attestationIdImei);
+
+    @CanIgnoreReturnValue
+    public final Builder setAttestationIdImei(String value) {
+      return setAttestationIdImei(ByteString.copyFromUtf8(value));
+    }
+
+    public abstract Builder setAttestationIdSecondImei(ByteString attestationIdSecondImei);
+
+    @CanIgnoreReturnValue
+    public final Builder setAttestationIdSecondImei(String value) {
+      return setAttestationIdSecondImei(ByteString.copyFromUtf8(value));
+    }
+
+    public abstract Builder setAttestationIdMeid(ByteString attestationIdMeid);
+
+    @CanIgnoreReturnValue
+    public final Builder setAttestationIdMeid(String value) {
+      return setAttestationIdMeid(ByteString.copyFromUtf8(value));
+    }
+
+    public abstract Builder setAttestationIdManufacturer(ByteString attestationIdManufacturer);
+
+    @CanIgnoreReturnValue
+    public final Builder setAttestationIdManufacturer(String value) {
+      return setAttestationIdManufacturer(ByteString.copyFromUtf8(value));
+    }
+
+    public abstract Builder setAttestationIdModel(ByteString attestationIdModel);
+
+    @CanIgnoreReturnValue
+    public final Builder setAttestationIdModel(String value) {
+      return setAttestationIdModel(ByteString.copyFromUtf8(value));
+    }
+
+    public abstract Builder setVendorPatchLevel(LocalDate vendorPatchLevel);
+
+    public abstract Builder setBootPatchLevel(LocalDate bootPatchLevel);
+
+    public abstract Builder setIndividualAttestation(boolean individualAttestation);
+
+    public abstract Builder setIdentityCredentialKey(boolean identityCredentialKey);
+
+    abstract ImmutableList.Builder<Integer> unorderedTagsBuilder();
+
+    @CanIgnoreReturnValue
+    public final Builder addUnorderedTag(Integer value) {
+      unorderedTagsBuilder().add(value);
+      return this;
+    }
+
+    public abstract AuthorizationList build();
+  }
+
   static AuthorizationList createAuthorizationList(
       ASN1Encodable[] authorizationList, int attestationVersion) {
     Builder builder = AuthorizationList.builder();
     ParsedAuthorizationMap parsedAuthorizationMap = getAuthorizationMap(authorizationList);
-
-    builder.setPurpose(
-        parsedAuthorizationMap.findIntegerSetAuthorizationListEntry(KM_TAG_PURPOSE).stream()
-            .flatMap(key -> Stream.ofNullable(ASN1_TO_OPERATION_PURPOSE.get(key)))
-            .collect(toImmutableSet()));
+    parsedAuthorizationMap.findIntegerSetAuthorizationListEntry(KM_TAG_PURPOSE).stream()
+        .map(ASN1_TO_OPERATION_PURPOSE::get)
+        .forEach(builder::addPurpose);
     parsedAuthorizationMap
         .findOptionalIntegerAuthorizationListEntry(KM_TAG_ALGORITHM)
         .map(ASN1_TO_ALGORITHM::get)
@@ -440,14 +623,12 @@ public abstract class AuthorizationList {
     parsedAuthorizationMap
         .findOptionalIntegerAuthorizationListEntry(KM_TAG_KEY_SIZE)
         .ifPresent(builder::setKeySize);
-    builder.setDigest(
-        parsedAuthorizationMap.findIntegerSetAuthorizationListEntry(KM_TAG_DIGEST).stream()
-            .flatMap(key -> Stream.ofNullable(ASN1_TO_DIGEST_MODE.get(key)))
-            .collect(toImmutableSet()));
-    builder.setPadding(
-        parsedAuthorizationMap.findIntegerSetAuthorizationListEntry(KM_TAG_PADDING).stream()
-            .flatMap(key -> Stream.ofNullable(ASN1_TO_PADDING_MODE.get(key)))
-            .collect(toImmutableSet()));
+    parsedAuthorizationMap.findIntegerSetAuthorizationListEntry(KM_TAG_DIGEST).stream()
+        .map(ASN1_TO_DIGEST_MODE::get)
+        .forEach(builder::addDigest);
+    parsedAuthorizationMap.findIntegerSetAuthorizationListEntry(KM_TAG_PADDING).stream()
+        .map(ASN1_TO_PADDING_MODE::get)
+        .forEach(builder::addPadding);
     parsedAuthorizationMap
         .findOptionalIntegerAuthorizationListEntry(KM_TAG_EC_CURVE)
         .map(ASN1_TO_EC_CURVE::get)
@@ -468,9 +649,13 @@ public abstract class AuthorizationList {
         .ifPresent(builder::setUsageExpireDateTime);
     builder.setNoAuthRequired(
         parsedAuthorizationMap.findBooleanAuthorizationListEntry(KM_TAG_NO_AUTH_REQUIRED));
-    builder.setUserAuthType(parsedAuthorizationMap.findUserAuthType(KM_TAG_USER_AUTH_TYPE));
     parsedAuthorizationMap
-        .findOptionalDurationSecondsAuthorizationListEntry(KM_TAG_AUTH_TIMEOUT)
+        .findOptionalLongAuthorizationListEntry(KM_TAG_USER_AUTH_TYPE)
+        .map(AuthorizationList::userAuthTypeToEnum)
+        .ifPresent(it -> it.forEach(builder::addUserAuthType));
+    parsedAuthorizationMap
+        .findOptionalIntegerAuthorizationListEntry(KM_TAG_AUTH_TIMEOUT)
+        .map(Duration::ofSeconds)
         .ifPresent(builder::setAuthTimeout);
     builder.setAllowWhileOnBody(
         parsedAuthorizationMap.findBooleanAuthorizationListEntry(KM_TAG_ALLOW_WHILE_ON_BODY));
@@ -516,9 +701,6 @@ public abstract class AuthorizationList {
         .map(AttestationApplicationId::createAttestationApplicationId)
         .ifPresent(builder::setAttestationApplicationId);
     parsedAuthorizationMap
-        .findOptionalByteArrayAuthorizationListEntry(KM_TAG_ATTESTATION_APPLICATION_ID)
-        .ifPresent(builder::setAttestationApplicationIdBytes);
-    parsedAuthorizationMap
         .findOptionalByteArrayAuthorizationListEntry(KM_TAG_ATTESTATION_ID_BRAND)
         .ifPresent(builder::setAttestationIdBrand);
     parsedAuthorizationMap
@@ -559,7 +741,7 @@ public abstract class AuthorizationList {
         parsedAuthorizationMap.findBooleanAuthorizationListEntry(KM_TAG_DEVICE_UNIQUE_ATTESTATION));
     builder.setIdentityCredentialKey(
         parsedAuthorizationMap.findBooleanAuthorizationListEntry(KM_TAG_IDENTITY_CREDENTIAL_KEY));
-    builder.setUnorderedTags(parsedAuthorizationMap.getUnorderedTags());
+    parsedAuthorizationMap.getUnorderedTags().forEach(builder::addUnorderedTag);
 
     return builder.build();
   }
@@ -725,11 +907,11 @@ public abstract class AuthorizationList {
         KM_TAG_OS_PATCH_LEVEL,
         this.osPatchLevel().map(AuthorizationList::toString).map(Integer::valueOf),
         vector);
-    addOptionalAttestationApplicationId(
-        KM_TAG_ATTESTATION_APPLICATION_ID,
-        this.attestationApplicationId(),
-        this.attestationApplicationIdBytes(),
-        vector);
+    this.attestationApplicationId()
+        .map(AttestationApplicationId::getEncoded)
+        .map(DEROctetString::new)
+        .map(obj -> new DERTaggedObject(KM_TAG_ATTESTATION_APPLICATION_ID, obj))
+        .ifPresent(vector::add);
     addOptionalOctetString(KM_TAG_ATTESTATION_ID_BRAND, this.attestationIdBrand(), vector);
     addOptionalOctetString(KM_TAG_ATTESTATION_ID_DEVICE, this.attestationIdDevice(), vector);
     addOptionalOctetString(KM_TAG_ATTESTATION_ID_PRODUCT, this.attestationIdProduct(), vector);
@@ -816,138 +998,6 @@ public abstract class AuthorizationList {
     }
   }
 
-  private static void addOptionalAttestationApplicationId(
-      int tag,
-      Optional<AttestationApplicationId> objectEntry,
-      Optional<ByteString> byteEntry,
-      ASN1EncodableVector vector) {
-    if (objectEntry.isPresent()) {
-      try {
-        vector.add(
-            new DERTaggedObject(
-                tag, new DEROctetString(objectEntry.get().toAsn1Sequence().getEncoded())));
-      } catch (Exception e) {
-        addOptionalOctetString(KM_TAG_ATTESTATION_APPLICATION_ID, byteEntry, vector);
-      }
-    } else if (byteEntry.isPresent()) {
-      addOptionalOctetString(KM_TAG_ATTESTATION_APPLICATION_ID, byteEntry, vector);
-    }
-  }
-
-  public static Builder builder() {
-    return new AutoValue_AuthorizationList.Builder()
-        .setPurpose(ImmutableSet.of())
-        .setDigest(ImmutableSet.of())
-        .setPadding(ImmutableSet.of())
-        .setRollbackResistance(false)
-        .setNoAuthRequired(false)
-        .setUserAuthType(ImmutableSet.of())
-        .setAllowWhileOnBody(false)
-        .setTrustedUserPresenceRequired(false)
-        .setTrustedConfirmationRequired(false)
-        .setUnlockedDeviceRequired(false)
-        .setAllApplications(false)
-        .setRollbackResistant(false)
-        .setIndividualAttestation(false)
-        .setIdentityCredentialKey(false)
-        .setUnorderedTags(ImmutableList.of());
-  }
-
-  /**
-   * Builder for an AuthorizationList. Any field not set will be made an Optional.empty or set with
-   * the default value.
-   */
-  @AutoValue.Builder
-  public abstract static class Builder {
-    public abstract Builder setPurpose(Set<OperationPurpose> purpose);
-
-    public abstract Builder setAlgorithm(Algorithm algorithm);
-
-    public abstract Builder setKeySize(Integer keySize);
-
-    public abstract Builder setDigest(Set<DigestMode> digest);
-
-    public abstract Builder setPadding(Set<PaddingMode> padding);
-
-    public abstract Builder setEcCurve(EcCurve ecCurve);
-
-    public abstract Builder setRsaPublicExponent(Long rsaPublicExponent);
-
-    public abstract Builder setRollbackResistance(boolean rollbackResistance);
-
-    public abstract Builder setActiveDateTime(Instant activeDateTime);
-
-    public abstract Builder setOriginationExpireDateTime(Instant originationExpireDateTime);
-
-    public abstract Builder setUsageExpireDateTime(Instant usageExpireDateTime);
-
-    public abstract Builder setNoAuthRequired(boolean noAuthRequired);
-
-    public abstract Builder setUserAuthType(Set<UserAuthType> userAuthType);
-
-    public abstract Builder setAuthTimeout(Duration authTimeout);
-
-    public abstract Builder setAllowWhileOnBody(boolean allowWhileOnBody);
-
-    public abstract Builder setTrustedUserPresenceRequired(boolean trustedUserPresenceRequired);
-
-    public abstract Builder setTrustedConfirmationRequired(boolean trustedConfirmationRequired);
-
-    public abstract Builder setUnlockedDeviceRequired(boolean unlockedDeviceRequired);
-
-    public abstract Builder setAllApplications(boolean allApplications);
-
-    public abstract Builder setApplicationId(ByteString applicationId);
-
-    public abstract Builder setCreationDateTime(Instant creationDateTime);
-
-    public abstract Builder setOrigin(KeyOrigin origin);
-
-    public abstract Builder setRollbackResistant(boolean rollbackResistant);
-
-    public abstract Builder setRootOfTrust(RootOfTrust rootOfTrust);
-
-    public abstract Builder setOsVersion(Integer osVersion);
-
-    public abstract Builder setOsPatchLevel(YearMonth osPatchLevel);
-
-    public abstract Builder setAttestationApplicationId(
-        AttestationApplicationId attestationApplicationId);
-
-    public abstract Builder setAttestationApplicationIdBytes(
-        ByteString attestationApplicationIdBytes);
-
-    public abstract Builder setAttestationIdBrand(ByteString attestationIdBrand);
-
-    public abstract Builder setAttestationIdDevice(ByteString attestationIdDevice);
-
-    public abstract Builder setAttestationIdProduct(ByteString attestationIdProduct);
-
-    public abstract Builder setAttestationIdSerial(ByteString attestationIdSerial);
-
-    public abstract Builder setAttestationIdImei(ByteString attestationIdImei);
-
-    public abstract Builder setAttestationIdSecondImei(ByteString attestationIdSecondImei);
-
-    public abstract Builder setAttestationIdMeid(ByteString attestationIdMeid);
-
-    public abstract Builder setAttestationIdManufacturer(ByteString attestationIdManufacturer);
-
-    public abstract Builder setAttestationIdModel(ByteString attestationIdModel);
-
-    public abstract Builder setVendorPatchLevel(LocalDate vendorPatchLevel);
-
-    public abstract Builder setBootPatchLevel(LocalDate bootPatchLevel);
-
-    public abstract Builder setIndividualAttestation(boolean individualAttestation);
-
-    public abstract Builder setIdentityCredentialKey(boolean identityCredentialKey);
-
-    public abstract Builder setUnorderedTags(ImmutableList<Integer> unorderedTags);
-
-    public abstract AuthorizationList build();
-  }
-
   /**
    * This data structure holds the parsed attest record authorizations mapped to their authorization
    * tags and a list of unordered authorization tags found in this authorization list.
@@ -978,11 +1028,6 @@ public abstract class AuthorizationList {
       return stream(asn1Set).map(ASN1Parsing::getIntegerFromAsn1).collect(toImmutableSet());
     }
 
-    private Optional<Duration> findOptionalDurationSecondsAuthorizationListEntry(int tag) {
-      Optional<Integer> seconds = findOptionalIntegerAuthorizationListEntry(tag);
-      return seconds.map(Duration::ofSeconds);
-    }
-
     private Optional<Integer> findOptionalIntegerAuthorizationListEntry(int tag) {
       return findAuthorizationListEntry(tag)
           .map(ASN1Integer.class::cast)
@@ -1009,11 +1054,6 @@ public abstract class AuthorizationList {
           .map(ASN1OctetString.class::cast)
           .map(ASN1OctetString::getOctets)
           .map(ByteString::copyFrom);
-    }
-
-    private ImmutableSet<UserAuthType> findUserAuthType(int tag) {
-      Optional<Long> userAuthType = findOptionalLongAuthorizationListEntry(tag);
-      return userAuthType.map(AuthorizationList::userAuthTypeToEnum).orElse(ImmutableSet.of());
     }
   }
 }

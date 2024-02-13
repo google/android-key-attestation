@@ -160,9 +160,6 @@ public class KeyAttestationExample {
               System.out.println(indent + "Attestation Application ID:");
               print(attestationApplicationId, indent + "\t");
             });
-    print(
-        authorizationList.attestationApplicationIdBytes(),
-        indent + "Attestation Application ID Bytes");
     print(authorizationList.attestationIdBrand(), indent + "Attestation ID Brand");
     print(authorizationList.attestationIdDevice(), indent + "Attestation ID Device");
     print(authorizationList.attestationIdProduct(), indent + "Attestation ID Product");
@@ -207,7 +204,8 @@ public class KeyAttestationExample {
   private static <T> void print(Optional<T> optional, String caption) {
     if (optional.isPresent()) {
       if (optional.get() instanceof byte[]) {
-        System.out.println(caption + ": " + Base64.getEncoder().encodeToString((byte[]) optional.get()));
+        System.out.println(
+            caption + ": " + Base64.getEncoder().encodeToString((byte[]) optional.get()));
       } else {
         System.out.println(caption + ": " + optional.get());
       }
