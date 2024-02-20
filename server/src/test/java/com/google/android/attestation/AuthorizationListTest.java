@@ -15,6 +15,7 @@
 
 package com.google.android.attestation;
 
+import static com.google.android.attestation.AuthorizationList.toLocalDate;
 import static com.google.android.attestation.AuthorizationList.DigestMode.SHA_2_256;
 import static com.google.android.attestation.AuthorizationList.OperationPurpose.SIGN;
 import static com.google.android.attestation.AuthorizationList.OperationPurpose.VERIFY;
@@ -268,5 +269,13 @@ public class AuthorizationListTest {
             AuthorizationList.ASN1_TO_OPERATION_PURPOSE.get(
                 AuthorizationList.OPERATION_PURPOSE_TO_ASN1.get(purpose)))
         .isEqualTo(purpose);
+  }
+
+  @Test
+  public void toLocalDate_conversionSucceeds() {
+    assertThat(toLocalDate("20240205")).isEqualTo(LocalDate.of(2024, 02, 05));
+    assertThat(toLocalDate("20240200")).isEqualTo(LocalDate.of(2024, 02, 01));
+    assertThat(toLocalDate("20240000")).isEqualTo(LocalDate.of(2024, 01, 01));
+    assertThat(toLocalDate("202402")).isEqualTo(LocalDate.of(2024, 02, 01));
   }
 }

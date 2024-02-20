@@ -771,20 +771,17 @@ public abstract class AuthorizationList {
     return new ParsedAuthorizationMap(authorizationMap, ImmutableList.copyOf(unorderedTags));
   }
 
-  private static LocalDate toLocalDate(String value) {
+  @VisibleForTesting
+  static LocalDate toLocalDate(String value) {
     checkArgument(value.length() == 6 || value.length() == 8);
-    if (value.length() == 6) {
-      // Workaround for dates incorrectly encoded as yyyyMM.
-      value = value.concat("01");
-    } else if (value.length() == 8 && value.substring(6, 8).equals("00")) {
-      // Workaround for dates incorrectly encoded with a day of '00'.
-      value = value.substring(0, 6).concat("01");
-    }
-    try {
-      return LocalDate.parse(value, DateTimeFormatter.ofPattern("yyyyMMdd"));
-    } catch (DateTimeParseException e) {
-      throw new IllegalArgumentException(e);
-    }
+    int year = Integer.parseInt(value.substring(0, 4));
+    int month =
+        Integer.parseInt(value.substring(4, 6)) == 0 ? 1 : Integer.parseInt(value.substring(4, 6));
+    int day =
+        value.length() == 8 && !value.substring(6, 8).equals("00")
+            ? Integer.parseInt(value.substring(6, 8))
+            : 1;
+    return LocalDate.of(year, month, day);
   }
 
   private static YearMonth toYearMonth(String value) {
