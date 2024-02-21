@@ -28,6 +28,7 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.Immutable;
 import com.google.protobuf.ByteString;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.Set;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Integer;
@@ -112,7 +113,10 @@ public abstract class AttestationApplicationId {
     return builder.build();
   }
 
-  byte[] getEncoded() {
+  Optional<byte[]> getEncoded() {
+    if (packageInfos().isEmpty() && signatureDigests().isEmpty()) {
+      return Optional.empty();
+    }
     ASN1Encodable[] applicationIdAsn1Array = new ASN1Encodable[2];
     applicationIdAsn1Array[ATTESTATION_APPLICATION_ID_PACKAGE_INFOS_INDEX] =
         new DERSet(
@@ -127,7 +131,7 @@ public abstract class AttestationApplicationId {
                 .toArray(DEROctetString[]::new));
 
     try {
-      return new DERSequence(applicationIdAsn1Array).getEncoded();
+      return Optional.of(new DERSequence(applicationIdAsn1Array).getEncoded());
     } catch (IOException e) {
       throw new IllegalArgumentException(e);
     }

@@ -15,7 +15,6 @@
 
 package com.google.android.attestation;
 
-import static com.google.android.attestation.AuthorizationList.toLocalDate;
 import static com.google.android.attestation.AuthorizationList.DigestMode.SHA_2_256;
 import static com.google.android.attestation.AuthorizationList.OperationPurpose.SIGN;
 import static com.google.android.attestation.AuthorizationList.OperationPurpose.VERIFY;
@@ -25,6 +24,7 @@ import static com.google.android.attestation.AuthorizationList.UserAuthType.FING
 import static com.google.android.attestation.AuthorizationList.UserAuthType.PASSWORD;
 import static com.google.android.attestation.AuthorizationList.UserAuthType.USER_AUTH_TYPE_ANY;
 import static com.google.android.attestation.AuthorizationList.UserAuthType.USER_AUTH_TYPE_NONE;
+import static com.google.android.attestation.AuthorizationList.toLocalDate;
 import static com.google.android.attestation.AuthorizationList.userAuthTypeToEnum;
 import static com.google.android.attestation.Constants.UINT32_MAX;
 import static com.google.common.truth.Truth.assertThat;
@@ -116,7 +116,7 @@ public class AuthorizationListTest {
     assertThat(authorizationList.creationDateTime()).hasValue(EXPECTED_SW_CREATION_DATETIME);
     assertThat(authorizationList.rootOfTrust()).isEmpty();
     assertThat(authorizationList.attestationApplicationId())
-        .hasValue(EXPECTED_SW_ATTESTATION_APPLICATION_ID);
+        .isEqualTo(EXPECTED_SW_ATTESTATION_APPLICATION_ID);
     assertThat(authorizationList.individualAttestation()).isFalse();
     assertThat(authorizationList.identityCredentialKey()).isFalse();
   }
