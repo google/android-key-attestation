@@ -392,7 +392,7 @@ public abstract class AuthorizationList {
 
   public abstract Optional<YearMonth> osPatchLevel();
 
-  public abstract Optional<AttestationApplicationId> attestationApplicationId();
+  public abstract AttestationApplicationId attestationApplicationId();
 
   public abstract Optional<ByteString> attestationIdBrand();
 
@@ -433,7 +433,8 @@ public abstract class AuthorizationList {
         .setAllApplications(false)
         .setRollbackResistant(false)
         .setIndividualAttestation(false)
-        .setIdentityCredentialKey(false);
+        .setIdentityCredentialKey(false)
+        .setAttestationApplicationId(AttestationApplicationId.builder().build());
   }
 
   /**
@@ -905,7 +906,7 @@ public abstract class AuthorizationList {
         this.osPatchLevel().map(AuthorizationList::toString).map(Integer::valueOf),
         vector);
     this.attestationApplicationId()
-        .map(AttestationApplicationId::getEncoded)
+        .getEncoded()
         .map(DEROctetString::new)
         .map(obj -> new DERTaggedObject(KM_TAG_ATTESTATION_APPLICATION_ID, obj))
         .ifPresent(vector::add);

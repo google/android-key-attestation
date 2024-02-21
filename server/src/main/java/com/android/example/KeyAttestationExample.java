@@ -153,13 +153,8 @@ public class KeyAttestationExample {
             });
     print(authorizationList.osVersion(), indent + "OS Version");
     print(authorizationList.osPatchLevel(), indent + "OS Patch Level");
-    authorizationList
-        .attestationApplicationId()
-        .ifPresent(
-            attestationApplicationId -> {
-              System.out.println(indent + "Attestation Application ID:");
-              print(attestationApplicationId, indent + "\t");
-            });
+    System.out.println(indent + "Attestation Application ID:");
+    print(authorizationList.attestationApplicationId(), indent + "\t");
     print(authorizationList.attestationIdBrand(), indent + "Attestation ID Brand");
     print(authorizationList.attestationIdDevice(), indent + "Attestation ID Device");
     print(authorizationList.attestationIdProduct(), indent + "Attestation ID Product");
