@@ -1,9 +1,9 @@
 java_binary(
     name = "KeyAttestationExample",
     srcs = ["KeyAttestationExample.java"],
-    data = ["//server/examples:example_certificates"],
+    data = ["//src/test/resources:example_certificates"],
     deps = [
-        "//server/src/main/java/com/google/android/attestation",
+        "//src/main/java/com/google/android/attestation",
         "@maven//:com_google_guava_guava",
         "@maven//:com_google_protobuf_protobuf_javalite",
     ],

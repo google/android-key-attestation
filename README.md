@@ -7,14 +7,14 @@ generated in a hardware-protected environment of an Android device. It is
 maintained in tandem with Android's key attestation capabilities and is meant
 for production use.
 
-This repository contains a [server](server/src/main/java/com/android/example/)
+This repository contains a [server](src/main/java/com/android/example/)
 sample code that shows how to validate an Android attestation certificate chain
 outside the Android framework. This is the recommended best practice, since if
 the Android device is rooted or otherwise compromised, on-device validation of
 the attestation may be inaccurate.
 
 The entry point into the
-[library itself](server/src/main/java/com/google/android/attestation/)
+[library itself](src/main/java/com/google/android/attestation/)
 is `com.google.android.attestation.ParsedAttestationRecord.createParsedAttestationRecord`.
 
 For more details, see the documentation and the guide at

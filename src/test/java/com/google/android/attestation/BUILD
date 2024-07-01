@@ -2,7 +2,7 @@ java_test(
     name = "AttestationApplicationIdTest",
     srcs = ["AttestationApplicationIdTest.java"],
     deps = [
-        "//server/src/main/java/com/google/android/attestation",
+        "//src/main/java/com/google/android/attestation",
         "@maven//:com_google_guava_guava",
         "@maven//:com_google_protobuf_protobuf_javalite",
         "@maven//:com_google_truth_extensions_truth_java8_extension",
@@ -15,7 +15,7 @@ java_test(
     name = "AuthorizationListTest",
     srcs = ["AuthorizationListTest.java"],
     deps = [
-        "//server/src/main/java/com/google/android/attestation",
+        "//src/main/java/com/google/android/attestation",
         "@maven//:com_google_guava_guava",
         "@maven//:com_google_testparameterinjector_test_parameter_injector",
         "@maven//:com_google_truth_extensions_truth_java8_extension",
@@ -29,7 +29,7 @@ java_test(
     name = "ParsedAttestationRecordTest",
     srcs = ["ParsedAttestationRecordTest.java"],
     deps = [
-        "//server/src/main/java/com/google/android/attestation",
+        "//src/main/java/com/google/android/attestation",
         "@maven//:com_google_protobuf_protobuf_javalite",
         "@maven//:com_google_testparameterinjector_test_parameter_injector",
         "@maven//:com_google_truth_extensions_truth_java8_extension",
@@ -43,7 +43,7 @@ java_test(
     name = "RootOfTrustTest",
     srcs = ["RootOfTrustTest.java"],
     deps = [
-        "//server/src/main/java/com/google/android/attestation",
+        "//src/main/java/com/google/android/attestation",
         "@maven//:com_google_protobuf_protobuf_javalite",
         "@maven//:com_google_truth_extensions_truth_java8_extension",
         "@maven//:com_google_truth_truth",
