@@ -22,8 +22,6 @@ import static com.google.android.attestation.AuthorizationList.UserAuthType.USER
 import static com.google.android.attestation.Constants.KM_TAG_ACTIVE_DATE_TIME;
 import static com.google.android.attestation.Constants.KM_TAG_ALGORITHM;
 import static com.google.android.attestation.Constants.KM_TAG_ALLOW_WHILE_ON_BODY;
-import static com.google.android.attestation.Constants.KM_TAG_ALL_APPLICATIONS;
-import static com.google.android.attestation.Constants.KM_TAG_APPLICATION_ID;
 import static com.google.android.attestation.Constants.KM_TAG_ATTESTATION_APPLICATION_ID;
 import static com.google.android.attestation.Constants.KM_TAG_ATTESTATION_ID_BRAND;
 import static com.google.android.attestation.Constants.KM_TAG_ATTESTATION_ID_DEVICE;
@@ -40,7 +38,6 @@ import static com.google.android.attestation.Constants.KM_TAG_CREATION_DATE_TIME
 import static com.google.android.attestation.Constants.KM_TAG_DEVICE_UNIQUE_ATTESTATION;
 import static com.google.android.attestation.Constants.KM_TAG_DIGEST;
 import static com.google.android.attestation.Constants.KM_TAG_EC_CURVE;
-import static com.google.android.attestation.Constants.KM_TAG_IDENTITY_CREDENTIAL_KEY;
 import static com.google.android.attestation.Constants.KM_TAG_KEY_SIZE;
 import static com.google.android.attestation.Constants.KM_TAG_NO_AUTH_REQUIRED;
 import static com.google.android.attestation.Constants.KM_TAG_ORIGIN;
@@ -376,10 +373,6 @@ public abstract class AuthorizationList {
 
   public abstract boolean unlockedDeviceRequired();
 
-  public abstract boolean allApplications();
-
-  public abstract Optional<ByteString> applicationId();
-
   public abstract Optional<Instant> creationDateTime();
 
   public abstract Optional<KeyOrigin> origin();
@@ -418,7 +411,6 @@ public abstract class AuthorizationList {
 
   public abstract boolean individualAttestation();
 
-  public abstract boolean identityCredentialKey();
 
   public abstract ImmutableList<Integer> unorderedTags();
 
@@ -430,10 +422,8 @@ public abstract class AuthorizationList {
         .setTrustedUserPresenceRequired(false)
         .setTrustedConfirmationRequired(false)
         .setUnlockedDeviceRequired(false)
-        .setAllApplications(false)
         .setRollbackResistant(false)
-        .setIndividualAttestation(false)
-        .setIdentityCredentialKey(false);
+        .setIndividualAttestation(false);
   }
 
   /**
@@ -501,15 +491,6 @@ public abstract class AuthorizationList {
     public abstract Builder setTrustedConfirmationRequired(boolean trustedConfirmationRequired);
 
     public abstract Builder setUnlockedDeviceRequired(boolean unlockedDeviceRequired);
-
-    public abstract Builder setAllApplications(boolean allApplications);
-
-    public abstract Builder setApplicationId(ByteString applicationId);
-
-    @CanIgnoreReturnValue
-    public final Builder setApplicationId(String value) {
-      return setApplicationId(ByteString.copyFromUtf8(value));
-    }
 
     public abstract Builder setCreationDateTime(Instant creationDateTime);
 
@@ -595,8 +576,6 @@ public abstract class AuthorizationList {
 
     public abstract Builder setIndividualAttestation(boolean individualAttestation);
 
-    public abstract Builder setIdentityCredentialKey(boolean identityCredentialKey);
-
     abstract ImmutableList.Builder<Integer> unorderedTagsBuilder();
 
     @CanIgnoreReturnValue
@@ -667,11 +646,6 @@ public abstract class AuthorizationList {
             KM_TAG_TRUSTED_CONFIRMATION_REQUIRED));
     builder.setUnlockedDeviceRequired(
         parsedAuthorizationMap.findBooleanAuthorizationListEntry(KM_TAG_UNLOCKED_DEVICE_REQUIRED));
-    builder.setAllApplications(
-        parsedAuthorizationMap.findBooleanAuthorizationListEntry(KM_TAG_ALL_APPLICATIONS));
-    parsedAuthorizationMap
-        .findOptionalByteArrayAuthorizationListEntry(KM_TAG_APPLICATION_ID)
-        .ifPresent(builder::setApplicationId);
     parsedAuthorizationMap
         .findOptionalInstantMillisAuthorizationListEntry(KM_TAG_CREATION_DATE_TIME)
         .ifPresent(builder::setCreationDateTime);
@@ -739,8 +713,6 @@ public abstract class AuthorizationList {
         .ifPresent(builder::setBootPatchLevel);
     builder.setIndividualAttestation(
         parsedAuthorizationMap.findBooleanAuthorizationListEntry(KM_TAG_DEVICE_UNIQUE_ATTESTATION));
-    builder.setIdentityCredentialKey(
-        parsedAuthorizationMap.findBooleanAuthorizationListEntry(KM_TAG_IDENTITY_CREDENTIAL_KEY));
     parsedAuthorizationMap.getUnorderedTags().forEach(builder::addUnorderedTag);
 
     return builder.build();
@@ -893,8 +865,6 @@ public abstract class AuthorizationList {
     addBoolean(KM_TAG_TRUSTED_USER_PRESENCE_REQUIRED, this.trustedUserPresenceRequired(), vector);
     addBoolean(KM_TAG_TRUSTED_CONFIRMATION_REQUIRED, this.trustedConfirmationRequired(), vector);
     addBoolean(KM_TAG_UNLOCKED_DEVICE_REQUIRED, this.unlockedDeviceRequired(), vector);
-    addBoolean(KM_TAG_ALL_APPLICATIONS, this.allApplications(), vector);
-    addOptionalOctetString(KM_TAG_APPLICATION_ID, this.applicationId(), vector);
     addOptionalInstant(KM_TAG_CREATION_DATE_TIME, this.creationDateTime(), vector);
     addOptionalInteger(KM_TAG_ORIGIN, this.origin().map(KEY_ORIGIN_TO_ASN1::get), vector);
     addBoolean(KM_TAG_ROLLBACK_RESISTANT, this.rollbackResistant(), vector);
