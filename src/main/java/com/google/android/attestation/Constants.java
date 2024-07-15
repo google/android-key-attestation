@@ -64,8 +64,6 @@ public class Constants {
   public static final int KM_TAG_TRUSTED_USER_PRESENCE_REQUIRED = 507;
   public static final int KM_TAG_TRUSTED_CONFIRMATION_REQUIRED = 508;
   public static final int KM_TAG_UNLOCKED_DEVICE_REQUIRED = 509;
-  public static final int KM_TAG_ALL_APPLICATIONS = 600;
-  public static final int KM_TAG_APPLICATION_ID = 601;
   public static final int KM_TAG_CREATION_DATE_TIME = 701;
   public static final int KM_TAG_ORIGIN = 702;
   public static final int KM_TAG_ROLLBACK_RESISTANT = 703;
@@ -84,7 +82,6 @@ public class Constants {
   public static final int KM_TAG_VENDOR_PATCH_LEVEL = 718;
   public static final int KM_TAG_BOOT_PATCH_LEVEL = 719;
   public static final int KM_TAG_DEVICE_UNIQUE_ATTESTATION = 720;
-  public static final int KM_TAG_IDENTITY_CREDENTIAL_KEY = 721;
   public static final int KM_TAG_ATTESTATION_ID_SECOND_IMEI = 723;
   static final int ROOT_OF_TRUST_VERIFIED_BOOT_KEY_INDEX = 0;
   static final int ROOT_OF_TRUST_DEVICE_LOCKED_INDEX = 1;

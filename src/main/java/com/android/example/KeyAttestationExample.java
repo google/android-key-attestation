@@ -139,8 +139,6 @@ public class KeyAttestationExample {
             + authorizationList.trustedConfirmationRequired());
     System.out.println(
         indent + "Unlocked Device Required: " + authorizationList.unlockedDeviceRequired());
-    System.out.println(indent + "All Applications: " + authorizationList.allApplications());
-    print(authorizationList.applicationId(), indent + "Application ID");
     print(authorizationList.creationDateTime(), indent + "Creation DateTime");
     print(authorizationList.origin(), indent + "Origin");
     System.out.println(indent + "Rollback Resistant: " + authorizationList.rollbackResistant());
@@ -171,8 +169,6 @@ public class KeyAttestationExample {
     print(authorizationList.attestationIdModel(), indent + "Attestation ID Model");
     print(authorizationList.vendorPatchLevel(), indent + "Vendor Patch Level");
     print(authorizationList.bootPatchLevel(), indent + "Boot Patch Level");
-    System.out.println(
-        indent + "Identity Credential Key: " + authorizationList.identityCredentialKey());
   }
 
   private static void print(RootOfTrust rootOfTrust, String indent) {
