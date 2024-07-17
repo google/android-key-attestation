@@ -385,8 +385,6 @@ public abstract class AuthorizationList {
 
   public abstract boolean individualAttestation();
 
-
-
   public static Builder builder() {
     return new AutoValue_AuthorizationList.Builder()
         .setRollbackResistance(false)

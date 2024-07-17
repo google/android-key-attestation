@@ -61,10 +61,6 @@ public abstract class ParsedAttestationRecord {
 
   public abstract AuthorizationList teeEnforced();
 
-  @AutoValue.CopyAnnotations
-  @SuppressWarnings("Immutable")
-  public abstract PublicKey attestedKey();
-
   public static Builder builder() {
     return new AutoValue_ParsedAttestationRecord.Builder()
         .setAttestationChallenge(ByteString.EMPTY)
@@ -102,8 +98,6 @@ public abstract class ParsedAttestationRecord {
 
     public abstract Builder setTeeEnforced(AuthorizationList value);
 
-    public abstract Builder setAttestedKey(PublicKey value);
-
     public abstract ParsedAttestationRecord build();
   }
 
@@ -121,14 +115,14 @@ public abstract class ParsedAttestationRecord {
       byte[] attestationExtensionBytes = certs.get(i).getExtensionValue(KEY_DESCRIPTION_OID);
       if (attestationExtensionBytes != null && attestationExtensionBytes.length != 0) {
         return ParsedAttestationRecord.create(
-            extractAttestationSequence(attestationExtensionBytes), certs.get(i).getPublicKey());
+            extractAttestationSequence(attestationExtensionBytes));
       }
     }
 
     throw new IllegalArgumentException("Couldn't find the keystore attestation extension data.");
   }
 
-  public static ParsedAttestationRecord create(ASN1Sequence extensionData, PublicKey attestedKey) {
+  public static ParsedAttestationRecord create(ASN1Sequence extensionData) {
     Builder builder = builder();
     int attestationVersion =
         ASN1Parsing.getIntegerFromAsn1(extensionData.getObjectAt(ATTESTATION_VERSION_INDEX));
@@ -156,7 +150,6 @@ public abstract class ParsedAttestationRecord {
         AuthorizationList.createAuthorizationList(
             ASN1Sequence.getInstance(extensionData.getObjectAt(TEE_ENFORCED_INDEX)).toArray(),
             attestationVersion));
-    builder.setAttestedKey(attestedKey);
     return builder.build();
   }
 
