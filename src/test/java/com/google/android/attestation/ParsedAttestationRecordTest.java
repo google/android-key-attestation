@@ -18,20 +18,15 @@ package com.google.android.attestation;
 import static com.google.common.truth.Truth.assertThat;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import com.google.android.attestation.AuthorizationList.UserAuthType;
 import com.google.android.attestation.ParsedAttestationRecord.SecurityLevel;
 import com.google.protobuf.ByteString;
 import com.google.testing.junit.testparameterinjector.TestParameterInjector;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
-import org.bouncycastle.asn1.ASN1Sequence;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -132,40 +127,5 @@ public class ParsedAttestationRecordTest {
     assertThat(attestationRecord.uniqueId()).isEqualTo(EXPECTED_UNIQUE_ID);
     assertThat(attestationRecord.softwareEnforced()).isNotNull();
     assertThat(attestationRecord.teeEnforced()).isNotNull();
-  }
-
-  @Test
-  public void testCreateAndParseAttestationRecord() throws NoSuchAlgorithmException {
-    KeyPairGenerator generator = KeyPairGenerator.getInstance("EC");
-    generator.initialize(384);
-    PublicKey attestedKey = generator.generateKeyPair().getPublic();
-    AuthorizationList.Builder teeEnforcedBuilder = AuthorizationList.builder();
-    teeEnforcedBuilder.addUserAuthType(UserAuthType.FINGERPRINT);
-    teeEnforcedBuilder.setAttestationIdBrand("premium free food");
-    ParsedAttestationRecord expected =
-        ParsedAttestationRecord.builder()
-            .setAttestationVersion(2)
-            .setAttestationSecurityLevel(ParsedAttestationRecord.SecurityLevel.TRUSTED_ENVIRONMENT)
-            .setKeymasterVersion(4)
-            .setKeymasterSecurityLevel(ParsedAttestationRecord.SecurityLevel.SOFTWARE)
-            .setAttestationChallenge(ByteString.copyFromUtf8("abc"))
-            .setUniqueId(ByteString.copyFromUtf8("foodplease"))
-            .setSoftwareEnforced(AuthorizationList.builder().build())
-            .setTeeEnforced(teeEnforcedBuilder.build())
-            .setAttestedKey(attestedKey)
-            .build();
-    ASN1Sequence seq = expected.toAsn1Sequence();
-    ParsedAttestationRecord actual = ParsedAttestationRecord.create(seq, attestedKey);
-    assertThat(actual.attestationVersion()).isEqualTo(expected.attestationVersion());
-    assertThat(actual.attestationSecurityLevel()).isEqualTo(expected.attestationSecurityLevel());
-    assertThat(actual.keymasterVersion()).isEqualTo(expected.keymasterVersion());
-    assertThat(actual.keymasterSecurityLevel()).isEqualTo(expected.keymasterSecurityLevel());
-    assertThat(actual.attestationChallenge()).isEqualTo(expected.attestationChallenge());
-    assertThat(actual.uniqueId()).isEqualTo(expected.uniqueId());
-    assertThat(actual.teeEnforced().userAuthType())
-        .isEqualTo(expected.teeEnforced().userAuthType());
-    assertThat(actual.teeEnforced().attestationIdBrand())
-        .isEqualTo(expected.teeEnforced().attestationIdBrand());
-    assertThat(actual.attestedKey()).isEqualTo(expected.attestedKey());
   }
 }

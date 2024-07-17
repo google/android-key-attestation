@@ -80,10 +80,7 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Stream;
 import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1OctetString;
@@ -91,11 +88,6 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.ASN1Util;
-import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.DERSet;
-import org.bouncycastle.asn1.DERTaggedObject;
 
 /**
  * This data structure contains the key pair's properties themselves, as defined in the Keymaster
@@ -122,8 +114,6 @@ public abstract class AuthorizationList {
     EC,
   }
 
-  private static final ImmutableMap<Algorithm, Integer> ALGORITHM_TO_ASN1 =
-      ImmutableMap.of(Algorithm.RSA, 1, Algorithm.EC, 3);
   private static final ImmutableMap<Integer, Algorithm> ASN1_TO_ALGORITHM =
       ImmutableMap.of(1, Algorithm.RSA, 3, Algorithm.EC);
 
@@ -139,18 +129,6 @@ public abstract class AuthorizationList {
     CURVE_25519
   }
 
-  private static final ImmutableMap<EcCurve, Integer> EC_CURVE_TO_ASN1 =
-      ImmutableMap.of(
-          EcCurve.P_224,
-          0,
-          EcCurve.P_256,
-          1,
-          EcCurve.P_384,
-          2,
-          EcCurve.P_521,
-          3,
-          EcCurve.CURVE_25519,
-          4);
   private static final ImmutableMap<Integer, EcCurve> ASN1_TO_EC_CURVE =
       ImmutableMap.of(
           0,
@@ -765,14 +743,6 @@ public abstract class AuthorizationList {
     }
   }
 
-  private static String toString(LocalDate date) {
-    return date.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-  }
-
-  private static String toString(YearMonth date) {
-    return date.format(DateTimeFormatter.ofPattern("yyyyMM"));
-  }
-
   @VisibleForTesting
   static ImmutableSet<UserAuthType> userAuthTypeToEnum(long userAuthType) {
     if (userAuthType == 0) {
@@ -797,172 +767,6 @@ public abstract class AuthorizationList {
     }
 
     return result;
-  }
-
-  private static Long userAuthTypeToLong(Set<UserAuthType> userAuthType) {
-    if (userAuthType.contains(USER_AUTH_TYPE_NONE)) {
-      return 0L;
-    }
-
-    long result = 0L;
-
-    for (UserAuthType type : userAuthType) {
-      switch (type) {
-        case PASSWORD:
-          result |= 1L;
-          break;
-        case FINGERPRINT:
-          result |= 2L;
-          break;
-        case USER_AUTH_TYPE_ANY:
-          result |= UINT32_MAX;
-          break;
-        default:
-          break;
-      }
-    }
-
-    if (result == 0) {
-      throw new IllegalArgumentException("Invalid User Auth Type.");
-    }
-
-    return result;
-  }
-
-  public ASN1Sequence toAsn1Sequence() {
-    ASN1EncodableVector vector = new ASN1EncodableVector();
-    addOptionalIntegerSet(
-        KM_TAG_PURPOSE,
-        this.purpose().stream()
-            .flatMap(key -> Stream.ofNullable(OPERATION_PURPOSE_TO_ASN1.get(key)))
-            .collect(toImmutableSet()),
-        vector);
-    addOptionalInteger(KM_TAG_ALGORITHM, this.algorithm().map(ALGORITHM_TO_ASN1::get), vector);
-    addOptionalInteger(KM_TAG_KEY_SIZE, this.keySize(), vector);
-    addOptionalIntegerSet(
-        KM_TAG_DIGEST,
-        this.digest().stream()
-            .flatMap(key -> Stream.ofNullable(DIGEST_MODE_TO_ASN1.get(key)))
-            .collect(toImmutableSet()),
-        vector);
-    addOptionalIntegerSet(
-        KM_TAG_PADDING,
-        this.padding().stream()
-            .flatMap(key -> Stream.ofNullable(PADDING_MODE_TO_ASN1.get(key)))
-            .collect(toImmutableSet()),
-        vector);
-    addOptionalInteger(KM_TAG_EC_CURVE, this.ecCurve().map(EC_CURVE_TO_ASN1::get), vector);
-    addOptionalLong(KM_TAG_RSA_PUBLIC_EXPONENT, this.rsaPublicExponent(), vector);
-    addBoolean(KM_TAG_ROLLBACK_RESISTANCE, this.rollbackResistance(), vector);
-    addOptionalInstant(KM_TAG_ACTIVE_DATE_TIME, this.activeDateTime(), vector);
-    addOptionalInstant(
-        KM_TAG_ORIGINATION_EXPIRE_DATE_TIME, this.originationExpireDateTime(), vector);
-    addOptionalInstant(KM_TAG_USAGE_EXPIRE_DATE_TIME, this.usageExpireDateTime(), vector);
-    addBoolean(KM_TAG_NO_AUTH_REQUIRED, this.noAuthRequired(), vector);
-    addOptionalUserAuthType(KM_TAG_USER_AUTH_TYPE, this.userAuthType(), vector);
-    addOptionalDuration(KM_TAG_AUTH_TIMEOUT, this.authTimeout(), vector);
-    addBoolean(KM_TAG_ALLOW_WHILE_ON_BODY, this.allowWhileOnBody(), vector);
-    addBoolean(KM_TAG_TRUSTED_USER_PRESENCE_REQUIRED, this.trustedUserPresenceRequired(), vector);
-    addBoolean(KM_TAG_TRUSTED_CONFIRMATION_REQUIRED, this.trustedConfirmationRequired(), vector);
-    addBoolean(KM_TAG_UNLOCKED_DEVICE_REQUIRED, this.unlockedDeviceRequired(), vector);
-    addOptionalInstant(KM_TAG_CREATION_DATE_TIME, this.creationDateTime(), vector);
-    addOptionalInteger(KM_TAG_ORIGIN, this.origin().map(KEY_ORIGIN_TO_ASN1::get), vector);
-    addBoolean(KM_TAG_ROLLBACK_RESISTANT, this.rollbackResistant(), vector);
-    addOptionalRootOfTrust(KM_TAG_ROOT_OF_TRUST, this.rootOfTrust(), vector);
-    addOptionalInteger(KM_TAG_OS_VERSION, this.osVersion(), vector);
-    addOptionalInteger(
-        KM_TAG_OS_PATCH_LEVEL,
-        this.osPatchLevel().map(AuthorizationList::toString).map(Integer::valueOf),
-        vector);
-    this.attestationApplicationId()
-        .map(AttestationApplicationId::getEncoded)
-        .map(DEROctetString::new)
-        .map(obj -> new DERTaggedObject(KM_TAG_ATTESTATION_APPLICATION_ID, obj))
-        .ifPresent(vector::add);
-    addOptionalOctetString(KM_TAG_ATTESTATION_ID_BRAND, this.attestationIdBrand(), vector);
-    addOptionalOctetString(KM_TAG_ATTESTATION_ID_DEVICE, this.attestationIdDevice(), vector);
-    addOptionalOctetString(KM_TAG_ATTESTATION_ID_PRODUCT, this.attestationIdProduct(), vector);
-    addOptionalOctetString(KM_TAG_ATTESTATION_ID_SERIAL, this.attestationIdSerial(), vector);
-    addOptionalOctetString(KM_TAG_ATTESTATION_ID_IMEI, this.attestationIdImei(), vector);
-    addOptionalOctetString(
-        KM_TAG_ATTESTATION_ID_SECOND_IMEI, this.attestationIdSecondImei(), vector);
-    addOptionalOctetString(KM_TAG_ATTESTATION_ID_MEID, this.attestationIdMeid(), vector);
-    addOptionalOctetString(
-        KM_TAG_ATTESTATION_ID_MANUFACTURER, this.attestationIdManufacturer(), vector);
-    addOptionalOctetString(KM_TAG_ATTESTATION_ID_MODEL, this.attestationIdModel(), vector);
-    addOptionalInteger(
-        KM_TAG_VENDOR_PATCH_LEVEL,
-        this.vendorPatchLevel().map(AuthorizationList::toString).map(Integer::valueOf),
-        vector);
-    addOptionalInteger(
-        KM_TAG_BOOT_PATCH_LEVEL,
-        this.bootPatchLevel().map(AuthorizationList::toString).map(Integer::valueOf),
-        vector);
-    addBoolean(KM_TAG_DEVICE_UNIQUE_ATTESTATION, this.individualAttestation(), vector);
-    return new DERSequence(vector);
-  }
-
-  private static void addOptionalIntegerSet(
-      int tag, Set<Integer> entry, ASN1EncodableVector vector) {
-    if (!entry.isEmpty()) {
-      ASN1EncodableVector tmp = new ASN1EncodableVector();
-      entry.forEach((Integer value) -> tmp.add(new ASN1Integer(value.longValue())));
-      vector.add(new DERTaggedObject(tag, new DERSet(tmp)));
-    }
-  }
-
-  private static void addOptionalInstant(
-      int tag, Optional<Instant> entry, ASN1EncodableVector vector) {
-    if (entry.isPresent()) {
-      vector.add(new DERTaggedObject(tag, new ASN1Integer(entry.get().toEpochMilli())));
-    }
-  }
-
-  private static void addOptionalDuration(
-      int tag, Optional<Duration> entry, ASN1EncodableVector vector) {
-    if (entry.isPresent()) {
-      vector.add(new DERTaggedObject(tag, new ASN1Integer(entry.get().getSeconds())));
-    }
-  }
-
-  private static void addBoolean(int tag, boolean entry, ASN1EncodableVector vector) {
-    if (entry) {
-      vector.add(new DERTaggedObject(tag, DERNull.INSTANCE));
-    }
-  }
-
-  private static void addOptionalInteger(
-      int tag, Optional<Integer> entry, ASN1EncodableVector vector) {
-    if (entry.isPresent()) {
-      vector.add(new DERTaggedObject(tag, new ASN1Integer(entry.get())));
-    }
-  }
-
-  private static void addOptionalLong(int tag, Optional<Long> entry, ASN1EncodableVector vector) {
-    if (entry.isPresent()) {
-      vector.add(new DERTaggedObject(tag, new ASN1Integer(entry.get())));
-    }
-  }
-
-  private static void addOptionalOctetString(
-      int tag, Optional<ByteString> entry, ASN1EncodableVector vector) {
-    if (entry.isPresent()) {
-      vector.add(new DERTaggedObject(tag, new DEROctetString(entry.get().toByteArray())));
-    }
-  }
-
-  private static void addOptionalUserAuthType(
-      int tag, Set<UserAuthType> entry, ASN1EncodableVector vector) {
-    if (!entry.isEmpty()) {
-      vector.add(new DERTaggedObject(tag, new ASN1Integer(userAuthTypeToLong(entry))));
-    }
-  }
-
-  private static void addOptionalRootOfTrust(
-      int tag, Optional<RootOfTrust> entry, ASN1EncodableVector vector) {
-    if (entry.isPresent()) {
-      vector.add(new DERTaggedObject(tag, entry.get().toAsn1Sequence()));
-    }
   }
 
   /**

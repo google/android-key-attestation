@@ -29,13 +29,8 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.Immutable;
 import com.google.protobuf.ByteString;
 import java.util.Optional;
-import org.bouncycastle.asn1.ASN1Boolean;
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1Enumerated;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DERSequence;
 
 /** This collection of values defines key information about the device's status. */
 @AutoValue
@@ -116,20 +111,6 @@ public abstract class RootOfTrust {
     }
   }
 
-  private static int verifiedBootStateToInt(VerifiedBootState verifiedBootState) {
-    switch (verifiedBootState) {
-      case VERIFIED:
-        return KM_VERIFIED_BOOT_STATE_VERIFIED;
-      case SELF_SIGNED:
-        return KM_VERIFIED_BOOT_STATE_SELF_SIGNED;
-      case UNVERIFIED:
-        return KM_VERIFIED_BOOT_STATE_UNVERIFIED;
-      case FAILED:
-        return KM_VERIFIED_BOOT_STATE_FAILED;
-    }
-    throw new IllegalArgumentException("Invalid verified boot state.");
-  }
-
   /**
    * This provides the device's current boot state, which represents the level of protection
    * provided to the user and to apps after the device finishes booting.
@@ -139,24 +120,5 @@ public abstract class RootOfTrust {
     SELF_SIGNED,
     UNVERIFIED,
     FAILED
-  }
-
-  public ASN1Sequence toAsn1Sequence() {
-    ASN1Encodable[] rootOfTrustElements;
-    ByteString verifiedBootHash = this.verifiedBootHash().orElse(null);
-    if (verifiedBootHash != null) {
-      rootOfTrustElements = new ASN1Encodable[4];
-      rootOfTrustElements[ROOT_OF_TRUST_VERIFIED_BOOT_HASH_INDEX] =
-          new DEROctetString(verifiedBootHash.toByteArray());
-    } else {
-      rootOfTrustElements = new ASN1Encodable[3];
-    }
-    rootOfTrustElements[ROOT_OF_TRUST_VERIFIED_BOOT_KEY_INDEX] =
-        new DEROctetString(this.verifiedBootKey().toByteArray());
-    rootOfTrustElements[ROOT_OF_TRUST_DEVICE_LOCKED_INDEX] =
-        ASN1Boolean.getInstance(this.deviceLocked());
-    rootOfTrustElements[ROOT_OF_TRUST_VERIFIED_BOOT_STATE_INDEX] =
-        new ASN1Enumerated(verifiedBootStateToInt(this.verifiedBootState()));
-    return new DERSequence(rootOfTrustElements);
   }
 }

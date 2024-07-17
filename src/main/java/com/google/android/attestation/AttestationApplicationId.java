@@ -27,16 +27,11 @@ import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.Immutable;
 import com.google.protobuf.ByteString;
-import java.io.IOException;
 import java.util.Set;
-import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.DERSet;
 
 /**
  * This data structure reflects the Android platform's belief as to which apps are allowed to use
@@ -112,27 +107,6 @@ public abstract class AttestationApplicationId {
     return builder.build();
   }
 
-  byte[] getEncoded() {
-    ASN1Encodable[] applicationIdAsn1Array = new ASN1Encodable[2];
-    applicationIdAsn1Array[ATTESTATION_APPLICATION_ID_PACKAGE_INFOS_INDEX] =
-        new DERSet(
-            packageInfos().stream()
-                .map(AttestationPackageInfo::toAsn1Sequence)
-                .toArray(ASN1Sequence[]::new));
-    applicationIdAsn1Array[ATTESTATION_APPLICATION_ID_SIGNATURE_DIGESTS_INDEX] =
-        new DERSet(
-            signatureDigests().stream()
-                .map(ByteString::toByteArray)
-                .map(DEROctetString::new)
-                .toArray(DEROctetString[]::new));
-
-    try {
-      return new DERSequence(applicationIdAsn1Array).getEncoded();
-    } catch (IOException e) {
-      throw new IllegalArgumentException(e);
-    }
-  }
-
   /** Provides package's name and version number. */
   @AutoValue
   @Immutable
@@ -170,14 +144,6 @@ public abstract class AttestationApplicationId {
           .setPackageName(packageName)
           .setVersion(version)
           .build();
-    }
-
-    ASN1Sequence toAsn1Sequence() {
-      ASN1Encodable[] packageInfoAsn1Array = new ASN1Encodable[2];
-      packageInfoAsn1Array[ATTESTATION_PACKAGE_INFO_PACKAGE_NAME_INDEX] =
-          new DEROctetString(packageName().getBytes(UTF_8));
-      packageInfoAsn1Array[ATTESTATION_PACKAGE_INFO_VERSION_INDEX] = new ASN1Integer(version());
-      return new DERSequence(packageInfoAsn1Array);
     }
   }
 }

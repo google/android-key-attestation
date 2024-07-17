@@ -15,7 +15,6 @@
 
 package com.google.android.attestation;
 
-import static com.google.android.attestation.AuthorizationList.toLocalDate;
 import static com.google.android.attestation.AuthorizationList.DigestMode.SHA_2_256;
 import static com.google.android.attestation.AuthorizationList.OperationPurpose.SIGN;
 import static com.google.android.attestation.AuthorizationList.OperationPurpose.VERIFY;
@@ -25,6 +24,7 @@ import static com.google.android.attestation.AuthorizationList.UserAuthType.FING
 import static com.google.android.attestation.AuthorizationList.UserAuthType.PASSWORD;
 import static com.google.android.attestation.AuthorizationList.UserAuthType.USER_AUTH_TYPE_ANY;
 import static com.google.android.attestation.AuthorizationList.UserAuthType.USER_AUTH_TYPE_NONE;
+import static com.google.android.attestation.AuthorizationList.toLocalDate;
 import static com.google.android.attestation.AuthorizationList.userAuthTypeToEnum;
 import static com.google.android.attestation.Constants.UINT32_MAX;
 import static com.google.common.truth.Truth.assertThat;
@@ -175,18 +175,6 @@ public class AuthorizationListTest {
 
     assertThat(authorizationList.unorderedTags()).isEmpty();
     assertThat(authorizationList.individualAttestation()).isTrue();
-  }
-
-  @Test
-  public void testCreateAndParse() throws IOException {
-    AuthorizationList authorizationList =
-        AuthorizationList.createAuthorizationList(
-            getEncodableAuthorizationList(EXTENTION_DATA_WITH_INDIVIDUAL_ATTESTATION),
-            ATTESTATION_VERSION);
-    ASN1Sequence seq = authorizationList.toAsn1Sequence();
-    assertThat(authorizationList.unorderedTags()).isEmpty();
-    assertThat(seq.getEncoded("DER"))
-        .isEqualTo(Base64.getDecoder().decode(EXTENTION_DATA_WITH_INDIVIDUAL_ATTESTATION));
   }
 
   @Test
