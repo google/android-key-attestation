@@ -15,45 +15,19 @@
 
 package com.google.android.attestation;
 
-import static com.google.android.attestation.AuthorizationList.DigestMode.SHA_2_256;
-import static com.google.android.attestation.AuthorizationList.OperationPurpose.SIGN;
-import static com.google.android.attestation.AuthorizationList.OperationPurpose.VERIFY;
-import static com.google.android.attestation.AuthorizationList.PaddingMode.RSA_PKCS1_1_5_SIGN;
-import static com.google.android.attestation.AuthorizationList.PaddingMode.RSA_PSS;
-import static com.google.android.attestation.AuthorizationList.UserAuthType.FINGERPRINT;
-import static com.google.android.attestation.AuthorizationList.UserAuthType.PASSWORD;
-import static com.google.android.attestation.AuthorizationList.UserAuthType.USER_AUTH_TYPE_ANY;
-import static com.google.android.attestation.AuthorizationList.UserAuthType.USER_AUTH_TYPE_NONE;
-import static com.google.android.attestation.AuthorizationList.toLocalDate;
-import static com.google.android.attestation.AuthorizationList.userAuthTypeToEnum;
-import static com.google.android.attestation.Constants.UINT32_MAX;
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.fail;
 
-import com.google.android.attestation.AuthorizationList.Algorithm;
-import com.google.android.attestation.AuthorizationList.DigestMode;
-import com.google.android.attestation.AuthorizationList.KeyOrigin;
-import com.google.android.attestation.AuthorizationList.OperationPurpose;
-import com.google.android.attestation.AuthorizationList.PaddingMode;
 import com.google.common.collect.ImmutableSet;
-import com.google.testing.junit.testparameterinjector.TestParameter;
-import com.google.testing.junit.testparameterinjector.TestParameterInjector;
 import java.io.IOException;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.YearMonth;
-import java.util.Arrays;
 import java.util.Base64;
-import java.util.Collections;
-import java.util.List;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 /** Test for {@link AuthorizationList}. */
-@RunWith(TestParameterInjector.class)
+@RunWith(JUnit4.class)
 public class AuthorizationListTest {
 
   // Generated from certificate with RSA Algorithm and StrongBox Security Level
@@ -72,8 +46,7 @@ public class AuthorizationListTest {
           + "NVCDUpCEqTeAG/hUEDAgEAv4VCBQIDAxSzv4VOBgIEATQV8b+FTwYCBAE0Few=";
   private static final int ATTESTATION_VERSION = 3;
 
-  // 2019-07-15T14:56:32.972Z
-  private static final Instant EXPECTED_SW_CREATION_DATETIME = Instant.ofEpochMilli(1563202592972L);
+  private static final Long EXPECTED_SW_CREATION_DATETIME = 1563202592972L;
   private static final AttestationApplicationId EXPECTED_SW_ATTESTATION_APPLICATION_ID =
       AttestationApplicationId.createAttestationApplicationId(
           Base64.getDecoder()
@@ -86,19 +59,19 @@ public class AuthorizationListTest {
                       + "YXBlcmJhY2t1cAIBHTAhBBxjb20uZ29vZ2xlLlNTUmVzdGFydERldGVjdG9yAgEdMCIEHWNvbS"
                       + "5nb29nbGUuYW5kcm9pZC5oaWRkZW5tZW51AgEBMCMEHmNvbS5hbmRyb2lkLnByb3ZpZGVycy5z"
                       + "ZXR0aW5ncwIBHTEiBCAwGqPLCBE0UBxF8UIqvGbCQiT9Xe1f3I8X5pcXb9hmqg=="));
-  private static final ImmutableSet<OperationPurpose> EXPECTED_TEE_PURPOSE =
-      ImmutableSet.of(SIGN, VERIFY);
-  private static final Algorithm EXPECTED_TEE_ALGORITHM = Algorithm.RSA;
+  private static final ImmutableSet<Integer> EXPECTED_TEE_PURPOSE =
+      ImmutableSet.of(2,3);
+  private static final Integer EXPECTED_TEE_ALGORITHM = 1;
   private static final Integer EXPECTED_TEE_KEY_SIZE = 2048;
-  private static final ImmutableSet<DigestMode> EXPECTED_TEE_DIGEST = ImmutableSet.of(SHA_2_256);
-  private static final ImmutableSet<PaddingMode> EXPECTED_TEE_PADDING =
-      ImmutableSet.of(RSA_PSS, RSA_PKCS1_1_5_SIGN);
+  private static final ImmutableSet<Integer> EXPECTED_TEE_DIGEST = ImmutableSet.of(4);
+  private static final ImmutableSet<Integer> EXPECTED_TEE_PADDING =
+      ImmutableSet.of(3, 5);
   private static final Long EXPECTED_TEE_RSA_PUBLIC_COMPONENT = 65537L;
-  private static final KeyOrigin EXPECTED_TEE_ORIGIN = KeyOrigin.GENERATED;
+  private static final Integer EXPECTED_TEE_ORIGIN = 0;
   private static final Integer EXPECTED_TEE_OS_VERSION = 0;
-  private static final YearMonth EXPECTED_TEE_OS_PATCH_LEVEL = YearMonth.of(2019, 7);
-  private static final LocalDate EXPECTED_TEE_VENDOR_PATCH_LEVEL = LocalDate.of(2019, 7, 5);
-  private static final LocalDate EXPECTED_TEE_BOOT_PATCH_LEVEL = LocalDate.of(2019, 7, 1);
+  private static final Integer EXPECTED_TEE_OS_PATCH_LEVEL = 201907;
+  private static final Integer EXPECTED_TEE_VENDOR_PATCH_LEVEL = 20190705;
+  private static final Integer EXPECTED_TEE_BOOT_PATCH_LEVEL = 20190700;
 
   private static ASN1Encodable[] getEncodableAuthorizationList(String extensionData)
       throws IOException {
@@ -116,7 +89,7 @@ public class AuthorizationListTest {
     assertThat(authorizationList.rootOfTrust()).isEmpty();
     assertThat(authorizationList.attestationApplicationId())
         .hasValue(EXPECTED_SW_ATTESTATION_APPLICATION_ID);
-    assertThat(authorizationList.individualAttestation()).isFalse();
+    assertThat(authorizationList.deviceUniqueAttestation()).isFalse();
   }
 
   @Test
@@ -138,24 +111,7 @@ public class AuthorizationListTest {
     assertThat(authorizationList.osPatchLevel()).hasValue(EXPECTED_TEE_OS_PATCH_LEVEL);
     assertThat(authorizationList.vendorPatchLevel()).hasValue(EXPECTED_TEE_VENDOR_PATCH_LEVEL);
     assertThat(authorizationList.bootPatchLevel()).hasValue(EXPECTED_TEE_BOOT_PATCH_LEVEL);
-    assertThat(authorizationList.individualAttestation()).isFalse();
-  }
-
-  @Test
-  public void testUserAuthTypeToEnum() {
-    assertThat(userAuthTypeToEnum(0L)).isEqualTo(ImmutableSet.of(USER_AUTH_TYPE_NONE));
-    assertThat(userAuthTypeToEnum(1L)).isEqualTo(ImmutableSet.of(PASSWORD));
-    assertThat(userAuthTypeToEnum(2L)).isEqualTo(ImmutableSet.of(FINGERPRINT));
-    assertThat(userAuthTypeToEnum(3L)).isEqualTo(ImmutableSet.of(PASSWORD, FINGERPRINT));
-    assertThat(userAuthTypeToEnum(UINT32_MAX))
-        .isEqualTo(ImmutableSet.of(PASSWORD, FINGERPRINT, USER_AUTH_TYPE_ANY));
-
-    try {
-      userAuthTypeToEnum(4L);
-      fail();
-    } catch (IllegalArgumentException expected) {
-      assertThat(expected).hasMessageThat().contains("Invalid User Auth Type.");
-    }
+    assertThat(authorizationList.deviceUniqueAttestation()).isFalse();
   }
 
   private static final String EXTENTION_DATA_WITH_INDIVIDUAL_ATTESTATION =
@@ -171,46 +127,6 @@ public class AuthorizationListTest {
             getEncodableAuthorizationList(EXTENTION_DATA_WITH_INDIVIDUAL_ATTESTATION),
             ATTESTATION_VERSION);
 
-    assertThat(authorizationList.individualAttestation()).isTrue();
-  }
-
-  @Test
-  public void testPaddingModeMap(@TestParameter AuthorizationList.PaddingMode paddingMode) {
-    assertThat(
-            AuthorizationList.ASN1_TO_PADDING_MODE.get(
-                AuthorizationList.PADDING_MODE_TO_ASN1.get(paddingMode)))
-        .isEqualTo(paddingMode);
-  }
-
-  @Test
-  public void testDigestModeMap(@TestParameter AuthorizationList.DigestMode digestMode) {
-    assertThat(
-            AuthorizationList.ASN1_TO_DIGEST_MODE.get(
-                AuthorizationList.DIGEST_MODE_TO_ASN1.get(digestMode)))
-        .isEqualTo(digestMode);
-  }
-
-  @Test
-  public void testKeyOriginMap(@TestParameter AuthorizationList.KeyOrigin keyOrigin) {
-    assertThat(
-            AuthorizationList.ASN1_TO_KEY_ORIGIN.get(
-                AuthorizationList.KEY_ORIGIN_TO_ASN1.get(keyOrigin)))
-        .isEqualTo(keyOrigin);
-  }
-
-  @Test
-  public void testOperationPurposeMap(@TestParameter AuthorizationList.OperationPurpose purpose) {
-    assertThat(
-            AuthorizationList.ASN1_TO_OPERATION_PURPOSE.get(
-                AuthorizationList.OPERATION_PURPOSE_TO_ASN1.get(purpose)))
-        .isEqualTo(purpose);
-  }
-
-  @Test
-  public void toLocalDate_conversionSucceeds() {
-    assertThat(toLocalDate("20240205")).isEqualTo(LocalDate.of(2024, 02, 05));
-    assertThat(toLocalDate("20240200")).isEqualTo(LocalDate.of(2024, 02, 01));
-    assertThat(toLocalDate("20240000")).isEqualTo(LocalDate.of(2024, 01, 01));
-    assertThat(toLocalDate("202402")).isEqualTo(LocalDate.of(2024, 02, 01));
+    assertThat(authorizationList.deviceUniqueAttestation()).isTrue();
   }
 }

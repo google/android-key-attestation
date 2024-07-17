@@ -16,7 +16,6 @@ java_test(
     deps = [
         "//src/main/java/com/google/android/attestation",
         "@maven//:com_google_guava_guava",
-        "@maven//:com_google_testparameterinjector_test_parameter_injector",
         "@maven//:com_google_truth_truth",
         "@maven//:junit_junit",
         "@maven//:org_bouncycastle_bcprov_jdk18on",

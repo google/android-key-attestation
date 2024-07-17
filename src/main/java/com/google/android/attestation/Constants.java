@@ -53,6 +53,7 @@ public class Constants {
   public static final int KM_TAG_PADDING = 6;
   public static final int KM_TAG_EC_CURVE = 10;
   public static final int KM_TAG_RSA_PUBLIC_EXPONENT = 200;
+  public static final int KM_TAG_RSA_OAEP_MGF_DIGEST = 203;
   public static final int KM_TAG_ROLLBACK_RESISTANCE = 303;
   public static final int KM_TAG_ACTIVE_DATE_TIME = 400;
   public static final int KM_TAG_ORIGINATION_EXPIRE_DATE_TIME = 401;
@@ -66,7 +67,6 @@ public class Constants {
   public static final int KM_TAG_UNLOCKED_DEVICE_REQUIRED = 509;
   public static final int KM_TAG_CREATION_DATE_TIME = 701;
   public static final int KM_TAG_ORIGIN = 702;
-  public static final int KM_TAG_ROLLBACK_RESISTANT = 703;
   public static final int KM_TAG_ROOT_OF_TRUST = 704;
   public static final int KM_TAG_OS_VERSION = 705;
   public static final int KM_TAG_OS_PATCH_LEVEL = 706;
@@ -100,8 +100,6 @@ public class Constants {
   static final int KM_VERIFIED_BOOT_STATE_SELF_SIGNED = 1;
   static final int KM_VERIFIED_BOOT_STATE_UNVERIFIED = 2;
   static final int KM_VERIFIED_BOOT_STATE_FAILED = 3;
-  // Unsigned max value of 32-bit integer, 2^32 - 1
-  static final long UINT32_MAX = (((long) Integer.MAX_VALUE) << 1) + 1;
 
   private Constants() {}
 }
