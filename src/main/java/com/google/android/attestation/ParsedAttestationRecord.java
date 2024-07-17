@@ -33,9 +33,7 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.Immutable;
 import com.google.protobuf.ByteString;
 import java.io.IOException;
-import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import java.util.List;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
@@ -101,25 +99,10 @@ public abstract class ParsedAttestationRecord {
     public abstract ParsedAttestationRecord build();
   }
 
-  public static ParsedAttestationRecord createParsedAttestationRecord(List<X509Certificate> certs)
+  public static ParsedAttestationRecord createParsedAttestationRecord(X509Certificate cert)
       throws IOException {
-
-    // Parse the attestation record that is closest to the root. This prevents an adversary from
-    // attesting an attestation record of their choice with an otherwise trusted chain using the
-    // following attack:
-    // 1) having the TEE attest a key under the adversary's control,
-    // 2) using that key to sign a new leaf certificate with an attestation extension that has their
-    //    chosen attestation record, then
-    // 3) appending that certificate to the original certificate chain.
-    for (int i = certs.size() - 1; i >= 0; i--) {
-      byte[] attestationExtensionBytes = certs.get(i).getExtensionValue(KEY_DESCRIPTION_OID);
-      if (attestationExtensionBytes != null && attestationExtensionBytes.length != 0) {
-        return ParsedAttestationRecord.create(
-            extractAttestationSequence(attestationExtensionBytes));
-      }
-    }
-
-    throw new IllegalArgumentException("Couldn't find the keystore attestation extension data.");
+    byte[] attestationExtensionBytes = cert.getExtensionValue(KEY_DESCRIPTION_OID);
+    return ParsedAttestationRecord.create(extractAttestationSequence(attestationExtensionBytes));
   }
 
   public static ParsedAttestationRecord create(ASN1Sequence extensionData) {
