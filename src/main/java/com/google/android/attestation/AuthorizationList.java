@@ -87,7 +87,6 @@ import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.ASN1Util;
 
 /**
  * This data structure contains the key pair's properties themselves, as defined in the Keymaster
@@ -707,8 +706,7 @@ public abstract class AuthorizationList {
             .map(ASN1TaggedObject::getInstance)
             .collect(
                 toImmutableMap(
-                    ASN1TaggedObject::getTagNo,
-                    obj -> ASN1Util.getExplicitContextBaseObject(obj, obj.getTagNo())));
+                    ASN1TaggedObject::getTagNo, ASN1TaggedObject::getExplicitBaseObject));
 
     List<Integer> unorderedTags = new ArrayList<>();
     int previousTag = 0;
