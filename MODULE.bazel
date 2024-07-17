@@ -3,17 +3,19 @@ bazel_dep(name = "rules_jvm_external", version = "6.2")
 maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
 maven.install(
     artifacts = [
-        "com.google.auto.value:auto-value:1.10.4",
-        "com.google.code.gson:gson:2.10.1",
-        "com.google.errorprone:error_prone_annotations:2.24.1",
-        "com.google.guava:guava:33.0.0-jre",
-        "com.google.protobuf:protobuf-javalite:3.25.1",
+        # main
+        "com.google.auto.value:auto-value:1.11.0",
+        "com.google.code.gson:gson:2.11.0",
+        "com.google.errorprone:error_prone_annotations:2.29.0",
+        "com.google.guava:guava:33.2.1-jre",
+        "com.google.protobuf:protobuf-javalite:4.27.2",
         "com.squareup.okhttp3:okhttp:4.12.0",
-        "org.bouncycastle:bcpkix-jdk18on:1.77",
-        "org.bouncycastle:bcprov-jdk18on:1.77",
-        "com.google.testparameterinjector:test-parameter-injector:1.15",
-        "com.google.truth:truth:1.4.0",
-        "com.google.truth.extensions:truth-java8-extension:1.3.0",
+        "org.bouncycastle:bcpkix-jdk18on:1.78.1",
+        "org.bouncycastle:bcprov-jdk18on:1.78.1",
+
+        # test
+        "com.google.testparameterinjector:test-parameter-injector:1.16",
+        "com.google.truth:truth:1.4.4",
         "junit:junit:4.13.2",
     ],
     lock_file = "//:maven_install.json",
