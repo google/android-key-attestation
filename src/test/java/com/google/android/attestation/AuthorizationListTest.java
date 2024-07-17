@@ -112,7 +112,6 @@ public class AuthorizationListTest {
         AuthorizationList.createAuthorizationList(
             getEncodableAuthorizationList(SW_ENFORCED_EXTENSION_DATA), ATTESTATION_VERSION);
 
-    assertThat(authorizationList.unorderedTags()).isEmpty();
     assertThat(authorizationList.creationDateTime()).hasValue(EXPECTED_SW_CREATION_DATETIME);
     assertThat(authorizationList.rootOfTrust()).isEmpty();
     assertThat(authorizationList.attestationApplicationId())
@@ -126,7 +125,6 @@ public class AuthorizationListTest {
         AuthorizationList.createAuthorizationList(
             getEncodableAuthorizationList(TEE_ENFORCED_EXTENSION_DATA), ATTESTATION_VERSION);
 
-    assertThat(authorizationList.unorderedTags()).isEmpty();
     assertThat(authorizationList.purpose()).isEqualTo(EXPECTED_TEE_PURPOSE);
     assertThat(authorizationList.algorithm()).hasValue(EXPECTED_TEE_ALGORITHM);
     assertThat(authorizationList.keySize()).hasValue(EXPECTED_TEE_KEY_SIZE);
@@ -173,37 +171,7 @@ public class AuthorizationListTest {
             getEncodableAuthorizationList(EXTENTION_DATA_WITH_INDIVIDUAL_ATTESTATION),
             ATTESTATION_VERSION);
 
-    assertThat(authorizationList.unorderedTags()).isEmpty();
     assertThat(authorizationList.individualAttestation()).isTrue();
-  }
-
-  @Test
-  public void testCreateWithUnorderedTagAndParse() throws IOException {
-    // Create a encodable auth list from valid attestation extension data.
-    ASN1Encodable[] encodableAuthList =
-        getEncodableAuthorizationList(EXTENTION_DATA_WITH_INDIVIDUAL_ATTESTATION);
-
-    // Introduce the error - alter the order of auth objects in auth list.
-    ASN1Encodable entry = encodableAuthList[13];
-    ASN1TaggedObject taggedEntry = ASN1TaggedObject.getInstance(entry);
-    encodableAuthList[13] = encodableAuthList[12];
-    encodableAuthList[12] = entry;
-    AuthorizationList authorizationList =
-        AuthorizationList.createAuthorizationList(encodableAuthList, ATTESTATION_VERSION);
-    // Make sure there is unordered tag present.
-    assertThat(authorizationList.unorderedTags()).containsExactly(taggedEntry.getTagNo());
-  }
-
-  @Test
-  public void testCreateWithUnorderedTagsAndParse() throws IOException {
-    List<ASN1Encodable> encodableAuthList =
-        Arrays.asList(getEncodableAuthorizationList(EXTENTION_DATA_WITH_INDIVIDUAL_ATTESTATION));
-    Collections.swap(encodableAuthList, 3, 5);
-    Collections.swap(encodableAuthList, 12, 13);
-    AuthorizationList authorizationList =
-        AuthorizationList.createAuthorizationList(
-            encodableAuthList.stream().toArray(ASN1Encodable[]::new), ATTESTATION_VERSION);
-    assertThat(authorizationList.unorderedTags()).containsExactly(6, 200, 712);
   }
 
   @Test

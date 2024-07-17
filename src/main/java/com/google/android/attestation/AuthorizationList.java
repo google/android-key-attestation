@@ -65,7 +65,6 @@ import static java.util.Arrays.stream;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
@@ -77,8 +76,6 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Integer;
@@ -389,7 +386,6 @@ public abstract class AuthorizationList {
   public abstract boolean individualAttestation();
 
 
-  public abstract ImmutableList<Integer> unorderedTags();
 
   public static Builder builder() {
     return new AutoValue_AuthorizationList.Builder()
@@ -553,14 +549,6 @@ public abstract class AuthorizationList {
 
     public abstract Builder setIndividualAttestation(boolean individualAttestation);
 
-    abstract ImmutableList.Builder<Integer> unorderedTagsBuilder();
-
-    @CanIgnoreReturnValue
-    public final Builder addUnorderedTag(Integer value) {
-      unorderedTagsBuilder().add(value);
-      return this;
-    }
-
     public abstract AuthorizationList build();
   }
 
@@ -690,7 +678,6 @@ public abstract class AuthorizationList {
         .ifPresent(builder::setBootPatchLevel);
     builder.setIndividualAttestation(
         parsedAuthorizationMap.findBooleanAuthorizationListEntry(KM_TAG_DEVICE_UNIQUE_ATTESTATION));
-    parsedAuthorizationMap.getUnorderedTags().forEach(builder::addUnorderedTag);
 
     return builder.build();
   }
@@ -707,16 +694,7 @@ public abstract class AuthorizationList {
             .collect(
                 toImmutableMap(
                     ASN1TaggedObject::getTagNo, ASN1TaggedObject::getExplicitBaseObject));
-
-    List<Integer> unorderedTags = new ArrayList<>();
-    int previousTag = 0;
-    for (int currentTag : authorizationMap.keySet()) {
-      if (previousTag > currentTag) {
-        unorderedTags.add(previousTag);
-      }
-      previousTag = currentTag;
-    }
-    return new ParsedAuthorizationMap(authorizationMap, ImmutableList.copyOf(unorderedTags));
+    return new ParsedAuthorizationMap(authorizationMap);
   }
 
   @VisibleForTesting
@@ -769,20 +747,13 @@ public abstract class AuthorizationList {
 
   /**
    * This data structure holds the parsed attest record authorizations mapped to their authorization
-   * tags and a list of unordered authorization tags found in this authorization list.
+   * tags.
    */
   private static class ParsedAuthorizationMap {
     private final ImmutableMap<Integer, ASN1Object> authorizationMap;
-    private final ImmutableList<Integer> unorderedTags;
 
-    private ParsedAuthorizationMap(
-        ImmutableMap<Integer, ASN1Object> authorizationMap, ImmutableList<Integer> unorderedTags) {
+    private ParsedAuthorizationMap(ImmutableMap<Integer, ASN1Object> authorizationMap) {
       this.authorizationMap = authorizationMap;
-      this.unorderedTags = unorderedTags;
-    }
-
-    private ImmutableList<Integer> getUnorderedTags() {
-      return unorderedTags;
     }
 
     private Optional<ASN1Object> findAuthorizationListEntry(int tag) {
