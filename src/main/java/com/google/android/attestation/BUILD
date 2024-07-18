@@ -21,7 +21,7 @@ kt_jvm_library(
     name = "attestation",
     srcs = [
         "ASN1Parsing.kt",
-        "AttestationApplicationId.java",
+        "AttestationApplicationId.kt",
         "AuthorizationList.java",
         "Constants.kt",
         "ParsedAttestationRecord.java",
