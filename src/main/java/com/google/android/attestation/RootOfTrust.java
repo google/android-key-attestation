@@ -43,7 +43,7 @@ public abstract class RootOfTrust {
 
   public abstract VerifiedBootState verifiedBootState();
 
-  public abstract Optional<ByteString> verifiedBootHash();
+  public abstract ByteString verifiedBootHash();
 
   public static Builder builder() {
     return new AutoValue_RootOfTrust.Builder()
