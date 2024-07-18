@@ -19,3 +19,5 @@ maven.install(
     lock_file = "//:maven_install.json",
 )
 use_repo(maven, "maven")
+
+bazel_dep(name = "rules_kotlin", version = "1.9.5")

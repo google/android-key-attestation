@@ -1,3 +1,5 @@
+load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
+
 package(default_visibility = ["//visibility:public"])
 
 java_plugin(
@@ -15,10 +17,10 @@ java_library(
     ],
 )
 
-java_library(
+kt_jvm_library(
     name = "attestation",
     srcs = [
-        "ASN1Parsing.java",
+        "ASN1Parsing.kt",
         "AttestationApplicationId.java",
         "AuthorizationList.java",
         "Constants.java",
