@@ -22,7 +22,7 @@ kt_jvm_library(
     srcs = [
         "ASN1Parsing.kt",
         "AttestationApplicationId.kt",
-        "AuthorizationList.java",
+        "AuthorizationList.kt",
         "Constants.kt",
         "ParsedAttestationRecord.kt",
         "RootOfTrust.kt",
