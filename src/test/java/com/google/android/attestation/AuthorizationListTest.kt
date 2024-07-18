@@ -1,0 +1,114 @@
+/* Copyright 2019, The Android Open Source Project, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.google.android.attestation
+
+import com.google.android.attestation.AttestationApplicationId.Companion.createAttestationApplicationId
+import com.google.android.attestation.AuthorizationList.Companion.createAuthorizationList
+import com.google.common.collect.ImmutableSet
+import com.google.common.truth.Truth.assertThat
+import org.bouncycastle.asn1.ASN1Encodable
+import org.bouncycastle.asn1.ASN1Sequence
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.JUnit4
+import java.io.IOException
+import java.util.*
+
+
+/** Test for [AuthorizationList].  */
+@RunWith(JUnit4::class)
+class AuthorizationListTest {
+    @Test
+    @Throws(IOException::class)
+    fun testCanParseAuthorizationListFromSwEnforced() {
+        val authorizationList = createAuthorizationList(
+            getEncodableAuthorizationList(SW_ENFORCED_EXTENSION_DATA), ATTESTATION_VERSION
+        )
+
+        assertThat(authorizationList.creationDateTime).isEqualTo(EXPECTED_SW_CREATION_DATETIME)
+        assertThat(authorizationList.rootOfTrust).isNull()
+        assertThat(authorizationList.attestationApplicationId).isEqualTo(EXPECTED_SW_ATTESTATION_APPLICATION_ID)
+        assertThat(authorizationList.deviceUniqueAttestation).isFalse()
+    }
+
+    @Test
+    @Throws(IOException::class)
+    fun testCanParseAuthorizationListFromTeeEnforced() {
+        val authorizationList = createAuthorizationList(
+            getEncodableAuthorizationList(TEE_ENFORCED_EXTENSION_DATA), ATTESTATION_VERSION
+        )
+
+        assertThat(authorizationList.purpose).isEqualTo(EXPECTED_TEE_PURPOSE)
+        assertThat(authorizationList.algorithm).isEqualTo(EXPECTED_TEE_ALGORITHM)
+        assertThat(authorizationList.keySize).isEqualTo(EXPECTED_TEE_KEY_SIZE)
+        assertThat(authorizationList.digest).isEqualTo(EXPECTED_TEE_DIGEST)
+        assertThat(authorizationList.padding).isEqualTo(EXPECTED_TEE_PADDING)
+        assertThat(authorizationList.rsaPublicExponent).isEqualTo(EXPECTED_TEE_RSA_PUBLIC_COMPONENT)
+        assertThat(authorizationList.noAuthRequired).isTrue()
+        assertThat(authorizationList.origin).isEqualTo(EXPECTED_TEE_ORIGIN)
+        assertThat(authorizationList.rootOfTrust).isNotNull()
+        assertThat(authorizationList.osVersion).isEqualTo(EXPECTED_TEE_OS_VERSION)
+        assertThat(authorizationList.osPatchLevel).isEqualTo(EXPECTED_TEE_OS_PATCH_LEVEL)
+        assertThat(authorizationList.vendorPatchLevel).isEqualTo(EXPECTED_TEE_VENDOR_PATCH_LEVEL)
+        assertThat(authorizationList.bootPatchLevel).isEqualTo(EXPECTED_TEE_BOOT_PATCH_LEVEL)
+        assertThat(authorizationList.deviceUniqueAttestation).isFalse()
+    }
+
+    @Test
+    @Throws(IOException::class)
+    fun testCanParseIndividualAttestation() {
+        val authorizationList = createAuthorizationList(
+            getEncodableAuthorizationList(EXTENTION_DATA_WITH_INDIVIDUAL_ATTESTATION), ATTESTATION_VERSION
+        )
+
+        assertThat(authorizationList.deviceUniqueAttestation).isTrue()
+    }
+
+    companion object {
+        // Generated from certificate with RSA Algorithm and StrongBox Security Level
+        private const val SW_ENFORCED_EXTENSION_DATA =
+            ("MIIBzb+FPQgCBgFr9iKgzL+FRYIBuwSCAbcwggGzMYIBizAMBAdhbmRyb2lkAgEdMBkEFGNvbS5hbmRyb2lkLmtleWNo" + "YWluAgEdMBkEFGNvbS5hbmRyb2lkLnNldHRpbmdzAgEdMBkEFGNvbS5xdGkuZGlhZ3NlcnZpY2VzAgEdMBoEFW" + "NvbS5hbmRyb2lkLmR5bnN5c3RlbQIBHTAdBBhjb20uYW5kcm9pZC5pbnB1dGRldmljZXMCAR0wHwQaY29tLmFu" + "ZHJvaWQubG9jYWx0cmFuc3BvcnQCAR0wHwQaY29tLmFuZHJvaWQubG9jYXRpb24uZnVzZWQCAR0wHwQaY29tLm" + "FuZHJvaWQuc2VydmVyLnRlbGVjb20CAR0wIAQbY29tLmFuZHJvaWQud2FsbHBhcGVyYmFja3VwAgEdMCEEHGNv" + "bS5nb29nbGUuU1NSZXN0YXJ0RGV0ZWN0b3ICAR0wIgQdY29tLmdvb2dsZS5hbmRyb2lkLmhpZGRlbm1lbnUCAQ" + "EwIwQeY29tLmFuZHJvaWQucHJvdmlkZXJzLnNldHRpbmdzAgEdMSIEIDAao8sIETRQHEXxQiq8ZsJCJP1d7V/c" + "jxfmlxdv2Gaq")
+        private const val TEE_ENFORCED_EXTENSION_DATA =
+            ("MIGwoQgxBgIBAgIBA6IDAgEBowQCAggApQUxAwIBBKYIMQYCAQMCAQW/gUgFAgMBAAG/g3cCBQC/hT4DAgEAv4VATDBK" + "BCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEBAAoBAgQgco2xJ08fHPFXHeQ4CwSKVUrEo4Dnb1" + "NVCDUpCEqTeAG/hUEDAgEAv4VCBQIDAxSzv4VOBgIEATQV8b+FTwYCBAE0Few=")
+        private const val ATTESTATION_VERSION = 3
+
+        private const val EXPECTED_SW_CREATION_DATETIME = 1563202592972L
+        private val EXPECTED_SW_ATTESTATION_APPLICATION_ID = createAttestationApplicationId(
+            Base64.getDecoder().decode(
+                    "MIIBszGCAYswDAQHYW5kcm9pZAIBHTAZBBRjb20uYW5kcm9pZC5rZXljaGFpbgIBHTAZBBRjb20uYW5k" + "cm9pZC5zZXR0aW5ncwIBHTAZBBRjb20ucXRpLmRpYWdzZXJ2aWNlcwIBHTAaBBVjb20uYW5kcm" + "9pZC5keW5zeXN0ZW0CAR0wHQQYY29tLmFuZHJvaWQuaW5wdXRkZXZpY2VzAgEdMB8EGmNvbS5h" + "bmRyb2lkLmxvY2FsdHJhbnNwb3J0AgEdMB8EGmNvbS5hbmRyb2lkLmxvY2F0aW9uLmZ1c2VkAg" + "EdMB8EGmNvbS5hbmRyb2lkLnNlcnZlci50ZWxlY29tAgEdMCAEG2NvbS5hbmRyb2lkLndhbGxw" + "YXBlcmJhY2t1cAIBHTAhBBxjb20uZ29vZ2xlLlNTUmVzdGFydERldGVjdG9yAgEdMCIEHWNvbS" + "5nb29nbGUuYW5kcm9pZC5oaWRkZW5tZW51AgEBMCMEHmNvbS5hbmRyb2lkLnByb3ZpZGVycy5z" + "ZXR0aW5ncwIBHTEiBCAwGqPLCBE0UBxF8UIqvGbCQiT9Xe1f3I8X5pcXb9hmqg=="
+                )
+        )
+        private val EXPECTED_TEE_PURPOSE: ImmutableSet<Int> = ImmutableSet.of(2, 3)
+        private const val EXPECTED_TEE_ALGORITHM = 1
+        private const val EXPECTED_TEE_KEY_SIZE = 2048
+        private val EXPECTED_TEE_DIGEST: ImmutableSet<Int> = ImmutableSet.of(4)
+        private val EXPECTED_TEE_PADDING: ImmutableSet<Int> = ImmutableSet.of(3, 5)
+        private const val EXPECTED_TEE_RSA_PUBLIC_COMPONENT = 65537L
+        private const val EXPECTED_TEE_ORIGIN = 0
+        private const val EXPECTED_TEE_OS_VERSION = 0
+        private const val EXPECTED_TEE_OS_PATCH_LEVEL = 201907
+        private const val EXPECTED_TEE_VENDOR_PATCH_LEVEL = 20190705
+        private const val EXPECTED_TEE_BOOT_PATCH_LEVEL = 20190700
+
+        @Throws(IOException::class)
+        private fun getEncodableAuthorizationList(extensionData: String): Array<ASN1Encodable> {
+            val extensionDataBytes = Base64.getDecoder().decode(extensionData)
+            return ASN1Sequence.getInstance(extensionDataBytes).toArray()
+        }
+
+        private const val EXTENTION_DATA_WITH_INDIVIDUAL_ATTESTATION =
+            ("MIH0oQgxBgIBAgIBA6IDAgEBowQCAggApQUxAwIBBKYIMQYCAQMCAQW/gUgFAgMBAAG/g3cCBQC/hT4DAgEAv4VATDBK" + "BCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEBAAoBAgQgEvR7Lf1t9nD6P2qyUmgiQ0mG+RixYn" + "glj2TaAMZmHn2/hUEFAgMBrbC/hUIFAgMDFRi/hUYIBAZnb29nbGW/hUcHBAVzYXJnb7+FSAcEBXNhcmdvv4VM" + "CAQGR29vZ2xlv4VNCgQIUGl4ZWwgM2G/hU4GAgQBND1lv4VPBgIEATQ9Zb+FUAIFAA==")
+    }
+}

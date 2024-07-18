@@ -1,6 +1,8 @@
-java_test(
+load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_test")
+
+kt_jvm_test(
     name = "AttestationApplicationIdTest",
-    srcs = ["AttestationApplicationIdTest.java"],
+    srcs = ["AttestationApplicationIdTest.kt"],
     deps = [
         "//src/main/java/com/google/android/attestation",
         "@maven//:com_google_guava_guava",
@@ -10,9 +12,9 @@ java_test(
     ],
 )
 
-java_test(
+kt_jvm_test(
     name = "AuthorizationListTest",
-    srcs = ["AuthorizationListTest.java"],
+    srcs = ["AuthorizationListTest.kt"],
     deps = [
         "//src/main/java/com/google/android/attestation",
         "@maven//:com_google_guava_guava",
@@ -22,9 +24,9 @@ java_test(
     ],
 )
 
-java_test(
+kt_jvm_test(
     name = "ParsedAttestationRecordTest",
-    srcs = ["ParsedAttestationRecordTest.java"],
+    srcs = ["ParsedAttestationRecordTest.kt"],
     deps = [
         "//src/main/java/com/google/android/attestation",
         "@maven//:com_google_protobuf_protobuf_javalite",
@@ -35,9 +37,9 @@ java_test(
     ],
 )
 
-java_test(
+kt_jvm_test(
     name = "RootOfTrustTest",
-    srcs = ["RootOfTrustTest.java"],
+    srcs = ["RootOfTrustTest.kt"],
     deps = [
         "//src/main/java/com/google/android/attestation",
         "@maven//:com_google_protobuf_protobuf_javalite",

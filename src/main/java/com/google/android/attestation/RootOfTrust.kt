@@ -24,49 +24,20 @@ import com.google.android.attestation.Constants.ROOT_OF_TRUST_DEVICE_LOCKED_INDE
 import com.google.android.attestation.Constants.ROOT_OF_TRUST_VERIFIED_BOOT_HASH_INDEX
 import com.google.android.attestation.Constants.ROOT_OF_TRUST_VERIFIED_BOOT_KEY_INDEX
 import com.google.android.attestation.Constants.ROOT_OF_TRUST_VERIFIED_BOOT_STATE_INDEX
-import com.google.auto.value.AutoValue
-import com.google.errorprone.annotations.CanIgnoreReturnValue
+import com.google.errorprone.annotations.Immutable
 import com.google.protobuf.ByteString
 import org.bouncycastle.asn1.ASN1OctetString
 import org.bouncycastle.asn1.ASN1Sequence
 
 
 /** This collection of values defines key information about the device's status.  */
-@AutoValue
-abstract class RootOfTrust {
-    abstract fun verifiedBootKey(): ByteString
-
-    abstract fun deviceLocked(): Boolean
-
-    abstract fun verifiedBootState(): VerifiedBootState
-
-    abstract fun verifiedBootHash(): ByteString
-
-    /** Builder for [RootOfTrust].  */
-    @AutoValue.Builder
-    abstract class Builder {
-        abstract fun setVerifiedBootKey(value: ByteString): Builder
-
-        @CanIgnoreReturnValue
-        fun setVerifiedBootKey(value: ByteArray): Builder {
-            return setVerifiedBootKey(ByteString.copyFrom(value))
-        }
-
-        abstract fun setDeviceLocked(value: Boolean): Builder
-
-        abstract fun setVerifiedBootState(value: VerifiedBootState): Builder
-
-        abstract fun setVerifiedBootHash(value: ByteString): Builder
-
-        @CanIgnoreReturnValue
-        fun setVerifiedBootHash(value: ByteArray): Builder {
-            setVerifiedBootHash(ByteString.copyFrom(value))
-            return this
-        }
-
-        abstract fun build(): RootOfTrust
-    }
-
+@Immutable
+data class RootOfTrust(
+    val verifiedBootKey: ByteString,
+    val deviceLocked: Boolean,
+    val verifiedBootState: VerifiedBootState,
+    val verifiedBootHash: ByteString,
+) {
     /**
      * This provides the device's current boot state, which represents the level of protection
      * provided to the user and to apps after the device finishes booting.
@@ -77,35 +48,24 @@ abstract class RootOfTrust {
 
     companion object {
         @JvmStatic
-        fun builder(): Builder {
-            return AutoValue_RootOfTrust.Builder().setVerifiedBootKey(ByteString.EMPTY)
-                .setVerifiedBootHash(ByteString.EMPTY)
-        }
-
-        @JvmStatic
         fun createRootOfTrust(rootOfTrust: ASN1Sequence, attestationVersion: Int): RootOfTrust {
-            val builder = builder()
-            builder.setVerifiedBootKey(
-                ASN1OctetString.getInstance(rootOfTrust.getObjectAt(ROOT_OF_TRUST_VERIFIED_BOOT_KEY_INDEX)).octets
+            val verifiedBootKey = ByteString.copyFrom(
+                ASN1OctetString.getInstance(
+                    rootOfTrust.getObjectAt(ROOT_OF_TRUST_VERIFIED_BOOT_KEY_INDEX)
+                ).octets
             )
-            builder.setDeviceLocked(
-                getBooleanFromAsn1(rootOfTrust.getObjectAt(ROOT_OF_TRUST_DEVICE_LOCKED_INDEX))
-            )
-            builder.setVerifiedBootState(
-                verifiedBootStateToEnum(
-                    getIntegerFromAsn1(
-                        rootOfTrust.getObjectAt(ROOT_OF_TRUST_VERIFIED_BOOT_STATE_INDEX)
-                    )
+            val deviceLocked = getBooleanFromAsn1(rootOfTrust.getObjectAt(ROOT_OF_TRUST_DEVICE_LOCKED_INDEX))
+            val verifiedBootState = verifiedBootStateToEnum(
+                getIntegerFromAsn1(
+                    rootOfTrust.getObjectAt(ROOT_OF_TRUST_VERIFIED_BOOT_STATE_INDEX)
                 )
             )
-            if (attestationVersion >= 3) {
-                builder.setVerifiedBootHash(
-                    ASN1OctetString.getInstance(
-                        rootOfTrust.getObjectAt(ROOT_OF_TRUST_VERIFIED_BOOT_HASH_INDEX)
-                    ).octets
-                )
-            }
-            return builder.build()
+            val verifiedBootHash = if (attestationVersion >= 3) ByteString.copyFrom(
+                ASN1OctetString.getInstance(
+                    rootOfTrust.getObjectAt(ROOT_OF_TRUST_VERIFIED_BOOT_HASH_INDEX)
+                ).octets
+            ) else ByteString.EMPTY
+            return RootOfTrust(verifiedBootKey, deviceLocked, verifiedBootState, verifiedBootHash)
         }
 
         private fun verifiedBootStateToEnum(securityLevel: Int): VerifiedBootState {

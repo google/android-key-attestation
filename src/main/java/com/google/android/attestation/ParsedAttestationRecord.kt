@@ -27,8 +27,6 @@ import com.google.android.attestation.Constants.KM_SECURITY_LEVEL_TRUSTED_ENVIRO
 import com.google.android.attestation.Constants.SW_ENFORCED_INDEX
 import com.google.android.attestation.Constants.TEE_ENFORCED_INDEX
 import com.google.android.attestation.Constants.UNIQUE_ID_INDEX
-import com.google.auto.value.AutoValue
-import com.google.errorprone.annotations.CanIgnoreReturnValue
 import com.google.errorprone.annotations.Immutable
 import com.google.protobuf.ByteString
 import org.bouncycastle.asn1.ASN1InputStream
@@ -38,56 +36,17 @@ import java.io.IOException
 import java.security.cert.X509Certificate
 
 /** Java representation of Key Attestation extension data.  */
-@AutoValue
 @Immutable
-abstract class ParsedAttestationRecord {
-    abstract fun attestationVersion(): Int
-
-    abstract fun attestationSecurityLevel(): SecurityLevel
-
-    abstract fun keymasterVersion(): Int
-
-    abstract fun keymasterSecurityLevel(): SecurityLevel
-
-    abstract fun attestationChallenge(): ByteString
-
-    abstract fun uniqueId(): ByteString
-
-    abstract fun softwareEnforced(): AuthorizationList
-
-    abstract fun teeEnforced(): AuthorizationList
-
-    /** Builder for [ParsedAttestationRecord].  */
-    @AutoValue.Builder
-    abstract class Builder {
-        abstract fun setAttestationVersion(value: Int): Builder
-
-        abstract fun setAttestationSecurityLevel(value: SecurityLevel): Builder
-
-        abstract fun setKeymasterVersion(value: Int): Builder
-
-        abstract fun setKeymasterSecurityLevel(value: SecurityLevel): Builder
-
-        abstract fun setAttestationChallenge(value: ByteString): Builder
-
-        @CanIgnoreReturnValue
-        fun setAttestationChallenge(value: ByteArray): Builder {
-            return setAttestationChallenge(ByteString.copyFrom(value))
-        }
-
-        abstract fun setUniqueId(value: ByteString): Builder
-
-        @CanIgnoreReturnValue
-        fun setUniqueId(value: ByteArray): Builder {
-            return setUniqueId(ByteString.copyFrom(value))
-        }
-
-        abstract fun setSoftwareEnforced(value: AuthorizationList): Builder
-
-        abstract fun setTeeEnforced(value: AuthorizationList): Builder
-
-        abstract fun build(): ParsedAttestationRecord
-    }
+data class ParsedAttestationRecord(
+    val attestationVersion: Int,
+    val attestationSecurityLevel: SecurityLevel,
+    val keymasterVersion: Int,
+    val keymasterSecurityLevel: SecurityLevel,
+    val attestationChallenge: ByteString,
+    val uniqueId: ByteString,
+    val softwareEnforced: AuthorizationList,
+    val teeEnforced: AuthorizationList,
+) {
 
     /**
      * This indicates the extent to which a software feature, such as a key pair, is protected based
@@ -98,11 +57,6 @@ abstract class ParsedAttestationRecord {
     }
 
     companion object {
-        fun builder(): Builder {
-            return AutoValue_ParsedAttestationRecord.Builder().setAttestationChallenge(ByteString.EMPTY)
-                .setUniqueId(ByteString.EMPTY).setSoftwareEnforced(AuthorizationList.builder().build())
-                .setTeeEnforced(AuthorizationList.builder().build())
-        }
 
         @JvmStatic
         @Throws(IOException::class)
@@ -112,44 +66,38 @@ abstract class ParsedAttestationRecord {
         }
 
         fun create(extensionData: ASN1Sequence): ParsedAttestationRecord {
-            val builder = builder()
             val attestationVersion = getIntegerFromAsn1(extensionData.getObjectAt(ATTESTATION_VERSION_INDEX))
-            builder.setAttestationVersion(attestationVersion)
-            builder.setAttestationSecurityLevel(
-                securityLevelToEnum(
-                    getIntegerFromAsn1(
-                        extensionData.getObjectAt(ATTESTATION_SECURITY_LEVEL_INDEX)
-                    )
+            val atttestationSecurityLevel = securityLevelToEnum(
+                getIntegerFromAsn1(
+                    extensionData.getObjectAt(ATTESTATION_SECURITY_LEVEL_INDEX)
                 )
             )
-            builder.setKeymasterVersion(
-                getIntegerFromAsn1(extensionData.getObjectAt(KEYMASTER_VERSION_INDEX))
-            )
-            builder.setKeymasterSecurityLevel(
-                securityLevelToEnum(
-                    getIntegerFromAsn1(
-                        extensionData.getObjectAt(KEYMASTER_SECURITY_LEVEL_INDEX)
-                    )
+            val keymasterVersion = getIntegerFromAsn1(extensionData.getObjectAt(KEYMASTER_VERSION_INDEX))
+            val keymasterSecurityLevel = securityLevelToEnum(
+                getIntegerFromAsn1(
+                    extensionData.getObjectAt(KEYMASTER_SECURITY_LEVEL_INDEX)
                 )
             )
-            builder.setAttestationChallenge(
-                ASN1OctetString.getInstance(extensionData.getObjectAt(ATTESTATION_CHALLENGE_INDEX)).octets
+            val attestationChallenge =
+                ByteString.copyFrom(ASN1OctetString.getInstance(extensionData.getObjectAt(ATTESTATION_CHALLENGE_INDEX)).octets)
+            val uniqueId =
+                ByteString.copyFrom(ASN1OctetString.getInstance(extensionData.getObjectAt(UNIQUE_ID_INDEX)).octets)
+            val softwareEnforced = AuthorizationList.createAuthorizationList(
+                ASN1Sequence.getInstance(extensionData.getObjectAt(SW_ENFORCED_INDEX)).toArray(), attestationVersion
             )
-            builder.setUniqueId(
-                ASN1OctetString.getInstance(extensionData.getObjectAt(UNIQUE_ID_INDEX)).octets
+            val teeEnforced = AuthorizationList.createAuthorizationList(
+                ASN1Sequence.getInstance(extensionData.getObjectAt(TEE_ENFORCED_INDEX)).toArray(), attestationVersion
             )
-            builder.setSoftwareEnforced(
-                AuthorizationList.createAuthorizationList(
-                    ASN1Sequence.getInstance(extensionData.getObjectAt(SW_ENFORCED_INDEX)).toArray(), attestationVersion
-                )
+            return ParsedAttestationRecord(
+                attestationVersion,
+                atttestationSecurityLevel,
+                keymasterVersion,
+                keymasterSecurityLevel,
+                attestationChallenge,
+                uniqueId,
+                softwareEnforced,
+                teeEnforced
             )
-            builder.setTeeEnforced(
-                AuthorizationList.createAuthorizationList(
-                    ASN1Sequence.getInstance(extensionData.getObjectAt(TEE_ENFORCED_INDEX)).toArray(),
-                    attestationVersion
-                )
-            )
-            return builder.build()
         }
 
         private fun securityLevelToEnum(securityLevel: Int): SecurityLevel {
