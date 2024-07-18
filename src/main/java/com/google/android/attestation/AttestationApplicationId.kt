@@ -18,7 +18,6 @@ import com.google.android.attestation.Constants.ATTESTATION_APPLICATION_ID_PACKA
 import com.google.android.attestation.Constants.ATTESTATION_APPLICATION_ID_SIGNATURE_DIGESTS_INDEX
 import com.google.android.attestation.Constants.ATTESTATION_PACKAGE_INFO_PACKAGE_NAME_INDEX
 import com.google.android.attestation.Constants.ATTESTATION_PACKAGE_INFO_VERSION_INDEX
-import com.google.common.collect.ImmutableSet
 import com.google.errorprone.annotations.Immutable
 import com.google.protobuf.ByteString
 import org.bouncycastle.asn1.ASN1Integer
@@ -37,8 +36,7 @@ import java.nio.charset.StandardCharsets
  */
 @Immutable
 data class AttestationApplicationId(
-    val packageInfos: ImmutableSet<AttestationPackageInfo>, val signatureDigests: ImmutableSet<ByteString>
-
+    val packageInfos: Set<AttestationPackageInfo>, val signatureDigests: Set<ByteString>
 ) {
     /** Provides package's name and version number.  */
     @Immutable
@@ -63,14 +61,13 @@ data class AttestationApplicationId(
         fun createAttestationApplicationId(attestationApplicationId: ByteArray): AttestationApplicationId {
             val attestationApplicationIdSequence = ASN1Sequence.getInstance(attestationApplicationId)
             val attestationPackageInfos =
-                (attestationApplicationIdSequence.getObjectAt(ATTESTATION_APPLICATION_ID_PACKAGE_INFOS_INDEX) as ASN1Set).map { obj ->
-                    ASN1Sequence::class.java.cast(obj)
-                }.map { packageInfo -> AttestationPackageInfo.create(packageInfo) }.toSet()
+                (attestationApplicationIdSequence.getObjectAt(ATTESTATION_APPLICATION_ID_PACKAGE_INFOS_INDEX) as ASN1Set).map {
+                    it as ASN1Sequence
+                }.map { AttestationPackageInfo.create(it) }.toSet()
             val digests = (attestationApplicationIdSequence.getObjectAt(
                 ATTESTATION_APPLICATION_ID_SIGNATURE_DIGESTS_INDEX
-            ) as ASN1Set).map { obj -> ASN1OctetString::class.java.cast(obj) }
-                .map { obj: ASN1OctetString -> obj.octets }.map { bytes -> ByteString.copyFrom(bytes) }.toSet()
-            return AttestationApplicationId(ImmutableSet.copyOf(attestationPackageInfos), ImmutableSet.copyOf(digests))
+            ) as ASN1Set).map { it as ASN1OctetString }.map { it.octets }.map { ByteString.copyFrom(it) }.toSet()
+            return AttestationApplicationId(attestationPackageInfos, digests)
         }
     }
 }

@@ -5,13 +5,11 @@ maven.install(
     artifacts = [
         # main
         "com.google.errorprone:error_prone_annotations:2.29.0",
-        "com.google.guava:guava:33.2.1-jre",
         "com.google.protobuf:protobuf-javalite:4.27.2",
         "org.bouncycastle:bcpkix-jdk18on:1.78.1",
         "org.bouncycastle:bcprov-jdk18on:1.78.1",
 
         # test
-        "com.google.testparameterinjector:test-parameter-injector:1.16",
         "com.google.truth:truth:1.4.4",
         "junit:junit:4.13.2",
     ],

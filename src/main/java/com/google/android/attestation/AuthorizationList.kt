@@ -52,9 +52,6 @@ import com.google.android.attestation.Constants.KM_TAG_USAGE_EXPIRE_DATE_TIME
 import com.google.android.attestation.Constants.KM_TAG_USER_AUTH_TYPE
 import com.google.android.attestation.Constants.KM_TAG_VENDOR_PATCH_LEVEL
 import com.google.android.attestation.RootOfTrust.Companion.createRootOfTrust
-import com.google.common.collect.ImmutableMap
-import com.google.common.collect.ImmutableSet
-import com.google.common.collect.Streams
 import com.google.errorprone.annotations.Immutable
 import com.google.protobuf.ByteString
 import org.bouncycastle.asn1.*
@@ -67,14 +64,14 @@ import java.util.*
  */
 @Immutable
 data class AuthorizationList(
-    val purpose: ImmutableSet<Int>,
+    val purpose: Set<Int>,
     val algorithm: Int?,
     val keySize: Int?,
-    val digest: ImmutableSet<Int>,
-    val padding: ImmutableSet<Int>,
+    val digest: Set<Int>,
+    val padding: Set<Int>,
     val ecCurve: Int?,
     val rsaPublicExponent: Long?,
-    val mgfDigest: ImmutableSet<Int>,
+    val mgfDigest: Set<Int>,
     val rollbackResistance: Boolean,
     // TODO earlyBootOnly
     val activeDateTime: Int?,
@@ -111,29 +108,27 @@ data class AuthorizationList(
      * This data structure holds the parsed attest record authorizations mapped to their authorization
      * tags.
      */
-    private class ParsedAuthorizationMap(private val authorizationMap: ImmutableMap<Int, ASN1Object>) {
+    private class ParsedAuthorizationMap(private val authorizationMap: Map<Int, ASN1Object>) {
         // TODO remove Optional<>
         fun findAuthorizationListEntry(tag: Int): Optional<ASN1Object> {
             return Optional.ofNullable(authorizationMap[tag])
         }
 
-        fun findIntegerSetAuthorizationListEntry(tag: Int): ImmutableSet<Int> {
-            val asn1Set = findAuthorizationListEntry(tag).map { obj -> ASN1Set::class.java.cast(obj) }.orElse(null)
+        fun findIntegerSetAuthorizationListEntry(tag: Int): Set<Int> {
+            val asn1Set = findAuthorizationListEntry(tag).map { it as ASN1Set }.orElse(null)
             if (asn1Set == null) {
-                return ImmutableSet.of()
+                return setOf()
             }
-            return Streams.stream<ASN1Encodable>(asn1Set).map { obj -> ASN1Parsing.getIntegerFromAsn1(obj) }.collect(
-                ImmutableSet.toImmutableSet()
-            )
+            return asn1Set.map { ASN1Parsing.getIntegerFromAsn1(it) }.toSet()
         }
 
         fun findOptionalIntegerAuthorizationListEntry(tag: Int): Int? {
-            return findAuthorizationListEntry(tag).map { obj -> ASN1Parsing.getIntegerFromAsn1(obj as ASN1Integer) }
+            return findAuthorizationListEntry(tag).map { ASN1Parsing.getIntegerFromAsn1(it as ASN1Integer) }
                 .orElse(null)
         }
 
         fun findOptionalLongAuthorizationListEntry(tag: Int): Long? {
-            return findAuthorizationListEntry(tag).map { obj -> (obj as ASN1Integer).value.toLong() }.orElse(null)
+            return findAuthorizationListEntry(tag).map { (it as ASN1Integer).value.toLong() }.orElse(null)
         }
 
         fun findBooleanAuthorizationListEntry(tag: Int): Boolean {
@@ -141,7 +136,7 @@ data class AuthorizationList(
         }
 
         fun findOptionalByteArrayAuthorizationListEntry(tag: Int): ByteString? {
-            return findAuthorizationListEntry(tag).map { obj -> ByteString.copyFrom((obj as ASN1OctetString).octets) }
+            return findAuthorizationListEntry(tag).map { ByteString.copyFrom((it as ASN1OctetString).octets) }
                 .orElse(null)
         }
     }
@@ -153,10 +148,10 @@ data class AuthorizationList(
         ): AuthorizationList {
             val parsedAuthorizationMap = getAuthorizationMap(authorizationList)
             val rootOfTrust = parsedAuthorizationMap.findAuthorizationListEntry(KM_TAG_ROOT_OF_TRUST)
-                .map { obj -> createRootOfTrust((obj as ASN1Sequence), attestationVersion) }.orElse(null)
+                .map { createRootOfTrust((it as ASN1Sequence), attestationVersion) }.orElse(null)
             val attestationApplicationId =
                 parsedAuthorizationMap.findAuthorizationListEntry(KM_TAG_ATTESTATION_APPLICATION_ID)
-                    .map { obj -> AttestationApplicationId.createAttestationApplicationId((obj as ASN1OctetString).octets) }
+                    .map { AttestationApplicationId.createAttestationApplicationId((it as ASN1OctetString).octets) }
                     .orElse(null)
             return AuthorizationList(
                 parsedAuthorizationMap.findIntegerSetAuthorizationListEntry(KM_TAG_PURPOSE),
@@ -207,10 +202,8 @@ data class AuthorizationList(
             // a ImmutableMap preserves insertion order.
             //
             // https://guava.dev/releases/23.0/api/docs/com/google/common/collect/ImmutableCollection.html
-            val authorizationMap = Arrays.stream(authorizationList).map { o -> ASN1TaggedObject.getInstance(o) }
-                .collect(ImmutableMap.toImmutableMap({ obj: ASN1TaggedObject -> obj.tagNo },
-                    { obj: ASN1TaggedObject -> obj.explicitBaseObject })
-                )
+            val authorizationMap = authorizationList.map { ASN1TaggedObject.getInstance(it) }
+                .associateBy({ it.tagNo }, { it.explicitBaseObject })
             return ParsedAuthorizationMap(authorizationMap)
         }
     }

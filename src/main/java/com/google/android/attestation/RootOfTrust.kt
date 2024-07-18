@@ -40,7 +40,8 @@ data class RootOfTrust(
 ) {
     /**
      * This provides the device's current boot state, which represents the level of protection
-     * provided to the user and to apps after the device finishes booting.
+     * provided to the user and
+     * fto apps after the device finishes booting.
      */
     enum class VerifiedBootState {
         VERIFIED, SELF_SIGNED, UNVERIFIED, FAILED

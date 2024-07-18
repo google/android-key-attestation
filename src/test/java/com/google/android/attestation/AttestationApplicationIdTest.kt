@@ -15,7 +15,6 @@
 package com.google.android.attestation
 
 import com.google.android.attestation.AttestationApplicationId.Companion.createAttestationApplicationId
-import com.google.common.collect.ImmutableSet
 import com.google.common.truth.Truth
 import com.google.protobuf.ByteString
 import org.junit.Test
@@ -39,7 +38,7 @@ class AttestationApplicationIdTest {
         )
 
         private val EXPECTED_ATTESTATION_APPLICATION_ID = AttestationApplicationId(
-            ImmutableSet.of(
+            setOf(
                 AttestationApplicationId.AttestationPackageInfo("android", 29),
                 AttestationApplicationId.AttestationPackageInfo("com.android.keychain", 29),
                 AttestationApplicationId.AttestationPackageInfo("com.android.settings", 29),
@@ -53,8 +52,7 @@ class AttestationApplicationIdTest {
                 AttestationApplicationId.AttestationPackageInfo("com.google.SSRestartDetector", 29),
                 AttestationApplicationId.AttestationPackageInfo("com.google.android.hiddenmenu", 1),
                 AttestationApplicationId.AttestationPackageInfo("com.android.providers.settings", 29),
-            ),
-            ImmutableSet.of(
+            ), setOf(
                 ByteString.copyFrom(
                     Base64.getDecoder().decode("MBqjywgRNFAcRfFCKrxmwkIk/V3tX9yPF+aXF2/YZqo=")
                 )

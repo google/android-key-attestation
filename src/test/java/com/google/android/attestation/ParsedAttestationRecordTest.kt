@@ -17,9 +17,9 @@ package com.google.android.attestation
 import com.google.android.attestation.ParsedAttestationRecord.Companion.createParsedAttestationRecord
 import com.google.common.truth.Truth.assertThat
 import com.google.protobuf.ByteString
-import com.google.testing.junit.testparameterinjector.TestParameterInjector
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.junit.runners.JUnit4
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.nio.charset.StandardCharsets
@@ -28,7 +28,7 @@ import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
 
 /** Test for [ParsedAttestationRecord].  */
-@RunWith(TestParameterInjector::class)
+@RunWith(JUnit4::class)
 class ParsedAttestationRecordTest {
     @Test
     @Throws(CertificateException::class, IOException::class)
