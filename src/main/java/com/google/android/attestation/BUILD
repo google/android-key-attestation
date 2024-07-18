@@ -25,7 +25,7 @@ kt_jvm_library(
         "AuthorizationList.java",
         "Constants.kt",
         "ParsedAttestationRecord.java",
-        "RootOfTrust.java",
+        "RootOfTrust.kt",
     ],
     deps = [
         ":auto",
