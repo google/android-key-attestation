@@ -24,7 +24,7 @@ kt_jvm_library(
         "AttestationApplicationId.kt",
         "AuthorizationList.java",
         "Constants.kt",
-        "ParsedAttestationRecord.java",
+        "ParsedAttestationRecord.kt",
         "RootOfTrust.kt",
     ],
     deps = [
