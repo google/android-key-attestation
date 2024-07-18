@@ -23,7 +23,7 @@ kt_jvm_library(
         "ASN1Parsing.kt",
         "AttestationApplicationId.java",
         "AuthorizationList.java",
-        "Constants.java",
+        "Constants.kt",
         "ParsedAttestationRecord.java",
         "RootOfTrust.java",
     ],
