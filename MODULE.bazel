@@ -9,8 +9,8 @@ maven.install(
         "org.bouncycastle:bcprov-jdk18on:1.78.1",
 
         # test
-        "junit:junit:4.13.2",
         "org.jetbrains.kotlin:kotlin-test:2.0.0",
+        "org.jetbrains.kotlin:kotlin-test-junit:2.0.0",
     ],
     lock_file = "//:maven_install.json",
 )

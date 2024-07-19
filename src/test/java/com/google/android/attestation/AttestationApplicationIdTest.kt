@@ -15,10 +15,10 @@
 package com.google.android.attestation
 
 import com.google.android.attestation.AttestationApplicationId.Companion.createAttestationApplicationId
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import java.util.*
+import kotlin.test.Test
 import kotlin.test.assertEquals
 
 /** Test for [AttestationApplicationId].  */

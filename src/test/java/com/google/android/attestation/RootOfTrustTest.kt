@@ -16,17 +16,14 @@ package com.google.android.attestation
 
 import com.google.android.attestation.RootOfTrust.Companion.createRootOfTrust
 import org.bouncycastle.asn1.ASN1Sequence
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 import java.io.IOException
 import java.util.*
+import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 /** Test for [RootOfTrust].  */
-@RunWith(JUnit4::class)
 class RootOfTrustTest {
     @Test
     @Throws(IOException::class)

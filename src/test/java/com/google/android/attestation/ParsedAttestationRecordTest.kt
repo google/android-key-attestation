@@ -15,21 +15,18 @@
 package com.google.android.attestation
 
 import com.google.android.attestation.ParsedAttestationRecord.Companion.createParsedAttestationRecord
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.security.cert.CertificateException
 import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
+import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.text.Charsets.UTF_8
 
 /** Test for [ParsedAttestationRecord].  */
-@RunWith(JUnit4::class)
 class ParsedAttestationRecordTest {
     @Test
     @Throws(CertificateException::class, IOException::class)
