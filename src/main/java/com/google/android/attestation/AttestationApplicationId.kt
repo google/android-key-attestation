@@ -19,7 +19,6 @@ import com.google.android.attestation.Constants.ATTESTATION_APPLICATION_ID_SIGNA
 import com.google.android.attestation.Constants.ATTESTATION_PACKAGE_INFO_PACKAGE_NAME_INDEX
 import com.google.android.attestation.Constants.ATTESTATION_PACKAGE_INFO_VERSION_INDEX
 import com.google.errorprone.annotations.Immutable
-import com.google.protobuf.ByteString
 import org.bouncycastle.asn1.ASN1Integer
 import org.bouncycastle.asn1.ASN1OctetString
 import org.bouncycastle.asn1.ASN1Sequence
@@ -36,10 +35,25 @@ import java.nio.charset.StandardCharsets
  */
 @Immutable
 data class AttestationApplicationId(
-    val packageInfos: Set<AttestationPackageInfo>, val signatureDigests: Set<ByteString>
+    val packageInfos: Set<AttestationPackageInfo>, val signatureDigests: Set<ByteArray>
 ) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is AttestationApplicationId) return false
+
+        if (packageInfos != other.packageInfos) return false
+        if (!signatureDigests.zip(other.signatureDigests).all { (it1, it2) -> it1.contentEquals(it2) }) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = packageInfos.hashCode()
+        result = 31 * result + signatureDigests.hashCode()
+        return result
+    }
+
     /** Provides package's name and version number.  */
-    @Immutable
     data class AttestationPackageInfo(
         val packageName: String, val version: Long
     ) {
@@ -66,7 +80,7 @@ data class AttestationApplicationId(
                 }.map { AttestationPackageInfo.create(it) }.toSet()
             val digests = (attestationApplicationIdSequence.getObjectAt(
                 ATTESTATION_APPLICATION_ID_SIGNATURE_DIGESTS_INDEX
-            ) as ASN1Set).map { it as ASN1OctetString }.map { it.octets }.map { ByteString.copyFrom(it) }.toSet()
+            ) as ASN1Set).map { it as ASN1OctetString }.map { it.octets }.toSet()
             return AttestationApplicationId(attestationPackageInfos, digests)
         }
     }

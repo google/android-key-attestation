@@ -5,9 +5,9 @@ kt_jvm_test(
     srcs = ["AttestationApplicationIdTest.kt"],
     deps = [
         "//src/main/java/com/google/android/attestation",
-        "@maven//:com_google_protobuf_protobuf_javalite",
         "@maven//:com_google_truth_truth",
         "@maven//:junit_junit",
+        "@maven//:org_jetbrains_kotlin_kotlin_test",
     ],
 )
 
@@ -27,7 +27,6 @@ kt_jvm_test(
     srcs = ["ParsedAttestationRecordTest.kt"],
     deps = [
         "//src/main/java/com/google/android/attestation",
-        "@maven//:com_google_protobuf_protobuf_javalite",
         "@maven//:com_google_truth_truth",
         "@maven//:junit_junit",
         "@maven//:org_bouncycastle_bcprov_jdk18on",
@@ -39,7 +38,6 @@ kt_jvm_test(
     srcs = ["RootOfTrustTest.kt"],
     deps = [
         "//src/main/java/com/google/android/attestation",
-        "@maven//:com_google_protobuf_protobuf_javalite",
         "@maven//:com_google_truth_truth",
         "@maven//:junit_junit",
         "@maven//:org_bouncycastle_bcprov_jdk18on",

@@ -15,12 +15,11 @@
 package com.google.android.attestation
 
 import com.google.android.attestation.AttestationApplicationId.Companion.createAttestationApplicationId
-import com.google.common.truth.Truth
-import com.google.protobuf.ByteString
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import java.util.*
+import kotlin.test.assertEquals
 
 /** Test for [AttestationApplicationId].  */
 @RunWith(JUnit4::class)
@@ -28,7 +27,7 @@ class AttestationApplicationIdTest {
     @Test
     fun testCreateAttestationApplicationId() {
         val attestationApplicationId = createAttestationApplicationId(ATTESTATION_APPLICATION_ID)
-        Truth.assertThat(attestationApplicationId).isEqualTo(EXPECTED_ATTESTATION_APPLICATION_ID)
+        assertEquals(attestationApplicationId, EXPECTED_ATTESTATION_APPLICATION_ID)
     }
 
     companion object {
@@ -53,9 +52,8 @@ class AttestationApplicationIdTest {
                 AttestationApplicationId.AttestationPackageInfo("com.google.android.hiddenmenu", 1),
                 AttestationApplicationId.AttestationPackageInfo("com.android.providers.settings", 29),
             ), setOf(
-                ByteString.copyFrom(
-                    Base64.getDecoder().decode("MBqjywgRNFAcRfFCKrxmwkIk/V3tX9yPF+aXF2/YZqo=")
-                )
+                Base64.getDecoder().decode("MBqjywgRNFAcRfFCKrxmwkIk/V3tX9yPF+aXF2/YZqo=")
+
             )
         )
     }

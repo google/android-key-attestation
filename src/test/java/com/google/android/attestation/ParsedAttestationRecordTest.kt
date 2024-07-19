@@ -16,16 +16,15 @@ package com.google.android.attestation
 
 import com.google.android.attestation.ParsedAttestationRecord.Companion.createParsedAttestationRecord
 import com.google.common.truth.Truth.assertThat
-import com.google.protobuf.ByteString
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import java.io.ByteArrayInputStream
 import java.io.IOException
-import java.nio.charset.StandardCharsets
 import java.security.cert.CertificateException
 import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
+import kotlin.text.Charsets.UTF_8
 
 /** Test for [ParsedAttestationRecord].  */
 @RunWith(JUnit4::class)
@@ -33,7 +32,7 @@ class ParsedAttestationRecordTest {
     @Test
     @Throws(CertificateException::class, IOException::class)
     fun testParseAttestationRecord() {
-        val x509Certificate = getAttestationRecord(CERT)
+        val x509Certificate = getAttestationRecord()
         val attestationRecord = createParsedAttestationRecord(x509Certificate)
 
         assertThat(attestationRecord.attestationVersion).isEqualTo(EXPECTED_ATTESTATION_VERSION)
@@ -55,14 +54,14 @@ class ParsedAttestationRecordTest {
         private val EXPECTED_ATTESTATION_SECURITY_LEVEL = ParsedAttestationRecord.SecurityLevel.TRUSTED_ENVIRONMENT
         private const val EXPECTED_KEYMASTER_VERSION = 4
         private val EXPECTED_KEYMASTER_SECURITY_LEVEL = ParsedAttestationRecord.SecurityLevel.TRUSTED_ENVIRONMENT
-        private val EXPECTED_ATTESTATION_CHALLENGE: ByteString = ByteString.copyFromUtf8("abc")
-        private val EXPECTED_UNIQUE_ID: ByteString = ByteString.copyFromUtf8("")
+        private val EXPECTED_ATTESTATION_CHALLENGE = "abc".toByteArray(UTF_8)
+        private val EXPECTED_UNIQUE_ID: ByteArray =  "".toByteArray(UTF_8)
 
         @Throws(CertificateException::class)
-        private fun getAttestationRecord(certStr: String): X509Certificate {
+        private fun getAttestationRecord(): X509Certificate {
             val factory = CertificateFactory.getInstance("X509")
             val cert =
-                factory.generateCertificate(ByteArrayInputStream(certStr.toByteArray(StandardCharsets.UTF_8))) as X509Certificate
+                factory.generateCertificate(ByteArrayInputStream(CERT.toByteArray(UTF_8))) as X509Certificate
             return cert
         }
     }

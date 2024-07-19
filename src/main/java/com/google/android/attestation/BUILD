@@ -14,7 +14,6 @@ kt_jvm_library(
     ],
     deps = [
         "@maven//:com_google_errorprone_error_prone_annotations",
-        "@maven//:com_google_protobuf_protobuf_javalite",
         "@maven//:org_bouncycastle_bcpkix_jdk18on",
         "@maven//:org_bouncycastle_bcprov_jdk18on",
     ],

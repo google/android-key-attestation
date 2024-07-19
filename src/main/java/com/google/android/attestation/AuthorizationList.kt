@@ -53,7 +53,6 @@ import com.google.android.attestation.Constants.KM_TAG_USER_AUTH_TYPE
 import com.google.android.attestation.Constants.KM_TAG_VENDOR_PATCH_LEVEL
 import com.google.android.attestation.RootOfTrust.Companion.createRootOfTrust
 import com.google.errorprone.annotations.Immutable
-import com.google.protobuf.ByteString
 import org.bouncycastle.asn1.*
 import java.util.*
 
@@ -91,18 +90,18 @@ data class AuthorizationList(
     val osVersion: Int?,
     val osPatchLevel: Int?,
     val attestationApplicationId: AttestationApplicationId?,
-    val attestationIdBrand: ByteString?,
-    val attestationIdDevice: ByteString?,
-    val attestationIdProduct: ByteString?,
-    val attestationIdSerial: ByteString?,
-    val attestationIdImei: ByteString?,
-    val attestationIdMeid: ByteString?,
-    val attestationIdManufacturer: ByteString?,
-    val attestationIdModel: ByteString?,
+    val attestationIdBrand: ByteArray?,
+    val attestationIdDevice: ByteArray?,
+    val attestationIdProduct: ByteArray?,
+    val attestationIdSerial: ByteArray?,
+    val attestationIdImei: ByteArray?,
+    val attestationIdMeid: ByteArray?,
+    val attestationIdManufacturer: ByteArray?,
+    val attestationIdModel: ByteArray?,
     val vendorPatchLevel: Int?,
     val bootPatchLevel: Int?,
     val deviceUniqueAttestation: Boolean,
-    val attestationIdSecondImei: ByteString?,
+    val attestationIdSecondImei: ByteArray?,
 ) {
     /**
      * This data structure holds the parsed attest record authorizations mapped to their authorization
@@ -135,8 +134,8 @@ data class AuthorizationList(
             return findAuthorizationListEntry(tag).isPresent
         }
 
-        fun findOptionalByteArrayAuthorizationListEntry(tag: Int): ByteString? {
-            return findAuthorizationListEntry(tag).map { ByteString.copyFrom((it as ASN1OctetString).octets) }
+        fun findOptionalByteArrayAuthorizationListEntry(tag: Int): ByteArray? {
+            return findAuthorizationListEntry(tag).map { (it as ASN1OctetString).octets }
                 .orElse(null)
         }
     }

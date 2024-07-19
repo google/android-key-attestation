@@ -28,7 +28,6 @@ import com.google.android.attestation.Constants.SW_ENFORCED_INDEX
 import com.google.android.attestation.Constants.TEE_ENFORCED_INDEX
 import com.google.android.attestation.Constants.UNIQUE_ID_INDEX
 import com.google.errorprone.annotations.Immutable
-import com.google.protobuf.ByteString
 import org.bouncycastle.asn1.ASN1InputStream
 import org.bouncycastle.asn1.ASN1OctetString
 import org.bouncycastle.asn1.ASN1Sequence
@@ -42,8 +41,8 @@ data class ParsedAttestationRecord(
     val attestationSecurityLevel: SecurityLevel,
     val keymasterVersion: Int,
     val keymasterSecurityLevel: SecurityLevel,
-    val attestationChallenge: ByteString,
-    val uniqueId: ByteString,
+    val attestationChallenge: ByteArray,
+    val uniqueId: ByteArray,
     val softwareEnforced: AuthorizationList,
     val teeEnforced: AuthorizationList,
 ) {
@@ -79,9 +78,8 @@ data class ParsedAttestationRecord(
                 )
             )
             val attestationChallenge =
-                ByteString.copyFrom(ASN1OctetString.getInstance(extensionData.getObjectAt(ATTESTATION_CHALLENGE_INDEX)).octets)
-            val uniqueId =
-                ByteString.copyFrom(ASN1OctetString.getInstance(extensionData.getObjectAt(UNIQUE_ID_INDEX)).octets)
+                ASN1OctetString.getInstance(extensionData.getObjectAt(ATTESTATION_CHALLENGE_INDEX)).octets
+            val uniqueId = ASN1OctetString.getInstance(extensionData.getObjectAt(UNIQUE_ID_INDEX)).octets
             val softwareEnforced = AuthorizationList.createAuthorizationList(
                 ASN1Sequence.getInstance(extensionData.getObjectAt(SW_ENFORCED_INDEX)).toArray(), attestationVersion
             )

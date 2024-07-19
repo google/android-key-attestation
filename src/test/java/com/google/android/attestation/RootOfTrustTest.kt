@@ -16,7 +16,6 @@ package com.google.android.attestation
 
 import com.google.android.attestation.RootOfTrust.Companion.createRootOfTrust
 import com.google.common.truth.Truth
-import com.google.protobuf.ByteString
 import org.bouncycastle.asn1.ASN1Sequence
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -46,12 +45,12 @@ class RootOfTrustTest {
             ("MEoEIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQEACgECBCByjbEnTx8c8Vcd5DgLBIpVSsSjgOdvU1UI" + "NSkISpN4AQ==")
         private const val ATTESTATION_VERSION = 3
 
-        private val EXPECTED_VERIFIED_BOOT_KEY: ByteString =
-            ByteString.copyFrom(Base64.getDecoder().decode("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="))
+        private val EXPECTED_VERIFIED_BOOT_KEY =
+            Base64.getDecoder().decode("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=")
         private const val EXPECTED_DEVICE_LOCKED = false
         private val EXPECTED_VERIFIED_BOOT_STATE = RootOfTrust.VerifiedBootState.UNVERIFIED
-        private val EXPECTED_VERIFIED_BOOT_HASH: ByteString =
-            ByteString.copyFrom(Base64.getDecoder().decode("co2xJ08fHPFXHeQ4CwSKVUrEo4Dnb1NVCDUpCEqTeAE="))
+        private val EXPECTED_VERIFIED_BOOT_HASH =
+            Base64.getDecoder().decode("co2xJ08fHPFXHeQ4CwSKVUrEo4Dnb1NVCDUpCEqTeAE=")
 
         @Throws(IOException::class)
         private fun getRootOfTrustSequence(): ASN1Sequence {
