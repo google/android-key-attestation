@@ -15,7 +15,6 @@
 package com.google.android.attestation
 
 import com.google.android.attestation.ParsedAttestationRecord.Companion.createParsedAttestationRecord
-import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -24,6 +23,9 @@ import java.io.IOException
 import java.security.cert.CertificateException
 import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
+import kotlin.test.assertContentEquals
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.text.Charsets.UTF_8
 
 /** Test for [ParsedAttestationRecord].  */
@@ -35,14 +37,14 @@ class ParsedAttestationRecordTest {
         val x509Certificate = getAttestationRecord()
         val attestationRecord = createParsedAttestationRecord(x509Certificate)
 
-        assertThat(attestationRecord.attestationVersion).isEqualTo(EXPECTED_ATTESTATION_VERSION)
-        assertThat(attestationRecord.attestationSecurityLevel).isEqualTo(EXPECTED_ATTESTATION_SECURITY_LEVEL)
-        assertThat(attestationRecord.keymasterVersion).isEqualTo(EXPECTED_KEYMASTER_VERSION)
-        assertThat(attestationRecord.keymasterSecurityLevel).isEqualTo(EXPECTED_KEYMASTER_SECURITY_LEVEL)
-        assertThat(attestationRecord.attestationChallenge).isEqualTo(EXPECTED_ATTESTATION_CHALLENGE)
-        assertThat(attestationRecord.uniqueId).isEqualTo(EXPECTED_UNIQUE_ID)
-        assertThat(attestationRecord.softwareEnforced).isNotNull()
-        assertThat(attestationRecord.teeEnforced).isNotNull()
+        assertEquals(attestationRecord.attestationVersion, EXPECTED_ATTESTATION_VERSION)
+        assertEquals(attestationRecord.attestationSecurityLevel, EXPECTED_ATTESTATION_SECURITY_LEVEL)
+        assertEquals(attestationRecord.keymasterVersion, EXPECTED_KEYMASTER_VERSION)
+        assertEquals(attestationRecord.keymasterSecurityLevel, EXPECTED_KEYMASTER_SECURITY_LEVEL)
+        assertContentEquals(attestationRecord.attestationChallenge, EXPECTED_ATTESTATION_CHALLENGE)
+        assertContentEquals(attestationRecord.uniqueId, EXPECTED_UNIQUE_ID)
+        assertNotNull(attestationRecord.softwareEnforced)
+        assertNotNull(attestationRecord.teeEnforced)
     }
 
     companion object {
@@ -55,13 +57,12 @@ class ParsedAttestationRecordTest {
         private const val EXPECTED_KEYMASTER_VERSION = 4
         private val EXPECTED_KEYMASTER_SECURITY_LEVEL = ParsedAttestationRecord.SecurityLevel.TRUSTED_ENVIRONMENT
         private val EXPECTED_ATTESTATION_CHALLENGE = "abc".toByteArray(UTF_8)
-        private val EXPECTED_UNIQUE_ID: ByteArray =  "".toByteArray(UTF_8)
+        private val EXPECTED_UNIQUE_ID: ByteArray = "".toByteArray(UTF_8)
 
         @Throws(CertificateException::class)
         private fun getAttestationRecord(): X509Certificate {
             val factory = CertificateFactory.getInstance("X509")
-            val cert =
-                factory.generateCertificate(ByteArrayInputStream(CERT.toByteArray(UTF_8))) as X509Certificate
+            val cert = factory.generateCertificate(ByteArrayInputStream(CERT.toByteArray(UTF_8))) as X509Certificate
             return cert
         }
     }

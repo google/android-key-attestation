@@ -15,13 +15,15 @@
 package com.google.android.attestation
 
 import com.google.android.attestation.RootOfTrust.Companion.createRootOfTrust
-import com.google.common.truth.Truth
 import org.bouncycastle.asn1.ASN1Sequence
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import java.io.IOException
 import java.util.*
+import kotlin.test.assertContentEquals
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 /** Test for [RootOfTrust].  */
 @RunWith(JUnit4::class)
@@ -32,11 +34,11 @@ class RootOfTrustTest {
         val rootOfTrustSequence = getRootOfTrustSequence()
         val rootOfTrust = createRootOfTrust(rootOfTrustSequence, ATTESTATION_VERSION)
 
-        Truth.assertThat(rootOfTrust).isNotNull()
-        Truth.assertThat(rootOfTrust.verifiedBootKey).isEqualTo(EXPECTED_VERIFIED_BOOT_KEY)
-        Truth.assertThat(rootOfTrust.deviceLocked).isEqualTo(EXPECTED_DEVICE_LOCKED)
-        Truth.assertThat(rootOfTrust.verifiedBootState).isEqualTo(EXPECTED_VERIFIED_BOOT_STATE)
-        Truth.assertThat(rootOfTrust.verifiedBootHash).isEqualTo(EXPECTED_VERIFIED_BOOT_HASH)
+        assertNotNull(rootOfTrust)
+        assertContentEquals(rootOfTrust.verifiedBootKey, EXPECTED_VERIFIED_BOOT_KEY)
+        assertEquals(rootOfTrust.deviceLocked, EXPECTED_DEVICE_LOCKED)
+        assertEquals(rootOfTrust.verifiedBootState, EXPECTED_VERIFIED_BOOT_STATE)
+        assertContentEquals(rootOfTrust.verifiedBootHash, EXPECTED_VERIFIED_BOOT_HASH)
     }
 
     companion object {

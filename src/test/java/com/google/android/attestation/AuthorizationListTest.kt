@@ -16,7 +16,6 @@ package com.google.android.attestation
 
 import com.google.android.attestation.AttestationApplicationId.Companion.createAttestationApplicationId
 import com.google.android.attestation.AuthorizationList.Companion.createAuthorizationList
-import com.google.common.truth.Truth.assertThat
 import org.bouncycastle.asn1.ASN1Encodable
 import org.bouncycastle.asn1.ASN1Sequence
 import org.junit.Test
@@ -24,6 +23,7 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import java.io.IOException
 import java.util.*
+import kotlin.test.*
 
 
 /** Test for [AuthorizationList].  */
@@ -36,10 +36,10 @@ class AuthorizationListTest {
             getEncodableAuthorizationList(SW_ENFORCED_EXTENSION_DATA), ATTESTATION_VERSION
         )
 
-        assertThat(authorizationList.creationDateTime).isEqualTo(EXPECTED_SW_CREATION_DATETIME)
-        assertThat(authorizationList.rootOfTrust).isNull()
-        assertThat(authorizationList.attestationApplicationId).isEqualTo(EXPECTED_SW_ATTESTATION_APPLICATION_ID)
-        assertThat(authorizationList.deviceUniqueAttestation).isFalse()
+        assertEquals(authorizationList.creationDateTime, EXPECTED_SW_CREATION_DATETIME)
+        assertNull(authorizationList.rootOfTrust)
+        assertEquals(authorizationList.attestationApplicationId, EXPECTED_SW_ATTESTATION_APPLICATION_ID)
+        assertFalse(authorizationList.deviceUniqueAttestation)
     }
 
     @Test
@@ -49,20 +49,20 @@ class AuthorizationListTest {
             getEncodableAuthorizationList(TEE_ENFORCED_EXTENSION_DATA), ATTESTATION_VERSION
         )
 
-        assertThat(authorizationList.purpose).isEqualTo(EXPECTED_TEE_PURPOSE)
-        assertThat(authorizationList.algorithm).isEqualTo(EXPECTED_TEE_ALGORITHM)
-        assertThat(authorizationList.keySize).isEqualTo(EXPECTED_TEE_KEY_SIZE)
-        assertThat(authorizationList.digest).isEqualTo(EXPECTED_TEE_DIGEST)
-        assertThat(authorizationList.padding).isEqualTo(EXPECTED_TEE_PADDING)
-        assertThat(authorizationList.rsaPublicExponent).isEqualTo(EXPECTED_TEE_RSA_PUBLIC_COMPONENT)
-        assertThat(authorizationList.noAuthRequired).isTrue()
-        assertThat(authorizationList.origin).isEqualTo(EXPECTED_TEE_ORIGIN)
-        assertThat(authorizationList.rootOfTrust).isNotNull()
-        assertThat(authorizationList.osVersion).isEqualTo(EXPECTED_TEE_OS_VERSION)
-        assertThat(authorizationList.osPatchLevel).isEqualTo(EXPECTED_TEE_OS_PATCH_LEVEL)
-        assertThat(authorizationList.vendorPatchLevel).isEqualTo(EXPECTED_TEE_VENDOR_PATCH_LEVEL)
-        assertThat(authorizationList.bootPatchLevel).isEqualTo(EXPECTED_TEE_BOOT_PATCH_LEVEL)
-        assertThat(authorizationList.deviceUniqueAttestation).isFalse()
+        assertEquals(authorizationList.purpose, EXPECTED_TEE_PURPOSE)
+        assertEquals(authorizationList.algorithm, EXPECTED_TEE_ALGORITHM)
+        assertEquals(authorizationList.keySize, EXPECTED_TEE_KEY_SIZE)
+        assertEquals(authorizationList.digest, EXPECTED_TEE_DIGEST)
+        assertEquals(authorizationList.padding, EXPECTED_TEE_PADDING)
+        assertEquals(authorizationList.rsaPublicExponent, EXPECTED_TEE_RSA_PUBLIC_COMPONENT)
+        assertTrue(authorizationList.noAuthRequired)
+        assertEquals(authorizationList.origin, EXPECTED_TEE_ORIGIN)
+        assertNotNull(authorizationList.rootOfTrust)
+        assertEquals(authorizationList.osVersion, EXPECTED_TEE_OS_VERSION)
+        assertEquals(authorizationList.osPatchLevel, EXPECTED_TEE_OS_PATCH_LEVEL)
+        assertEquals(authorizationList.vendorPatchLevel, EXPECTED_TEE_VENDOR_PATCH_LEVEL)
+        assertEquals(authorizationList.bootPatchLevel, EXPECTED_TEE_BOOT_PATCH_LEVEL)
+        assertFalse(authorizationList.deviceUniqueAttestation)
     }
 
     @Test
@@ -72,7 +72,7 @@ class AuthorizationListTest {
             getEncodableAuthorizationList(EXTENTION_DATA_WITH_INDIVIDUAL_ATTESTATION), ATTESTATION_VERSION
         )
 
-        assertThat(authorizationList.deviceUniqueAttestation).isTrue()
+        assertTrue(authorizationList.deviceUniqueAttestation)
     }
 
     companion object {
