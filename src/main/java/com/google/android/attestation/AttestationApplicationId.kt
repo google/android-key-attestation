@@ -18,7 +18,6 @@ import com.google.android.attestation.Constants.ATTESTATION_APPLICATION_ID_PACKA
 import com.google.android.attestation.Constants.ATTESTATION_APPLICATION_ID_SIGNATURE_DIGESTS_INDEX
 import com.google.android.attestation.Constants.ATTESTATION_PACKAGE_INFO_PACKAGE_NAME_INDEX
 import com.google.android.attestation.Constants.ATTESTATION_PACKAGE_INFO_VERSION_INDEX
-import com.google.errorprone.annotations.Immutable
 import org.bouncycastle.asn1.ASN1Integer
 import org.bouncycastle.asn1.ASN1OctetString
 import org.bouncycastle.asn1.ASN1Sequence
@@ -33,7 +32,6 @@ import java.nio.charset.StandardCharsets
  *
  * The Attestation Application ID data from KeyMint will not exceed 1K bytes.
  */
-@Immutable
 data class AttestationApplicationId(
     val packageInfos: Set<AttestationPackageInfo>, val signatureDigests: Set<ByteArray>
 ) {

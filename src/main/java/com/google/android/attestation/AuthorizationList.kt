@@ -52,7 +52,6 @@ import com.google.android.attestation.Constants.KM_TAG_USAGE_EXPIRE_DATE_TIME
 import com.google.android.attestation.Constants.KM_TAG_USER_AUTH_TYPE
 import com.google.android.attestation.Constants.KM_TAG_VENDOR_PATCH_LEVEL
 import com.google.android.attestation.RootOfTrust.Companion.createRootOfTrust
-import com.google.errorprone.annotations.Immutable
 import org.bouncycastle.asn1.*
 import java.util.*
 
@@ -61,7 +60,6 @@ import java.util.*
  * hardware abstraction layer (HAL). You compare these values to the device's current state or to a
  * set of expected values to verify that a key pair is still valid for use in your app.
  */
-@Immutable
 data class AuthorizationList(
     val purpose: Set<Int>,
     val algorithm: Int?,

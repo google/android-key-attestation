@@ -27,7 +27,6 @@ import com.google.android.attestation.Constants.KM_SECURITY_LEVEL_TRUSTED_ENVIRO
 import com.google.android.attestation.Constants.SW_ENFORCED_INDEX
 import com.google.android.attestation.Constants.TEE_ENFORCED_INDEX
 import com.google.android.attestation.Constants.UNIQUE_ID_INDEX
-import com.google.errorprone.annotations.Immutable
 import org.bouncycastle.asn1.ASN1InputStream
 import org.bouncycastle.asn1.ASN1OctetString
 import org.bouncycastle.asn1.ASN1Sequence
@@ -35,7 +34,6 @@ import java.io.IOException
 import java.security.cert.X509Certificate
 
 /** Java representation of Key Attestation extension data.  */
-@Immutable
 data class ParsedAttestationRecord(
     val attestationVersion: Int,
     val attestationSecurityLevel: SecurityLevel,
@@ -56,7 +54,6 @@ data class ParsedAttestationRecord(
     }
 
     companion object {
-
         @JvmStatic
         @Throws(IOException::class)
         fun createParsedAttestationRecord(cert: X509Certificate): ParsedAttestationRecord {

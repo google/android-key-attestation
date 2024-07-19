@@ -4,7 +4,6 @@ maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
 maven.install(
     artifacts = [
         # main
-        "com.google.errorprone:error_prone_annotations:2.29.0",
         "org.bouncycastle:bcpkix-jdk18on:1.78.1",
         "org.bouncycastle:bcprov-jdk18on:1.78.1",
 
