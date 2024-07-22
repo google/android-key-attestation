@@ -66,7 +66,6 @@ public class Constants {
   public static final int KM_TAG_UNLOCKED_DEVICE_REQUIRED = 509;
   public static final int KM_TAG_CREATION_DATE_TIME = 701;
   public static final int KM_TAG_ORIGIN = 702;
-  public static final int KM_TAG_ROLLBACK_RESISTANT = 703;
   public static final int KM_TAG_ROOT_OF_TRUST = 704;
   public static final int KM_TAG_OS_VERSION = 705;
   public static final int KM_TAG_OS_PATCH_LEVEL = 706;

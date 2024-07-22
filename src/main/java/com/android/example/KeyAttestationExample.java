@@ -141,7 +141,6 @@ public class KeyAttestationExample {
         indent + "Unlocked Device Required: " + authorizationList.unlockedDeviceRequired());
     print(authorizationList.creationDateTime(), indent + "Creation DateTime");
     print(authorizationList.origin(), indent + "Origin");
-    System.out.println(indent + "Rollback Resistant: " + authorizationList.rollbackResistant());
     authorizationList
         .rootOfTrust()
         .ifPresent(
