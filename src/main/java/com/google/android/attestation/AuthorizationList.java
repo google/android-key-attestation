@@ -47,7 +47,6 @@ import static com.google.android.attestation.Constants.KM_TAG_OS_VERSION;
 import static com.google.android.attestation.Constants.KM_TAG_PADDING;
 import static com.google.android.attestation.Constants.KM_TAG_PURPOSE;
 import static com.google.android.attestation.Constants.KM_TAG_ROLLBACK_RESISTANCE;
-import static com.google.android.attestation.Constants.KM_TAG_ROLLBACK_RESISTANT;
 import static com.google.android.attestation.Constants.KM_TAG_ROOT_OF_TRUST;
 import static com.google.android.attestation.Constants.KM_TAG_RSA_PUBLIC_EXPONENT;
 import static com.google.android.attestation.Constants.KM_TAG_TRUSTED_CONFIRMATION_REQUIRED;
@@ -377,8 +376,6 @@ public abstract class AuthorizationList {
 
   public abstract Optional<KeyOrigin> origin();
 
-  public abstract boolean rollbackResistant();
-
   public abstract Optional<RootOfTrust> rootOfTrust();
 
   public abstract Optional<Integer> osVersion();
@@ -422,7 +419,6 @@ public abstract class AuthorizationList {
         .setTrustedUserPresenceRequired(false)
         .setTrustedConfirmationRequired(false)
         .setUnlockedDeviceRequired(false)
-        .setRollbackResistant(false)
         .setIndividualAttestation(false);
   }
 
@@ -495,8 +491,6 @@ public abstract class AuthorizationList {
     public abstract Builder setCreationDateTime(Instant creationDateTime);
 
     public abstract Builder setOrigin(KeyOrigin origin);
-
-    public abstract Builder setRollbackResistant(boolean rollbackResistant);
 
     public abstract Builder setRootOfTrust(RootOfTrust rootOfTrust);
 
@@ -653,8 +647,6 @@ public abstract class AuthorizationList {
         .findOptionalIntegerAuthorizationListEntry(KM_TAG_ORIGIN)
         .map(ASN1_TO_KEY_ORIGIN::get)
         .ifPresent(builder::setOrigin);
-    builder.setRollbackResistant(
-        parsedAuthorizationMap.findBooleanAuthorizationListEntry(KM_TAG_ROLLBACK_RESISTANT));
     parsedAuthorizationMap
         .findAuthorizationListEntry(KM_TAG_ROOT_OF_TRUST)
         .map(ASN1Sequence.class::cast)
@@ -867,7 +859,6 @@ public abstract class AuthorizationList {
     addBoolean(KM_TAG_UNLOCKED_DEVICE_REQUIRED, this.unlockedDeviceRequired(), vector);
     addOptionalInstant(KM_TAG_CREATION_DATE_TIME, this.creationDateTime(), vector);
     addOptionalInteger(KM_TAG_ORIGIN, this.origin().map(KEY_ORIGIN_TO_ASN1::get), vector);
-    addBoolean(KM_TAG_ROLLBACK_RESISTANT, this.rollbackResistant(), vector);
     addOptionalRootOfTrust(KM_TAG_ROOT_OF_TRUST, this.rootOfTrust(), vector);
     addOptionalInteger(KM_TAG_OS_VERSION, this.osVersion(), vector);
     addOptionalInteger(
