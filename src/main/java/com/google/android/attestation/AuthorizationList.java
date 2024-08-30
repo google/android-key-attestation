@@ -411,6 +411,8 @@ public abstract class AuthorizationList {
 
   public abstract ImmutableList<Integer> unorderedTags();
 
+  public abstract Builder toBuilder();
+
   public static Builder builder() {
     return new AutoValue_AuthorizationList.Builder()
         .setRollbackResistance(false)

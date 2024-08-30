@@ -127,4 +127,11 @@ public class AttestationApplicationIdTest {
             AttestationApplicationId.createAttestationApplicationId(
                 "Invalid DEROctet String".getBytes(UTF_8)));
   }
+
+  @Test
+  public void testBuildAttestationApplicationId() {
+    byte[] encoded = EXPECTED_ATTESTATION_APPLICATION_ID.getEncoded();
+
+    assertThat(encoded).isEqualTo(ATTESTATION_APPLICATION_ID);
+  }
 }

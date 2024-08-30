@@ -50,6 +50,8 @@ public abstract class RootOfTrust {
 
   public abstract Optional<ByteString> verifiedBootHash();
 
+  public abstract Builder toBuilder();
+
   public static Builder builder() {
     return new AutoValue_RootOfTrust.Builder()
         .setVerifiedBootKey(ByteString.EMPTY)
