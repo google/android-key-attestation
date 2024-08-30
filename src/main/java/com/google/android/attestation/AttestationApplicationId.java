@@ -52,6 +52,8 @@ public abstract class AttestationApplicationId {
 
   public abstract ImmutableSet<ByteString> signatureDigests();
 
+  public abstract Builder toBuilder();
+
   public static Builder builder() {
     return new AutoValue_AttestationApplicationId.Builder();
   }

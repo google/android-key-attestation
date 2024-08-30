@@ -68,4 +68,36 @@ public class RootOfTrustTest {
     assertThrows(
         NullPointerException.class, () -> RootOfTrust.createRootOfTrust(null, ATTESTATION_VERSION));
   }
+
+  @Test
+  public void testBuildRootOfTrust() throws IOException {
+    RootOfTrust rootOfTrust = RootOfTrust.builder()
+        .setVerifiedBootKey(EXPECTED_VERIFIED_BOOT_KEY)
+        .setDeviceLocked(EXPECTED_DEVICE_LOCKED)
+        .setVerifiedBootState(EXPECTED_VERIFIED_BOOT_STATE)
+        .setVerifiedBootHash(EXPECTED_VERIFIED_BOOT_HASH)
+        .build();
+
+    ASN1Sequence rootOfTrustSequence = rootOfTrust.toAsn1Sequence();
+    String rootOfTrustB64 = Base64.getEncoder().encodeToString(rootOfTrustSequence.getEncoded());
+
+    assertThat(rootOfTrustB64).isEqualTo(ROOT_OF_TRUST);
+  }
+
+  @Test
+  public void testBuildAndCreateRootOfTrust() throws IOException {
+    ByteString key = ByteString.copyFromUtf8("my boot key");
+    ByteString hash = ByteString.copyFromUtf8("my boot hash");
+    RootOfTrust expected = RootOfTrust.builder()
+        .setVerifiedBootKey(key)
+        .setDeviceLocked(true)
+        .setVerifiedBootState(VerifiedBootState.VERIFIED)
+        .setVerifiedBootHash(hash)
+        .build();
+
+    RootOfTrust actual =
+        RootOfTrust.createRootOfTrust(expected.toAsn1Sequence(), ATTESTATION_VERSION);
+
+    assertThat(actual).isEqualTo(expected);
+  }
 }

@@ -70,6 +70,8 @@ public abstract class ParsedAttestationRecord {
   @SuppressWarnings("Immutable")
   public abstract PublicKey attestedKey();
 
+  public abstract Builder toBuilder();
+
   public static Builder builder() {
     return new AutoValue_ParsedAttestationRecord.Builder()
         .setAttestationChallenge(ByteString.EMPTY)
