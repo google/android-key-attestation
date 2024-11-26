@@ -4,8 +4,7 @@ Android Key Attestation Library
 This library uses the [Bouncy Castle ASN.1][1] parser to extract information
 from an Android attestation data structure to verify that a key pair has been
 generated in a hardware-protected environment of an Android device. It is
-maintained in tandem with Android's key attestation capabilities and is meant
-for production use.
+sample code only, and not intended for production use.
 
 This repository contains a [server](src/main/java/com/android/example/)
 sample code that shows how to validate an Android attestation certificate chain
@@ -27,17 +26,6 @@ Getting Started
 ---------------
 
 See the [server](server/) sample for details.
-
-Support
--------
-
-- Stack Overflow: http://stackoverflow.com/questions/tagged/android
-
-If you've found an error in this sample, please file an issue:
-https://github.com/google/android-key-attestation
-
-Patches are encouraged, and may be submitted by forking this project and
-submitting a pull request through GitHub. Please see CONTRIBUTING.md for more details.
 
 License
 -------
