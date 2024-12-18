@@ -57,16 +57,16 @@ import static com.google.android.attestation.Constants.KM_TAG_USER_AUTH_TYPE;
 import static com.google.android.attestation.Constants.KM_TAG_VENDOR_PATCH_LEVEL;
 import static com.google.android.attestation.Constants.UINT32_MAX;
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
-import static com.google.common.collect.Streams.stream;
 import static java.util.Arrays.stream;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Streams;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.Immutable;
 import com.google.protobuf.ByteString;
@@ -586,7 +586,7 @@ public abstract class AuthorizationList {
   static AuthorizationList createAuthorizationList(
       ASN1Encodable[] authorizationList, int attestationVersion) {
     Builder builder = AuthorizationList.builder();
-    ParsedAuthorizationMap parsedAuthorizationMap = getAuthorizationMap(authorizationList);
+    ParsedAuthorizationMap parsedAuthorizationMap = new ParsedAuthorizationMap(authorizationList);
     parsedAuthorizationMap.findIntegerSetAuthorizationListEntry(KM_TAG_PURPOSE).stream()
         .map(ASN1_TO_OPERATION_PURPOSE::get)
         .forEach(builder::addPurpose);
@@ -710,31 +710,6 @@ public abstract class AuthorizationList {
     parsedAuthorizationMap.getUnorderedTags().forEach(builder::addUnorderedTag);
 
     return builder.build();
-  }
-
-  private static ParsedAuthorizationMap getAuthorizationMap(ASN1Encodable[] authorizationList) {
-    // authorizationMap must retain the order of authorizationList, otherwise
-    // the code searching for out of order tags below will break. Helpfully
-    // a ImmutableMap preserves insertion order.
-    //
-    // https://guava.dev/releases/23.0/api/docs/com/google/common/collect/ImmutableCollection.html
-    ImmutableMap<Integer, ASN1Object> authorizationMap =
-        stream(authorizationList)
-            .map(ASN1TaggedObject::getInstance)
-            .collect(
-                toImmutableMap(
-                    ASN1TaggedObject::getTagNo,
-                    obj -> ASN1Util.getExplicitContextBaseObject(obj, obj.getTagNo())));
-
-    List<Integer> unorderedTags = new ArrayList<>();
-    int previousTag = 0;
-    for (int currentTag : authorizationMap.keySet()) {
-      if (previousTag > currentTag) {
-        unorderedTags.add(previousTag);
-      }
-      previousTag = currentTag;
-    }
-    return new ParsedAuthorizationMap(authorizationMap, ImmutableList.copyOf(unorderedTags));
   }
 
   @VisibleForTesting
@@ -963,13 +938,27 @@ public abstract class AuthorizationList {
    * tags and a list of unordered authorization tags found in this authorization list.
    */
   private static class ParsedAuthorizationMap {
-    private final ImmutableMap<Integer, ASN1Object> authorizationMap;
+    private final ImmutableListMultimap<Integer, ASN1Object> authorizationMap;
     private final ImmutableList<Integer> unorderedTags;
 
-    private ParsedAuthorizationMap(
-        ImmutableMap<Integer, ASN1Object> authorizationMap, ImmutableList<Integer> unorderedTags) {
-      this.authorizationMap = authorizationMap;
-      this.unorderedTags = unorderedTags;
+    private ParsedAuthorizationMap(ASN1Encodable[] authorizationList) {
+      this.authorizationMap =
+          stream(authorizationList)
+              .map(ASN1TaggedObject::getInstance)
+              .collect(
+                  ImmutableListMultimap.toImmutableListMultimap(
+                      ASN1TaggedObject::getTagNo,
+                      obj -> ASN1Util.getExplicitContextBaseObject(obj, obj.getTagNo())));
+
+      ImmutableList.Builder<Integer> unorderedTags = ImmutableList.builder();
+      int previousTag = 0;
+      for (int currentTag : authorizationMap.keySet()) {
+        if (previousTag > currentTag) {
+          unorderedTags.add(previousTag);
+        }
+        previousTag = currentTag;
+      }
+      this.unorderedTags = unorderedTags.build();
     }
 
     private ImmutableList<Integer> getUnorderedTags() {
@@ -977,21 +966,30 @@ public abstract class AuthorizationList {
     }
 
     private Optional<ASN1Object> findAuthorizationListEntry(int tag) {
-      return Optional.ofNullable(authorizationMap.get(tag));
-    }
-
-    private ImmutableSet<Integer> findIntegerSetAuthorizationListEntry(int tag) {
-      ASN1Set asn1Set = findAuthorizationListEntry(tag).map(ASN1Set.class::cast).orElse(null);
-      if (asn1Set == null) {
-        return ImmutableSet.of();
+      ImmutableList<ASN1Object> entries = authorizationMap.get(tag);
+      if (entries.isEmpty()) {
+        return Optional.empty();
+      } else if (entries.size() == 1) {
+        return Optional.of(entries.get(0));
+      } else {
+        throw new IllegalStateException(
+            String.format("Multiple authorization list entries for tag %d", tag));
       }
-      return stream(asn1Set).map(ASN1Parsing::getIntegerFromAsn1).collect(toImmutableSet());
     }
 
     private Optional<Integer> findOptionalIntegerAuthorizationListEntry(int tag) {
       return findAuthorizationListEntry(tag)
           .map(ASN1Integer.class::cast)
           .map(ASN1Parsing::getIntegerFromAsn1);
+    }
+
+    private ImmutableSet<Integer> findIntegerSetAuthorizationListEntry(int tag) {
+      // if there are duplicate ASN1Set(s) for given tag, merge them into one set
+      return authorizationMap.get(tag).stream()
+          .map(ASN1Set.class::cast)
+          .flatMap(Streams::stream)
+          .map(ASN1Parsing::getIntegerFromAsn1)
+          .collect(toImmutableSet());
     }
 
     private Optional<Instant> findOptionalInstantMillisAuthorizationListEntry(int tag) {

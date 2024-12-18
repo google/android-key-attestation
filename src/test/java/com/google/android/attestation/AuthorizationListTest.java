@@ -70,6 +70,11 @@ public class AuthorizationListTest {
       "MIGwoQgxBgIBAgIBA6IDAgEBowQCAggApQUxAwIBBKYIMQYCAQMCAQW/gUgFAgMBAAG/g3cCBQC/hT4DAgEAv4VATDBK"
           + "BCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEBAAoBAgQgco2xJ08fHPFXHeQ4CwSKVUrEo4Dnb1"
           + "NVCDUpCEqTeAG/hUEDAgEAv4VCBQIDAxSzv4VOBgIEATQV8b+FTwYCBAE0Few=";
+  private static final String EXTENSION_DATA_WITH_REPATED_TAGS =
+      "MIGzoQUxAwIBBaIDAgEBowQCAggApQUxAwIBAaUFMQMCAQSmBTEDAgECv4FIBQIDAQABv4N3AgUA"
+          + "v4U+AwIBAL+FQEwwSgQg0YXLL7B1/cOxKINr4Re9RIUaq6zOLr/9KFz04rOqVOYBAf8KAQAEIOhJ"
+          + "/T8xWO2DYrAAz8/G0F6npvG+ZH64uF8N/azeheA0v4VBBQIDAiLgv4VCBQIDAxaqv4VOBgIEATTa"
+          + "ab+FTwYCBAE02mk=";
   private static final int ATTESTATION_VERSION = 3;
 
   // 2019-07-15T14:56:32.972Z
@@ -256,5 +261,14 @@ public class AuthorizationListTest {
     assertThat(toLocalDate("20240200")).isEqualTo(LocalDate.of(2024, 02, 01));
     assertThat(toLocalDate("20240000")).isEqualTo(LocalDate.of(2024, 01, 01));
     assertThat(toLocalDate("202402")).isEqualTo(LocalDate.of(2024, 02, 01));
+  }
+
+  @Test
+  public void testRepatedAuthorizationTags() throws Exception {
+    AuthorizationList authorizationList =
+        AuthorizationList.createAuthorizationList(
+            getEncodableAuthorizationList(EXTENSION_DATA_WITH_REPATED_TAGS), ATTESTATION_VERSION);
+
+    assertThat(authorizationList.digest()).containsExactly(DigestMode.SHA_2_256, DigestMode.MD5);
   }
 }
