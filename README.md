@@ -1,3 +1,9 @@
+# DEPRECATED
+
+Please use https://github.com/android/keyattestation instead.
+
+-----------
+
 Android Key Attestation Library
 ===================================
 
